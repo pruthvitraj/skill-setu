@@ -9,5 +9,8 @@ const router = express.Router();
 router.use(authMiddleware);
 router.get('/', asyncHandler(controller.list));
 router.post('/', validate(v.create), asyncHandler(controller.create));
+router.post('/:id/like', asyncHandler(controller.like));
+router.delete('/:id/like', asyncHandler(controller.unlike));
+router.delete('/:id', asyncHandler(controller.remove));
 
 module.exports = router;

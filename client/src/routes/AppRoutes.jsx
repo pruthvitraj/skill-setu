@@ -13,6 +13,7 @@ import StudentResume from '../pages/student/StudentResume';
 import StudentRoadmap from '../pages/student/StudentRoadmap';
 import StudentSkills from '../pages/student/StudentSkills';
 import StudentSkillTracker from '../pages/student/StudentSkillTracker';
+import StudentFeed from '../pages/student/StudentFeed';
 import { authApi } from '../services/authApi';
 
 function HomePage() {
@@ -296,6 +297,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboard /></StudentRoute>} />
+      <Route path="/student/feed" element={<StudentRoute><StudentFeed /></StudentRoute>} />
       <Route path="/student/profile" element={<StudentRoute><StudentProfile /></StudentRoute>} />
       <Route path="/student/resume" element={<StudentRoute><StudentResume /></StudentRoute>} />
       <Route path="/student/skills" element={<StudentRoute><StudentSkills /></StudentRoute>} />
