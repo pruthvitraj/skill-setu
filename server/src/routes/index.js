@@ -1,0 +1,39 @@
+const express = require('express');
+const auth = require('../modules/auth/auth.routes');
+const students = require('../modules/student/student.routes');
+const tpo = require('../modules/tpo/tpo.routes');
+const recruiters = require('../modules/recruiter/recruiter.routes');
+const resumes = require('../modules/resume/resume.routes');
+const skills = require('../modules/skills/skill.routes');
+const roadmaps = require('../modules/roadmap/roadmap.routes');
+const courses = require('../modules/courses/course.routes');
+const jobs = require('../modules/jobs/job.routes');
+const applications = require('../modules/applications/application.routes');
+const interviews = require('../modules/interviews/interview.routes');
+const placement = require('../modules/placement/placement.routes');
+const messages = require('../modules/messaging/message.routes');
+const notifications = require('../modules/notifications/notification.routes');
+const analytics = require('../modules/analytics/analytics.routes');
+const posts = require('../modules/posts/post.routes');
+
+const router = express.Router();
+
+router.get('/health', (req, res) => res.json({ success: true, message: 'SkillSetu API', data: { ok: true } }));
+router.use('/auth', auth);
+router.use('/students', students);
+router.use('/tpo', tpo);
+router.use('/recruiters', recruiters);
+router.use('/resumes', resumes);
+router.use('/skills', skills);
+router.use('/roadmaps', roadmaps);
+router.use('/courses', courses);
+router.use('/jobs', jobs);
+router.use('/applications', applications);
+router.use('/interviews', interviews);
+router.use('/placement-drives', placement);
+router.use('/messages', messages);
+router.use('/notifications', notifications);
+router.use('/analytics', analytics);
+router.use('/posts', posts);
+
+module.exports = router;

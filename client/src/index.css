@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: 29 75 143;
+  --accent-soft: 231 238 248;
+  --navy: #0f2447;
+  --gold: #e2ac3f;
+  --river: #17806d;
+  --line: #e1e7f0;
+}
+
+[data-role='student'] {
+  --accent: 29 75 143;
+  --accent-soft: 231 238 248;
+}
+
+[data-role='tpo'] {
+  --accent: 13 148 136;
+  --accent-soft: 204 251 241;
+}
+
+[data-role='recruiter'] {
+  --accent: 217 119 6;
+  --accent-soft: 254 243 199;
+}
+
+body {
+  @apply bg-white text-slate-800 antialiased;
+  font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+.card {
+  @apply rounded-[10px] border border-slate-200 bg-white p-5 shadow-sm;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition;
+}
+
+.btn-primary {
+  @apply btn text-white;
+  background: var(--navy);
+  border: 1px solid var(--navy);
+}
+
+.btn-ghost {
+  @apply btn bg-white text-slate-700 hover:bg-slate-50;
+}
+
+.input {
+  @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2;
+  --tw-ring-color: rgb(var(--accent) / 0.3);
+}
+
+.label {
+  @apply mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500;
+}
+
+/* Background grid for landing page */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+    linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center top;
+}
+
+.student-shell {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 100vh;
+  background: #f8fafc; /* bg-slate-50 */
+}
+
+.student-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  padding: 18px 14px;
+}
+
+.student-sidebar a {
+  color: #475569; /* text-slate-600 */
+}
+
+.student-sidebar a:hover {
+  background: #f1f5f9; /* bg-slate-100 */
+  color: #0f172a;
+}
+
+.student-sidebar a[aria-current='page'] {
+  background: #eff6ff; /* bg-blue-50 */
+  color: #1d4ed8; /* text-blue-700 */
+  font-weight: 600;
+}
+
+.student-content {
+  min-width: 0;
+  padding: 32px;
+}
+
+@media (max-width: 980px) {
+  .student-shell { display: block; }
+  .student-sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid #e2e8f0; }
+}

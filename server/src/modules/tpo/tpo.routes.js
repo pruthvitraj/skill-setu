@@ -1,0 +1,22 @@
+const express = require('express');
+const { asyncHandler } = require('../../middleware/asyncHandler');
+const { authMiddleware } = require('../../middleware/auth.middleware');
+const { requireRoles } = require('../../middleware/role.middleware');
+const { validate } = require('../../middleware/validation.middleware');
+const { ROLES } = require('../../utils/constants');
+const controller = require('./tpo.controller');
+const v = require('./tpo.validation');
+
+const router = express.Router();
+router.use(authMiddleware, requireRoles(ROLES.TPO));
+router.get('/dashboard', asyncHandler(controller.dashboard));
+router.get('/students', asyncHandler(controller.students));
+router.get('/students/:id', asyncHandler(controller.studentDetails));
+router.get('/internships', asyncHandler(controller.internships));
+router.get('/announcements', asyncHandler(controller.announcements));
+router.post('/announcements', validate(v.announcement), asyncHandler(controller.createAnnouncement));
+router.get('/companies', asyncHandler(controller.companies));
+router.get('/skills/analytics', asyncHandler(controller.skills));
+router.get('/reports/:type', asyncHandler(controller.reports));
+
+module.exports = router;

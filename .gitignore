@@ -1,0 +1,16 @@
+node_modules
+dist
+build
+coverage
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+server/uploads/*
+!server/uploads/.gitkeep
+client/dist
+.vscode
+.idea
+*.tmp
+.cache
