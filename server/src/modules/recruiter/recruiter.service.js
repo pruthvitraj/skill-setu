@@ -28,7 +28,8 @@ async function dashboard(userId) {
   const topMatches = topJob
     ? students.map((s) => ({ student: s, match: matching.matchStudentToJob(s, topJob) })).sort((a, b) => b.match.score - a.match.score)
     : [];
-  return {
+    return {
+    totalJobs: jobs.length,
     activeJobs,
     applications: applications.length,
     shortlisted: count(APPLICATION_STATUS.SHORTLISTED),

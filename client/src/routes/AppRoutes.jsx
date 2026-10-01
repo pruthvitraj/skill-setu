@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -29,6 +29,13 @@ import TpoCompanies from '../pages/tpo/TpoCompanies';
 import TpoSkills from '../pages/tpo/TpoSkills';
 import TpoPlacementDrives from '../pages/tpo/TpoPlacementDrives';
 import TpoApplications from '../pages/tpo/TpoApplications';
+import CompanyDashboardView from '../pages/company/CompanyDashboard';
+import CompanyJobsView from '../pages/company/CompanyJobs';
+import CompanyApplicationsView from '../pages/company/CompanyApplications';
+import CompanyJobForm from '../pages/company/CompanyJobForm';
+import CompanyAnalyticsView from '../pages/company/CompanyAnalytics';
+import CompanyTeamView from '../pages/company/CompanyTeam';
+import CompanySettingsView from '../pages/company/CompanySettings';
 
 function HomePage() {
   return (
@@ -379,7 +386,7 @@ function StudentRoute({ children }) {
             const isActive = location.pathname === link.path || (link.path === '/student/dashboard' && location.pathname === '/student/dashboard');
             return (
               <Link 
-                className={`flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
+                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
                 to={link.path} 
                 aria-current={isActive ? 'page' : undefined} 
                 key={link.path}
@@ -454,7 +461,7 @@ function TpoRoute({ children }) {
             const isActive = location.pathname === link.path || (link.path === '/tpo/dashboard' && location.pathname === '/tpo/dashboard');
             return (
               <Link 
-                className={`flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
+                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
                 to={link.path} 
                 aria-current={isActive ? 'page' : undefined} 
                 key={link.path}
@@ -514,7 +521,55 @@ function CompanyRoute({ children }) {
   ];
 
   return (
-    <div className="company-shell">
+    <>
+      <style>{`
+        .company-shell {
+          display: grid;
+          grid-template-columns: 260px minmax(0, 1fr);
+          min-height: 100vh;
+          width: 100%;
+          background: #f8fafc;
+        }
+        .company-sidebar {
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          min-height: 100vh;
+          box-sizing: border-box;
+          overflow-y: auto;
+          z-index: 20;
+        }
+        .company-content {
+          min-width: 0;
+          width: 100%;
+          min-height: 100vh;
+          overflow-x: hidden;
+          box-sizing: border-box;
+        }
+        .company-sidebar nav a {
+          position: relative;
+        }
+        @media (max-width: 900px) {
+          .company-shell {
+            display: block;
+          }
+          .company-sidebar {
+            position: relative;
+            height: auto;
+            min-height: auto;
+            border-right: 0;
+            border-bottom: 1px solid #e2e8f0;
+          }
+          .company-sidebar nav {
+            flex-direction: row;
+            flex-wrap: wrap;
+          }
+          .company-sidebar nav a {
+            flex: 1 1 180px;
+          }
+        }
+      `}</style>
+      <div className="company-shell">
       <aside className="company-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
         <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/company/dashboard">
           <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
@@ -527,7 +582,7 @@ function CompanyRoute({ children }) {
             const isActive = location.pathname === link.path || (link.path === '/company/dashboard' && location.pathname === '/company/dashboard');
             return (
               <Link 
-                className={`flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
+                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
                 to={link.path} 
                 aria-current={isActive ? 'page' : undefined} 
                 key={link.path}
@@ -555,7 +610,8 @@ function CompanyRoute({ children }) {
         </div>
       </aside>
       <main className="company-content">{children}</main>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -638,27 +694,43 @@ function TpoSettingsPage() {
 }
 
 function CompanyDashboardPage() {
-  return <CompanyRoute><CompanyDashboard /></CompanyRoute>;
+  return <CompanyRoute><CompanyDashboardView /></CompanyRoute>;
 }
 
 function CompanyJobsPage() {
-  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Job Postings</h1><p className="text-slate-600">Create and manage job postings.</p></div></CompanyRoute>;
+  return <CompanyRoute><CompanyJobsView /></CompanyRoute>;
 }
 
 function CompanyApplicationsPage() {
-  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Applications</h1><p className="text-slate-600">Review and manage applications.</p></div></CompanyRoute>;
+  return <CompanyRoute><CompanyApplicationsView /></CompanyRoute>;
+}
+
+function CompanyJobFormPage() {
+  return <CompanyRoute><CompanyJobForm /></CompanyRoute>;
 }
 
 function CompanyAnalyticsPage() {
-  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Analytics</h1><p className="text-slate-600">View hiring analytics.</p></div></CompanyRoute>;
+  return (
+    <CompanyRoute>
+      <CompanyAnalyticsView />
+    </CompanyRoute>
+  );
 }
 
 function CompanyTeamPage() {
-  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Team</h1><p className="text-slate-600">Manage team members.</p></div></CompanyRoute>;
+  return (
+    <CompanyRoute>
+      <CompanyTeamView />
+    </CompanyRoute>
+  );
 }
 
 function CompanySettingsPage() {
-  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Settings</h1><p className="text-slate-600">Company account settings.</p></div></CompanyRoute>;
+  return (
+    <CompanyRoute>
+      <CompanySettingsView />
+    </CompanyRoute>
+  );
 }
 
 export default function AppRoutes() {
@@ -696,6 +768,8 @@ export default function AppRoutes() {
       <Route path="/tpo/settings" element={<TpoSettingsPage />} />
       <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
       <Route path="/company/jobs" element={<CompanyJobsPage />} />
+      <Route path="/company/jobs/new" element={<CompanyJobFormPage />} />
+      <Route path="/company/jobs/:id/edit" element={<CompanyJobFormPage />} />
       <Route path="/company/applications" element={<CompanyApplicationsPage />} />
       <Route path="/company/analytics" element={<CompanyAnalyticsPage />} />
       <Route path="/company/team" element={<CompanyTeamPage />} />
@@ -704,3 +778,4 @@ export default function AppRoutes() {
     </Routes>
   );
 }
+

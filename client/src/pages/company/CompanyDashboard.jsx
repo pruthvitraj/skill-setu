@@ -1,77 +1,197 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  BriefcaseBusiness,
+  FileText,
+  UserCheck,
+  Users,
+  CalendarDays,
+  TrendingUp,
+  RefreshCw,
+} from 'lucide-react';
+
 import { useAuth } from '../../context/AuthContext';
 import { companyApi } from '../../services/companyApi';
 
-function timeAgo(d) {
-  const m = Math.floor((Date.now() - new Date(d)) / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
+function unwrap(response) {
+  return response?.data?.data ?? response?.data ?? response ?? {};
 }
 
-function Avatar({ name = '?', size = 36 }) {
-  const pal = ['#22488f', '#7c3aed', '#0f766e', '#b45309', '#be123c', '#1d4ed8'];
-  const c = pal[(name.charCodeAt(0) || 0) % pal.length];
+function formatDate(value) {
+  if (!value) return '—';
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '—';
+  }
+
+  return date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function timeAgo(value) {
+  if (!value) return '—';
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '—';
+  }
+
+  const minutes = Math.floor((Date.now() - date.getTime()) / 60000);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+
+  return `${days}d ago`;
+}
+
+function Card({ children, className = '' }) {
   return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: c,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#fff', fontWeight: 700, fontSize: size * 0.36, flexShrink: 0 }}>
-      {name.slice(0, 2).toUpperCase()}
+    <div
+      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
+    >
+      {children}
     </div>
   );
 }
 
-function Chip({ label, color = '#1d4ed8', bg = '#eff6ff', border = '#bfdbfe' }) {
+function StatCard({ title, value, icon: Icon, helper }) {
   return (
-    <span style={{ padding: '3px 10px', borderRadius: 20, background: bg,
-      color, border: `1px solid ${border}`, fontSize: 12, fontWeight: 600 }}>
-      {label}
-    </span>
-  );
-}
-
-function Card({ children, style = {} }) {
-  return <div style={{ background: '#fff', border: '1px solid #e2e8f0',
-    borderRadius: 14, padding: '18px 20px', ...style }}>{children}</div>;
-}
-
-function StatCard({ title, value, icon, color = '#22488f', trend }) {
-  return (
-    <Card style={{ background: 'linear-gradient(135deg, #fff, #f8fafc)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <Card className="p-5">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 500, color: '#64748b' }}>{title}</p>
-          <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: '#0f2447' }}>{value}</p>
-          {trend && <p style={{ margin: '4px 0 0', fontSize: 12, fontWeight: 600, color: trend.startsWith('+') ? '#16a34a' : '#ef4444' }}>{trend}</p>}
+          <p className="text-sm font-medium text-slate-500">
+            {title}
+          </p>
+
+          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+            {value ?? 0}
+          </p>
+
+          {helper && (
+            <p className="mt-1 text-xs text-slate-400">
+              {helper}
+            </p>
+          )}
         </div>
-        <div style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${color}15`, color }}>
-          {icon}
+
+        <div className="rounded-xl bg-slate-100 p-3 text-slate-700">
+          <Icon size={20} />
         </div>
       </div>
     </Card>
   );
 }
 
-function ActivityItem({ activity }) {
-  const colors = {
-    application: '#3b82f6',
-    shortlisted: '#16a34a',
-    interview: '#7c3aed',
-    hired: '#0f766e',
-    rejected: '#ef4444',
-    message: '#22488f',
-    invitation: '#b45309',
-  };
-  const color = colors[activity.type] || '#64748b';
+function StatusBadge({ value }) {
+  const status = String(value || '').toLowerCase();
+
+  let classes =
+    'border-slate-200 bg-slate-50 text-slate-600';
+
+  if (
+    ['published', 'active', 'hired', 'selected', 'completed'].some(
+      (item) => status.includes(item)
+    )
+  ) {
+    classes =
+      'border-emerald-200 bg-emerald-50 text-emerald-700';
+  } else if (
+    ['pending', 'review', 'shortlisted', 'assessment'].some(
+      (item) => status.includes(item)
+    )
+  ) {
+    classes =
+      'border-amber-200 bg-amber-50 text-amber-700';
+  } else if (
+    ['rejected', 'closed', 'cancelled'].some(
+      (item) => status.includes(item)
+    )
+  ) {
+    classes =
+      'border-red-200 bg-red-50 text-red-700';
+  }
+
   return (
-    <div style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
-      <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, marginTop: 6, flexShrink: 0 }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 500, color: '#0f2447' }}>{activity.message}</p>
-        <p style={{ margin: 0, fontSize: 11, color: '#94a3b8' }}>{timeAgo(activity.createdAt)}</p>
+    <span
+      className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${classes}`}
+    >
+      {String(value || 'Unknown')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase())}
+    </span>
+  );
+}
+
+function HiringFunnel({ funnel = [], applications = 0 }) {
+  const stages =
+    funnel.length > 0
+      ? funnel
+      : [
+          { name: 'Applied', value: applications },
+          { name: 'Shortlisted', value: 0 },
+          { name: 'Interview', value: 0 },
+          { name: 'Hired', value: 0 },
+        ];
+
+  const max = Math.max(
+    Number(applications) || 0,
+    ...stages.map((stage) => Number(stage.value) || 0),
+    1
+  );
+
+  return (
+    <Card>
+      <div className="border-b border-slate-100 px-6 py-5">
+        <h2 className="text-lg font-bold text-slate-950">
+          Hiring Funnel
+        </h2>
+
+        <p className="mt-1 text-sm text-slate-500">
+          Candidate progression through your recruitment pipeline
+        </p>
+      </div>
+
+      <div className="space-y-5 p-6">
+        {stages.map((stage) => {
+          const value = Number(stage.value) || 0;
+          const percentage = Math.round((value / max) * 100);
+
+          return (
+            <div
+              key={stage.name}
+              className="grid grid-cols-[90px_1fr_45px] items-center gap-3"
+            >
+              <span className="text-xs font-semibold text-slate-500">
+                {stage.name}
+              </span>
+
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-slate-900 transition-all"
+                  style={{
+                    width: `${percentage}%`,
+                  }}
+                />
+              </div>
+
+              <span className="text-right text-sm font-bold text-slate-800">
+                {value}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </Card>
   );
@@ -79,79 +199,361 @@ function ActivityItem({ activity }) {
 
 export default function CompanyDashboard() {
   const { user } = useAuth();
-  const [dash, setDash] = useState(null);
+
+  const [dashboard, setDashboard] = useState(null);
+  const [jobs, setJobs] = useState([]);
   const [activities, setActivities] = useState([]);
-  const [topJobs, setTopJobs] = useState([]);
+
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  async function loadDashboard() {
+    try {
+      setLoading(true);
+      setError('');
+
+      const [dashboardResponse, jobsResponse, notificationsResponse] =
+        await Promise.all([
+          companyApi.dashboard(),
+          companyApi.jobs.list({
+            page: 1,
+            limit: 5,
+          }),
+          companyApi.notifications.list({
+            page: 1,
+            limit: 10,
+          }),
+        ]);
+
+      const dashboardData = unwrap(dashboardResponse);
+      const jobsData = unwrap(jobsResponse);
+      const notificationsData = unwrap(notificationsResponse);
+
+      setDashboard(dashboardData);
+
+      setJobs(
+        Array.isArray(jobsData)
+          ? jobsData
+          : jobsData?.items || []
+      );
+
+      setActivities(
+        Array.isArray(notificationsData)
+          ? notificationsData
+          : notificationsData?.items || []
+      );
+    } catch (err) {
+      console.error('Company dashboard load failed:', err);
+
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Unable to load company dashboard.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [dashRes, actsRes, jobsRes] = await Promise.all([
-          companyApi.dashboard(),
-          companyApi.notifications.list({ limit: 10 }),
-          companyApi.jobs.list({ limit: 5, page: 1 }),
-        ]);
-        setDash(dashRes.data?.data || dashRes.data);
-        setActivities(actsRes.data?.data?.items || actsRes.data?.items || []);
-        setTopJobs(jobsRes.data?.data?.items || jobsRes.data?.items || []);
-      } catch (e) {
-        console.error('Failed to load dashboard', e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    loadDashboard();
   }, []);
 
   if (loading) {
     return (
-      <div style={{ padding: '24px' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f2447', marginBottom: 20 }}>Company Dashboard</h1>
-        <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-          {[1,2,3,4,5,6].map(i => <Card key={i} style={{ height: 100 }} />)}
+      <div className="space-y-6 p-6">
+        <div>
+          <div className="h-8 w-64 animate-pulse rounded bg-slate-200" />
+          <div className="mt-3 h-4 w-96 animate-pulse rounded bg-slate-100" />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((item) => (
+            <div
+              key={item}
+              className="h-32 animate-pulse rounded-2xl bg-slate-100"
+            />
+          ))}
         </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-5 p-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-950">
+            Company Dashboard
+          </h1>
+        </div>
+
+        <Card className="p-6">
+          <p className="font-semibold text-red-700">
+            Unable to load dashboard
+          </p>
+
+          <p className="mt-2 text-sm text-slate-500">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            onClick={loadDashboard}
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            <RefreshCw size={16} />
+            Retry
+          </button>
+        </Card>
+      </div>
+    );
+  }
+
+  const totalJobs =
+    dashboard?.totalJobs ??
+    dashboard?.jobs ??
+    jobs.length ??
+    0;
+
+  const activeJobs =
+    dashboard?.activeJobs ??
+    jobs.filter((job) => job.status === 'published').length;
+
+  const applications =
+    dashboard?.applications ?? 0;
+
+  const shortlisted =
+    dashboard?.shortlisted ?? 0;
+
+  const interviews =
+    dashboard?.interviews ?? 0;
+
+  const hired =
+    dashboard?.hired ?? 0;
+
+  const selected =
+    dashboard?.selected ?? 0;
+
+  const funnel = Array.isArray(dashboard?.funnel)
+    ? dashboard.funnel
+    : [];
+
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px' }}>
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0f2447', margin: '0 0 4px', fontFamily: 'Georgia, serif' }}>Company Dashboard</h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 15 }}>Welcome back, {user?.firstName}. Here's your recruitment overview.</p>
+    <div className="space-y-6 p-6 pb-10">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Company Workspace
+          </p>
+
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+            Company Dashboard
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Welcome back
+            {user?.firstName ? `, ${user.firstName}` : ''}.
+            Manage jobs, candidates and hiring activity.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={loadDashboard}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+        >
+          <RefreshCw size={16} />
+          Refresh
+        </button>
       </div>
 
-      <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginBottom: 24 }}>
-        <StatCard title="Total Job Openings" value={dash?.totalJobs || 0} icon="📋" color="#22488f" />
-        <StatCard title="Active Openings" value={dash?.activeJobs || 0} icon="🟢" color="#16a34a" />
-        <StatCard title="Total Applications" value={dash?.applications || 0} icon="📄" color="#3b82f6" />
-        <StatCard title="Shortlisted" value={dash?.shortlisted || 0} icon="⭐" color="#f59e0b" />
-        <StatCard title="Interviews Scheduled" value={dash?.interviews || 0} icon="📅" color="#7c3aed" />
-        <StatCard title="Candidates Hired" value={dash?.hired || 0} icon="🎉" color="#0f766e" />
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          title="Total Job Openings"
+          value={totalJobs}
+          icon={BriefcaseBusiness}
+          helper={`${activeJobs} currently active`}
+        />
+
+        <StatCard
+          title="Total Applications"
+          value={applications}
+          icon={FileText}
+          helper="Applications received"
+        />
+
+        <StatCard
+          title="Shortlisted"
+          value={shortlisted}
+          icon={UserCheck}
+          helper={`${interviews} interviews scheduled`}
+        />
+
+        <StatCard
+          title="Hired"
+          value={hired}
+          icon={Users}
+          helper={`${selected} selected`}
+        />
       </div>
 
-      <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
-        <Card style={{ gridColumn: '1 / -1' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0f2447', fontFamily: 'Georgia, serif' }}>Top Performing Jobs</h2>
-            <Link to="/company/jobs" style={{ fontSize: 12, color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all →</Link>
+      {/* Funnel + Activity */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <HiringFunnel
+          funnel={funnel}
+          applications={applications}
+        />
+
+        <Card>
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">
+                Recent Activity
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Latest company notifications
+              </p>
+            </div>
+
+            <Link
+              to="/company/notifications"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              View all
+            </Link>
           </div>
-          {topJobs.length === 0 ? (
-            <p style={{ color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>No jobs posted yet. <Link to="/company/jobs/new" style={{ color: '#3b82f6', fontWeight: 600 }}>Create your first job</Link></p>
+
+          <div className="divide-y divide-slate-100">
+            {activities.length === 0 ? (
+              <div className="px-6 py-10 text-center text-sm text-slate-400">
+                No recent activity.
+              </div>
+            ) : (
+              activities.slice(0, 6).map((activity, index) => (
+                <div
+                  key={activity._id || index}
+                  className="flex gap-3 px-6 py-4"
+                >
+                  <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-slate-900" />
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-800">
+                      {activity.message ||
+                        activity.title ||
+                        activity.type ||
+                        'Activity'}
+                    </p>
+
+                    <p className="mt-1 text-xs text-slate-400">
+                      {timeAgo(
+                        activity.createdAt ||
+                          activity.updatedAt
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Jobs + quick actions */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
+        <Card>
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">
+                Recent Job Postings
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Your latest recruitment openings
+              </p>
+            </div>
+
+            <Link
+              to="/company/jobs"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              View all
+            </Link>
+          </div>
+
+          {jobs.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <BriefcaseBusiness
+                size={32}
+                className="mx-auto text-slate-300"
+              />
+
+              <p className="mt-3 text-sm text-slate-500">
+                No job postings yet.
+              </p>
+
+              <Link
+                to="/company/jobs/new"
+                className="mt-4 inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white"
+              >
+                Post your first job
+              </Link>
+            </div>
           ) : (
-            <div style={{ display: 'grid', gap: 12 }}>
-              {topJobs.slice(0, 4).map(job => (
-                <div key={job._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <Link to={`/company/jobs/${job._id}`} style={{ textDecoration: 'none' }}>
-                      <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 600, color: '#0f2447' }}>{job.title}</p>
-                      <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>{job.company?.name} · {job.location} · {job.jobType}</p>
+            <div className="divide-y divide-slate-100">
+              {jobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <Link
+                      to={`/company/jobs/${job._id}`}
+                      className="font-semibold text-slate-900 hover:text-blue-600"
+                    >
+                      {job.title || 'Untitled Job'}
                     </Link>
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {job.location && (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          {job.location}
+                        </span>
+                      )}
+
+                      {job.jobType && (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          {job.jobType}
+                        </span>
+                      )}
+
+                      <StatusBadge value={job.status} />
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <Chip label={`${job.applications || 0} apps`} color="#3b82f6" />
-                    <Chip label={job.status} color={job.status === 'published' ? '#16a34a' : '#64748b'} />
+
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="text-right">
+                      <p className="font-bold text-slate-900">
+                        {job.applications ?? 0}
+                      </p>
+
+                      <p className="text-xs text-slate-400">
+                        Applications
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-semibold text-slate-700">
+                        {formatDate(job.deadline)}
+                      </p>
+
+                      <p className="text-xs text-slate-400">
+                        Deadline
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -159,44 +561,49 @@ export default function CompanyDashboard() {
           )}
         </Card>
 
-        <Card>
-          <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#0f2447', fontFamily: 'Georgia, serif' }}>Recent Activity</h2>
-          {activities.length === 0 ? (
-            <p style={{ color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>No recent activity</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {activities.slice(0, 6).map((act, i) => (
-                <ActivityItem key={act._id || i} activity={act} />
-              ))}
-            </div>
-          )}
-          <div style={{ marginTop: 12, textAlign: 'center' }}>
-            <Link to="/company/notifications" style={{ fontSize: 12, color: '#3b82f6', fontWeight: 600, textDecoration: 'none' }}>View all activity →</Link>
+        <Card className="h-fit">
+          <div className="border-b border-slate-100 px-6 py-5">
+            <h2 className="text-lg font-bold text-slate-950">
+              Quick Actions
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Common recruiter actions
+            </p>
           </div>
-        </Card>
 
-        <Card>
-          <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#0f2447', fontFamily: 'Georgia, serif' }}>Hiring Funnel</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {[
-              { name: 'Applied', value: dash?.applications || 0, color: '#3b82f6' },
-              { name: 'Under Review', value: dash?.underReview || 0, color: '#f59e0b' },
-              { name: 'Shortlisted', value: dash?.shortlisted || 0, color: '#f59e0b' },
-              { name: 'Interview', value: dash?.interviews || 0, color: '#7c3aed' },
-              { name: 'Hired', value: dash?.hired || 0, color: '#16a34a' },
-            ].map((stage, i) => {
-              const max = dash?.applications || 1;
-              const pct = Math.round((stage.value / max) * 100);
-              return (
-                <div key={stage.name} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 80, fontSize: 12, fontWeight: 500, color: '#64748b' }}>{stage.name}</div>
-                  <div style={{ flex: 1, height: 8, background: '#e2e8f0', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: stage.color, borderRadius: 4, transition: 'width 0.3s' }} />
-                  </div>
-                  <div style={{ width: 50, textAlign: 'right', fontSize: 13, fontWeight: 600, color: '#0f2447' }}>{stage.value}</div>
-                </div>
-              );
-            })}
+          <div className="space-y-3 p-6">
+            <Link
+              to="/company/jobs/new"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <BriefcaseBusiness size={18} />
+              Post a new job
+            </Link>
+
+            <Link
+              to="/company/applications"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <FileText size={18} />
+              Review applications
+            </Link>
+
+            <Link
+              to="/company/analytics"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <TrendingUp size={18} />
+              View analytics
+            </Link>
+
+            <Link
+              to="/company/interviews"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <CalendarDays size={18} />
+              Manage interviews
+            </Link>
           </div>
         </Card>
       </div>

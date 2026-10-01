@@ -8,12 +8,48 @@ const controller = require('./job.controller');
 const v = require('./job.validation');
 
 const router = express.Router();
+
 router.use(authMiddleware);
-router.get('/', asyncHandler(controller.list));
-router.get('/mine', requireRoles(ROLES.RECRUITER), asyncHandler(controller.mine));
-router.get('/:id', asyncHandler(controller.getOne));
-router.get('/:id/matches', requireRoles(ROLES.RECRUITER), asyncHandler(controller.matches));
-router.post('/', requireRoles(ROLES.RECRUITER), validate(v.createJob), asyncHandler(controller.create));
-router.patch('/:id', requireRoles(ROLES.RECRUITER), asyncHandler(controller.update));
+
+router.get(
+  '/',
+  asyncHandler(controller.list)
+);
+
+router.get(
+  '/mine',
+  requireRoles(ROLES.RECRUITER),
+  asyncHandler(controller.mine)
+);
+
+router.get(
+  '/:id',
+  asyncHandler(controller.getOne)
+);
+
+router.get(
+  '/:id/matches',
+  requireRoles(ROLES.RECRUITER),
+  asyncHandler(controller.matches)
+);
+
+router.post(
+  '/',
+  requireRoles(ROLES.RECRUITER),
+  validate(v.createJob),
+  asyncHandler(controller.create)
+);
+
+router.patch(
+  '/:id',
+  requireRoles(ROLES.RECRUITER),
+  asyncHandler(controller.update)
+);
+
+router.delete(
+  '/:id',
+  requireRoles(ROLES.RECRUITER),
+  asyncHandler(controller.remove)
+);
 
 module.exports = router;
