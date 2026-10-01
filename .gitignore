@@ -14,3 +14,4 @@ client/dist
 .idea
 *.tmp
 .cache
+recruiter-backend-audit.txt
