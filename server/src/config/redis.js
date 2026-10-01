@@ -11,6 +11,7 @@ function getRedis() {
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false,
       lazyConnect: true,
+      retryStrategy: () => null,
     });
     client.on('error', (err) => {
       logger.warn(`Redis: ${err.message}`);

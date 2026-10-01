@@ -2,6 +2,7 @@ const { verifyToken } = require('../utils/jwt');
 const env = require('../config/env');
 const User = require('../models/User');
 const { AppError } = require('../utils/AppError');
+const sessionService = require('../modules/auth/session.service');
 
 async function authMiddleware(req, res, next) {
   try {
@@ -14,7 +15,15 @@ async function authMiddleware(req, res, next) {
     const user = await User.findById(payload.sub);
     if (!user || !user.isActive) throw new AppError('Invalid session', 401, 'UNAUTHORIZED');
 
-    req.user = { id: user._id.toString(), role: user.role, email: user.email };
+    // Validate session if session ID present
+    if (payload.sid) {
+      const sessionCheck = await sessionService.validateSession(payload.sub, payload.sid);
+      if (!sessionCheck.valid) {
+        throw new AppError('Session expired or revoked', 401, 'SESSION_EXPIRED');
+      }
+    }
+
+    req.user = { id: user._id.toString(), role: user.role, email: user.email, sid: payload.sid, sub: payload.sub };
     next();
   } catch (err) {
     if (err instanceof AppError) return next(err);

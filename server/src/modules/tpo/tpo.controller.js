@@ -12,6 +12,10 @@ async function students(req, res) {
   return success(res, 'OK', data);
 }
 
+async function studentFilters(req, res) {
+  return success(res, 'OK', await service.studentFilters(req.user.id));
+}
+
 async function studentDetails(req, res) {
   return success(res, 'OK', await service.studentDetails(req.user.id, req.params.id));
 }
@@ -30,7 +34,31 @@ async function createAnnouncement(req, res) {
 }
 
 async function companies(req, res) {
-  return success(res, 'OK', { items: await service.companies() });
+  return success(res, 'OK', { items: await service.companies(req.user.id) });
+}
+
+async function placementDrives(req, res) {
+  return success(res, 'OK', { items: await service.placementDrives(req.user.id) });
+}
+
+async function reviewPlacementDrive(req, res) {
+  return success(res, 'Drive updated', { drive: await service.reviewPlacementDrive(req.user.id, req.params.id, req.body) });
+}
+
+async function applications(req, res) {
+  return success(res, 'OK', { items: await service.applications(req.user.id, req.query) });
+}
+
+async function updateApplicationStatus(req, res) {
+  return success(res, 'Status updated', { application: await service.updateApplicationStatus(req.user.id, req.params.id, req.body) });
+}
+
+async function interviews(req, res) {
+  return success(res, 'OK', { items: await service.interviews(req.user.id) });
+}
+
+async function placementAnalytics(req, res) {
+  return success(res, 'OK', await service.placementAnalytics(req.user.id));
 }
 
 async function skills(req, res) {
@@ -43,12 +71,19 @@ async function reports(req, res) {
 
 module.exports = {
   dashboard,
+  studentFilters,
   students,
   studentDetails,
   internships,
   announcements,
   createAnnouncement,
   companies,
+  placementDrives,
+  reviewPlacementDrive,
+  applications,
+  updateApplicationStatus,
+  interviews,
+  placementAnalytics,
   skills,
   reports,
 };

@@ -12,6 +12,7 @@ const { signToken } = require('../../utils/jwt');
 const { AppError } = require('../../utils/AppError');
 const { sendMail } = require('../../integrations/email/email.service');
 const env = require('../../config/env');
+const sessionService = require('./session.service');
 
 const registerSchema = z.object({
   body: z.object({
@@ -89,13 +90,19 @@ async function register(payload) {
   return { user: publicUser(user), token: signToken({ sub: user._id.toString(), role: user.role }) };
 }
 
-async function login({ email, password }) {
+async function login({ email, password, userAgent, ip }) {
   const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
   if (!user) throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
   const ok = await comparePassword(password, user.passwordHash);
   if (!ok) throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
   if (!user.isActive) throw new AppError('Account disabled', 403, 'DISABLED');
-  return { user: publicUser(user), token: signToken({ sub: user._id.toString(), role: user.role }) };
+
+  const sessionId = crypto.randomBytes(32).toString('hex');
+  const token = signToken({ sub: user._id.toString(), role: user.role, sid: sessionId });
+
+  await sessionService.createSession(user._id.toString(), sessionId, { userAgent, ip });
+
+  return { user: publicUser(user), token };
 }
 
 async function forgotPassword(email) {
@@ -149,9 +156,14 @@ function publicUser(user) {
   };
 }
 
+async function deleteSession(userId, sessionId) {
+  return sessionService.deleteSession(userId, sessionId);
+}
+
 module.exports = {
   register,
   login,
+  logout: deleteSession,
   forgotPassword,
   resetPassword,
   verifyEmail,

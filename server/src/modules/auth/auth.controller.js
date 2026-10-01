@@ -1,6 +1,7 @@
 const env = require('../../config/env');
 const { success } = require('../../utils/response');
 const authService = require('./auth.service');
+const sessionService = require('./session.service');
 
 function setAuthCookie(res, token) {
   res.cookie(env.jwtCookieName, token, {
@@ -18,12 +19,20 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
-  const result = await authService.login(req.validated.body);
+  const { email, password } = req.validated.body;
+  const userAgent = req.get('user-agent') || '';
+  const ip = req.ip || req.connection?.remoteAddress || '';
+  const result = await authService.login({ email, password, userAgent, ip });
   setAuthCookie(res, result.token);
   return success(res, 'Logged in', result);
 }
 
 async function logout(req, res) {
+  const sessionId = req.user?.sid;
+  const userId = req.user?.sub;
+  if (sessionId && userId) {
+    await authService.deleteSession(userId, sessionId);
+  }
   res.clearCookie(env.jwtCookieName);
   return success(res, 'Logged out');
 }
@@ -49,4 +58,33 @@ async function me(req, res) {
   return success(res, 'OK', { user: authService.publicUser(user) });
 }
 
-module.exports = { register, login, logout, forgot, reset, verify, me };
+async function getSessions(req, res) {
+  const sessions = await sessionService.getActiveSessions(req.user.id);
+  const currentSid = req.user.sid;
+  const formatted = sessions.map(s => ({
+    sessionId: s.sessionId,
+    userAgent: s.userAgent,
+    ip: s.ip,
+    createdAt: new Date(s.createdAt).toISOString(),
+    lastActivity: new Date(s.lastActivity).toISOString(),
+    current: s.sessionId === currentSid,
+  }));
+  return success(res, 'OK', { sessions: formatted });
+}
+
+async function revokeSession(req, res) {
+  const { sessionId } = req.params;
+  if (sessionId === req.user.sid) {
+    return success(res, 'Cannot revoke current session', { success: false }, 400);
+  }
+  await sessionService.deleteSession(req.user.id, sessionId);
+  return success(res, 'Session revoked');
+}
+
+async function revokeAllSessions(req, res) {
+  await sessionService.deleteAllSessions(req.user.id);
+  res.clearCookie(env.jwtCookieName);
+  return success(res, 'All sessions revoked');
+}
+
+module.exports = { register, login, logout, forgot, reset, verify, me, getSessions, revokeSession, revokeAllSessions };

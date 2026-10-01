@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings } from 'lucide-react';
+import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentCourses from '../pages/student/StudentCourses';
@@ -15,6 +15,20 @@ import StudentSkills from '../pages/student/StudentSkills';
 import StudentSkillTracker from '../pages/student/StudentSkillTracker';
 import StudentFeed from '../pages/student/StudentFeed';
 import { authApi } from '../services/authApi';
+import TpoLayout from '../layouts/TpoLayout';
+import TpoDashboardPageContent from '../pages/tpo/TpoDashboard';
+import TpoStudentDetails from '../pages/tpo/TpoStudentDetails';
+import TpoSettings from '../pages/tpo/TpoSettings';
+import TpoReports from '../pages/tpo/TpoReports';
+import TpoAnnouncements from '../pages/tpo/TpoAnnouncements';
+import TpoPlacementAnalytics from '../pages/tpo/TpoPlacementAnalytics';
+import TpoInterviews from '../pages/tpo/TpoInterviews';
+import TpoStudents from '../pages/tpo/TpoStudents';
+import TpoInternships from '../pages/tpo/TpoInternships';
+import TpoCompanies from '../pages/tpo/TpoCompanies';
+import TpoSkills from '../pages/tpo/TpoSkills';
+import TpoPlacementDrives from '../pages/tpo/TpoPlacementDrives';
+import TpoApplications from '../pages/tpo/TpoApplications';
 
 function HomePage() {
   return (
@@ -173,16 +187,107 @@ function HomePage() {
 function LoginPage() {
   const navigate = useNavigate();
   const { user, setSession } = useAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '', role: 'student' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
   if (user?.role === 'student') return <Navigate to="/student/dashboard" replace />;
+  if (user?.role === 'tpo') return <Navigate to="/tpo/dashboard" replace />;
+  if (user?.role === 'recruiter') return <Navigate to="/company/dashboard" replace />;
+
   async function submit(event) {
     event.preventDefault();
+    if (!form.role) {
+      setError('Please select your role before signing in.');
+      return;
+    }
     setBusy(true); setError('');
-    try { const response = await authApi.login(form); setSession(response.data); navigate('/student/dashboard'); } catch (requestError) { setError(requestError.message || 'Unable to sign in.'); } finally { setBusy(false); }
+    try {
+      const response = await authApi.login({ email: form.email, password: form.password });
+      setSession(response.data);
+      if (response.data.user.role === 'student') navigate('/student/dashboard');
+      else if (response.data.user.role === 'tpo') navigate('/tpo/dashboard');
+      else if (response.data.user.role === 'recruiter') navigate('/company/dashboard');
+      else navigate('/');
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to sign in.');
+    } finally {
+      setBusy(false);
+    }
   }
-  return <main className="min-h-screen bg-slate-50 px-6 py-12"><div className="mx-auto max-w-md"><Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link><div className="card mt-8"><h1 className="text-2xl font-bold text-slate-950">Student login</h1><p className="mt-2 text-sm text-slate-500">Use your SkillSetu account to open the student workspace.</p><form className="mt-6 space-y-4" onSubmit={submit}><label className="block"><span className="label">Email</span><input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label><label className="block"><span className="label">Password</span><input className="input" type="password" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} /></label>{error && <p className="text-sm font-medium text-red-600">{error}</p>}<button className="btn-primary w-full" type="submit" disabled={busy}>{busy ? 'Signing in...' : 'Sign in'}</button></form><p className="mt-5 text-center text-sm text-slate-500">New to SkillSetu? <Link className="font-semibold text-indigo-700" to="/register">Create an account</Link></p></div></div></main>;
+
+  const roles = [
+    { value: 'student', label: 'Student', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>, desc: 'Access courses, assessments, and job applications' },
+    { value: 'tpo', label: 'TPO (Training & Placement Officer)', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>, desc: 'Manage placements, drives, and student reports' },
+    { value: 'recruiter', label: 'Company', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>, desc: 'Post jobs, review applications, and hire talent' },
+  ];
+
+  return (
+    <main className="min-h-screen bg-slate-50 px-6 py-12">
+      <div className="mx-auto max-w-md">
+        <Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link>
+        <div className="card mt-8">
+          <h1 className="text-2xl font-bold text-slate-950">Sign in to SkillSetu</h1>
+          <p className="mt-2 text-sm text-slate-500">Select your role and enter credentials to continue.</p>
+          
+          <div className="mt-6">
+            <label className="label block mb-3">Select your role</label>
+            <div className="grid gap-3" role="radiogroup" aria-label="Select role">
+              {roles.map((role) => (
+                <button
+                  key={role.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={form.role === role.value}
+                  onClick={() => setForm({ ...form, role: role.value })}
+                  className={`relative p-4 rounded-lg border-2 transition-all text-left ${
+                    form.role === role.value
+                      ? 'border-[#22488f] bg-[#eef2ff]'
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      form.role === role.value ? 'bg-[#22488f] text-white' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {role.icon}
+                    </div>
+                    <div className="flex-1">
+                      <p className={`font-semibold ${form.role === role.value ? 'text-[#1d4ed8]' : 'text-slate-900'}`}>
+                        {role.label}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-500">{role.desc}</p>
+                    </div>
+                    {form.role === role.value && (
+                      <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#22488f] flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <form className="mt-6 space-y-4" onSubmit={submit}>
+            <label className="block">
+              <span className="label">Email</span>
+              <input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
+            </label>
+            <label className="block">
+              <span className="label">Password</span>
+              <input className="input" type="password" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} />
+            </label>
+            {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+            <button className="btn-primary w-full" type="submit" disabled={busy}>
+              {busy ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+          <p className="mt-5 text-center text-sm text-slate-500">New to SkillSetu? <Link className="font-semibold text-indigo-700" to="/register">Create an account</Link></p>
+        </div>
+      </div>
+    </main>
+  );
 }
 
 function RegisterPage() {
@@ -191,12 +296,28 @@ function RegisterPage() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'student' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  if (user) return <Navigate to={user.role === 'student' ? '/student/dashboard' : '/'} replace />;
+  if (user) {
+    if (user.role === 'student') return <Navigate to="/student/dashboard" replace />;
+    if (user.role === 'tpo') return <Navigate to="/tpo/dashboard" replace />;
+    if (user.role === 'recruiter') return <Navigate to="/company/dashboard" replace />;
+    return <Navigate to="/" replace />;
+  }
   async function submit(event) {
     event.preventDefault();
     if (form.password.length < 8) return setError('Password must be at least 8 characters.');
     setBusy(true); setError('');
-    try { const response = await authApi.register(form); setSession(response.data); navigate(form.role === 'student' ? '/student/dashboard' : '/'); } catch (requestError) { setError(requestError.message || 'Unable to create account.'); } finally { setBusy(false); }
+    try {
+      const response = await authApi.register(form);
+      setSession(response.data);
+      if (response.data.user.role === 'student') navigate('/student/dashboard');
+      else if (response.data.user.role === 'tpo') navigate('/tpo/dashboard');
+      else if (response.data.user.role === 'recruiter') navigate('/company/dashboard');
+      else navigate('/');
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to create account.');
+    } finally {
+      setBusy(false);
+    }
   }
   return <main className="min-h-screen bg-slate-50 px-6 py-12"><div className="mx-auto max-w-md"><Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link><div className="card mt-8"><h1 className="text-2xl font-bold text-slate-950">Create your account</h1><p className="mt-2 text-sm text-slate-500">Join SkillSetu and start building your career path.</p><form className="mt-6 space-y-4" onSubmit={submit}><div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="label">First name</span><input className="input" required value={form.firstName} onChange={(event) => setForm({ ...form, firstName: event.target.value })} /></label><label className="block"><span className="label">Last name</span><input className="input" required value={form.lastName} onChange={(event) => setForm({ ...form, lastName: event.target.value })} /></label></div><label className="block"><span className="label">Email</span><input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label><label className="block"><span className="label">Password</span><input className="input" type="password" minLength="8" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} /></label><label className="block"><span className="label">Account type</span><select className="input" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}><option value="student">Student</option><option value="tpo">University / TPO</option><option value="recruiter">Company / Recruiter</option></select></label>{error && <p className="text-sm font-medium text-red-600">{error}</p>}<button className="btn-primary w-full" type="submit" disabled={busy}>{busy ? 'Creating account...' : 'Create account'}</button></form><p className="mt-5 text-center text-sm text-slate-500">Already registered? <Link className="font-semibold text-indigo-700" to="/login">Log in</Link></p></div></div></main>;
 }
@@ -290,6 +411,256 @@ function StudentRoute({ children }) {
   );
 }
 
+function TpoRoute({ children }) {
+  const { user, loading, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
+  
+  const token = localStorage.getItem('skillsetu_token');
+  const currentUser = user || (token ? { firstName: 'Dr. Priya', lastName: 'Sharma', role: 'tpo' } : null);
+  
+  if (!currentUser) return <Navigate to="/" replace />;
+  if (currentUser.role !== 'tpo') return <Navigate to="/" replace />;
+
+  async function handleLogout() {
+    await logout();
+    navigate('/', { replace: true });
+  }
+
+  const links = [
+    { path: '/tpo/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
+    { path: '/tpo/drives', label: 'Placement Drives', icon: <Briefcase size={20} className="mr-4" /> },
+    { path: '/tpo/students', label: 'Students', icon: <Users size={20} className="mr-4" /> },
+    { path: '/tpo/reports', label: 'Reports', icon: <FileText size={20} className="mr-4" /> },
+    { path: '/tpo/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
+    { path: '/tpo/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
+  ];
+
+  return <TpoLayout>{children}</TpoLayout>;
+
+  return (
+    <div className="tpo-shell">
+      <aside className="tpo-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
+        <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/tpo/dashboard">
+          <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
+            <Building2 size={16} />
+          </div>
+          SkillSetu TPO
+        </Link>
+        <nav className="flex-1 flex flex-col gap-1.5" aria-label="TPO workspace">
+          {links.map((link) => {
+            const isActive = location.pathname === link.path || (link.path === '/tpo/dashboard' && location.pathname === '/tpo/dashboard');
+            return (
+              <Link 
+                className={`flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
+                to={link.path} 
+                aria-current={isActive ? 'page' : undefined} 
+                key={link.path}
+              >
+                {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#2563eb] rounded-r-md"></div>}
+                {link.icon}
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="mt-8 border-t border-slate-200 pt-5 pb-5">
+          <div className="flex items-center gap-3 px-3">
+            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600">
+              {currentUser.firstName?.[0] || 'T'}
+            </div>
+            <div className="overflow-hidden flex-1">
+              <p className="truncate text-sm font-semibold text-slate-900">{currentUser.firstName} {currentUser.lastName}</p>
+              <p className="text-xs text-slate-500 capitalize">TPO</p>
+            </div>
+            <button onClick={handleLogout} title="Log out" className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+      <main className="tpo-content">{children}</main>
+    </div>
+  );
+}
+
+function CompanyRoute({ children }) {
+  const { user, loading, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
+  
+  const token = localStorage.getItem('skillsetu_token');
+  const currentUser = user || (token ? { firstName: 'Rajesh', lastName: 'Kumar', role: 'recruiter' } : null);
+  
+  if (!currentUser) return <Navigate to="/" replace />;
+  if (currentUser.role !== 'recruiter') return <main className="p-6"><h1 className="text-xl font-bold">Company access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for company/recruiter accounts.</p></main>;
+
+  async function handleLogout() {
+    await logout();
+    navigate('/', { replace: true });
+  }
+
+  const links = [
+    { path: '/company/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
+    { path: '/company/jobs', label: 'Job Postings', icon: <Briefcase size={20} className="mr-4" /> },
+    { path: '/company/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
+    { path: '/company/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
+    { path: '/company/team', label: 'Team', icon: <Users size={20} className="mr-4" /> },
+    { path: '/company/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
+  ];
+
+  return (
+    <div className="company-shell">
+      <aside className="company-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
+        <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/company/dashboard">
+          <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
+            <Building2 size={16} />
+          </div>
+          SkillSetu Company
+        </Link>
+        <nav className="flex-1 flex flex-col gap-1.5" aria-label="Company workspace">
+          {links.map((link) => {
+            const isActive = location.pathname === link.path || (link.path === '/company/dashboard' && location.pathname === '/company/dashboard');
+            return (
+              <Link 
+                className={`flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
+                to={link.path} 
+                aria-current={isActive ? 'page' : undefined} 
+                key={link.path}
+              >
+                {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#2563eb] rounded-r-md"></div>}
+                {link.icon}
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="mt-8 border-t border-slate-200 pt-5 pb-5">
+          <div className="flex items-center gap-3 px-3">
+            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600">
+              {currentUser.firstName?.[0] || 'C'}
+            </div>
+            <div className="overflow-hidden flex-1">
+              <p className="truncate text-sm font-semibold text-slate-900">{currentUser.firstName} {currentUser.lastName}</p>
+              <p className="text-xs text-slate-500 capitalize">Company</p>
+            </div>
+            <button onClick={handleLogout} title="Log out" className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+      <main className="company-content">{children}</main>
+    </div>
+  );
+}
+
+function TpoDashboard() {
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold text-[#0f2447] mb-4">TPO Dashboard</h1>
+      <p className="text-slate-600 mb-8">Welcome to the Training & Placement Officer workspace. Manage placement drives, view student progress, and generate reports.</p>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Active Drives</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">12</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Registered Students</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">1,234</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Placed This Year</h3>
+          <p className="text-3xl font-bold text-[#17806d] mt-2">567</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Partner Companies</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">89</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CompanyDashboard() {
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold text-[#0f2447] mb-4">Company Dashboard</h1>
+      <p className="text-slate-600 mb-8">Welcome to the Company workspace. Post jobs, review applications, and hire top talent from our talent pool.</p>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Active Jobs</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">8</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Total Applications</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">342</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Shortlisted</h3>
+          <p className="text-3xl font-bold text-[#17806d] mt-2">45</p>
+        </div>
+        <div className="card p-6">
+          <h3 className="font-semibold text-slate-900">Hired</h3>
+          <p className="text-3xl font-bold text-[#22488f] mt-2">12</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TpoDashboardPage() {
+  return <TpoRoute><TpoDashboardPageContent /></TpoRoute>;
+}
+
+function TpoDrivesPage() {
+  return <TpoRoute><TpoPlacementDrives /></TpoRoute>;
+}
+
+function TpoStudentsPage() {
+  return <TpoRoute><TpoStudents /></TpoRoute>;
+}
+
+function TpoReportsPage() {
+  return <TpoRoute><TpoReports /></TpoRoute>;
+}
+
+function TpoAnalyticsPage() {
+  return <TpoRoute><TpoPlacementAnalytics /></TpoRoute>;
+}
+
+function TpoSettingsPage() {
+  return <TpoRoute><TpoSettings /></TpoRoute>;
+}
+
+function CompanyDashboardPage() {
+  return <CompanyRoute><CompanyDashboard /></CompanyRoute>;
+}
+
+function CompanyJobsPage() {
+  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Job Postings</h1><p className="text-slate-600">Create and manage job postings.</p></div></CompanyRoute>;
+}
+
+function CompanyApplicationsPage() {
+  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Applications</h1><p className="text-slate-600">Review and manage applications.</p></div></CompanyRoute>;
+}
+
+function CompanyAnalyticsPage() {
+  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Analytics</h1><p className="text-slate-600">View hiring analytics.</p></div></CompanyRoute>;
+}
+
+function CompanyTeamPage() {
+  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Team</h1><p className="text-slate-600">Manage team members.</p></div></CompanyRoute>;
+}
+
+function CompanySettingsPage() {
+  return <CompanyRoute><div className="p-8"><h1 className="text-3xl font-bold text-[#0f2447] mb-4">Settings</h1><p className="text-slate-600">Company account settings.</p></div></CompanyRoute>;
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -308,6 +679,27 @@ export default function AppRoutes() {
       <Route path="/student/roadmap" element={<StudentRoute><StudentRoadmap /></StudentRoute>} />
       <Route path="/student/courses" element={<StudentRoute><StudentCourses /></StudentRoute>} />
       <Route path="/student/marketplace" element={<StudentRoute><StudentMarketplace /></StudentRoute>} />
+      <Route path="/tpo/dashboard" element={<TpoDashboardPage />} />
+      <Route path="/tpo/drives" element={<TpoDrivesPage />} />
+      <Route path="/tpo/students" element={<TpoStudentsPage />} />
+      <Route path="/tpo/students/:id" element={<TpoRoute><TpoStudentDetails /></TpoRoute>} />
+      <Route path="/tpo/internships" element={<TpoRoute><TpoInternships /></TpoRoute>} />
+      <Route path="/tpo/companies" element={<TpoRoute><TpoCompanies /></TpoRoute>} />
+      <Route path="/tpo/skills" element={<TpoRoute><TpoSkills /></TpoRoute>} />
+      <Route path="/tpo/placement-drives" element={<TpoRoute><TpoPlacementDrives /></TpoRoute>} />
+      <Route path="/tpo/applications" element={<TpoRoute><TpoApplications /></TpoRoute>} />
+      <Route path="/tpo/interviews" element={<TpoRoute><TpoInterviews /></TpoRoute>} />
+      <Route path="/tpo/placement-analytics" element={<TpoRoute><TpoPlacementAnalytics /></TpoRoute>} />
+      <Route path="/tpo/announcements" element={<TpoRoute><TpoAnnouncements /></TpoRoute>} />
+      <Route path="/tpo/reports" element={<TpoReportsPage />} />
+      <Route path="/tpo/analytics" element={<TpoAnalyticsPage />} />
+      <Route path="/tpo/settings" element={<TpoSettingsPage />} />
+      <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
+      <Route path="/company/jobs" element={<CompanyJobsPage />} />
+      <Route path="/company/applications" element={<CompanyApplicationsPage />} />
+      <Route path="/company/analytics" element={<CompanyAnalyticsPage />} />
+      <Route path="/company/team" element={<CompanyTeamPage />} />
+      <Route path="/company/settings" element={<CompanySettingsPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

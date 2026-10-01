@@ -15,5 +15,8 @@ router.post('/forgot-password', authLimiter, validate(v.forgotSchema), asyncHand
 router.post('/reset-password', validate(v.resetSchema), asyncHandler(controller.reset));
 router.post('/verify-email', validate(v.verifySchema), asyncHandler(controller.verify));
 router.get('/me', authMiddleware, asyncHandler(controller.me));
+router.get('/sessions', authMiddleware, asyncHandler(controller.getSessions));
+router.delete('/sessions/:sessionId', authMiddleware, validate(v.revokeSessionSchema), asyncHandler(controller.revokeSession));
+router.delete('/sessions', authMiddleware, asyncHandler(controller.revokeAllSessions));
 
 module.exports = router;
