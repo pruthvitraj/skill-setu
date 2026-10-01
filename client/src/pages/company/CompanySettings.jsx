@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import {
   Building2,
   Mail,
@@ -11,22 +11,23 @@ import {
   Lock,
   CheckCircle2,
 } from 'lucide-react';
+import { companyApi } from '../../services/companyApi';
 
 const initialSettings = {
-  companyName: 'Nimbus Labs',
-  email: 'recruiter@skillsetu.dev',
-  phone: '+91 98765 43210',
-  website: 'https://nimbuslabs.example',
-  location: 'Bengaluru, Karnataka',
-  industry: 'Technology & Software',
-  companySize: '51-200 employees',
-  description:
-    'Nimbus Labs builds modern software products and hires engineers across frontend, backend, data and cloud roles.',
+  companyName: '',
+  email: '',
+  phone: '',
+  website: '',
+  location: '',
+  industry: '',
+  companySize: '',
+  description: '',
 };
 
 export default function CompanySettings() {
   const [form, setForm] = useState(initialSettings);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
   const [notifications, setNotifications] = useState({
     applications: true,
     interviews: true,
@@ -34,15 +35,39 @@ export default function CompanySettings() {
     marketing: false,
   });
 
+  useEffect(() => {
+    companyApi.me()
+      .then((response) => {
+        const recruiter = response.data.recruiter;
+        const company = recruiter.company || {};
+        setForm((current) => ({
+          ...current,
+          companyName: company.name || '',
+          email: recruiter.user?.email || '',
+          website: company.website || '',
+          location: company.location || '',
+          industry: company.industry || '',
+          description: company.about || '',
+        }));
+      })
+      .catch((requestError) => setError(requestError.message || 'Unable to load company settings.'));
+  }, []);
+
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
     setSaved(false);
   }
 
-  function saveSettings(event) {
+  async function saveSettings(event) {
     event.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      setError('');
+      await companyApi.updateMe({ company: { name: form.companyName, website: form.website, location: form.location, industry: form.industry, about: form.description } });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to save company settings.');
+    }
   }
 
   return (
@@ -64,6 +89,7 @@ export default function CompanySettings() {
             Company settings saved successfully.
           </div>
         )}
+        {error && <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
         <form onSubmit={saveSettings} className="mt-8 space-y-6">
           <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -277,12 +303,6 @@ export default function CompanySettings() {
           </div>
         </form>
 
-        <div className="mt-6 rounded-xl border border-blue-100 bg-[#eef2ff] p-5">
-          <p className="font-semibold text-[#0f2447]">Demo settings data</p>
-          <p className="mt-1 text-sm text-slate-600">
-            Profile and notification values are currently local demonstration data.
-          </p>
-        </div>
       </div>
     </div>
   );

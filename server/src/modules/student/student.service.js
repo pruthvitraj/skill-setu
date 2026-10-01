@@ -74,7 +74,7 @@ async function removeSub(userId, field, itemId) {
 async function dashboard(userId) {
   const student = await getByUserId(userId);
   const [applications, interviews, jobs, courses, notifications, roadmap] = await Promise.all([
-    Application.find({ student: student._id }).populate('job', 'title location').limit(8).sort({ createdAt: -1 }),
+    Application.find({ student: student._id }).populate('resume', 'fileName ats createdAt').populate('job', 'title location').limit(8).sort({ createdAt: -1 }),
     Interview.find({ candidate: student._id, scheduledAt: { $gte: new Date() } })
       .populate('job', 'title')
       .sort({ scheduledAt: 1 })

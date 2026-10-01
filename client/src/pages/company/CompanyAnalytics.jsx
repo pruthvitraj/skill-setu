@@ -1,69 +1,32 @@
-﻿import { useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import {
-  BarChart3,
   TrendingUp,
   Users,
   Briefcase,
   FileText,
   UserCheck,
   CalendarDays,
-  ArrowUpRight,
 } from 'lucide-react';
-
-const monthlyApplications = [
-  { month: 'Apr', applications: 18, shortlisted: 7, hired: 1 },
-  { month: 'May', applications: 24, shortlisted: 10, hired: 2 },
-  { month: 'Jun', applications: 31, shortlisted: 13, hired: 2 },
-  { month: 'Jul', applications: 38, shortlisted: 16, hired: 3 },
-  { month: 'Aug', applications: 46, shortlisted: 20, hired: 4 },
-  { month: 'Sep', applications: 52, shortlisted: 24, hired: 3 },
-];
-
-const jobPerformance = [
-  {
-    title: 'Backend Developer',
-    applications: 18,
-    shortlisted: 8,
-    interviews: 4,
-    hired: 0,
-    status: 'Published',
-  },
-  {
-    title: 'Junior Data Engineer',
-    applications: 14,
-    shortlisted: 7,
-    interviews: 3,
-    hired: 0,
-    status: 'Published',
-  },
-];
-
-const skillDemand = [
-  { skill: 'JavaScript', demand: 18 },
-  { skill: 'React', demand: 15 },
-  { skill: 'Node.js', demand: 13 },
-  { skill: 'Python', demand: 11 },
-  { skill: 'SQL', demand: 10 },
-];
-
-const funnel = [
-  { label: 'Applications', value: 32 },
-  { label: 'Shortlisted', value: 15 },
-  { label: 'Interviews', value: 7 },
-  { label: 'Selected', value: 2 },
-  { label: 'Hired', value: 0 },
-];
+import { companyApi } from '../../services/companyApi';
 
 export default function CompanyAnalytics() {
   const [period, setPeriod] = useState('6 months');
+  const [dashboard, setDashboard] = useState(null);
+  const [error, setError] = useState('');
+
+  const monthlyApplications = dashboard?.monthlyApplications || [];
+  const jobPerformance = dashboard?.jobPerformance || [];
+  const skillDemand = dashboard?.skillDemand || [];
+  const funnel = dashboard?.funnel || [];
 
   const totals = useMemo(() => ({
-    applications: monthlyApplications.reduce((sum, item) => sum + item.applications, 0),
-    shortlisted: monthlyApplications.reduce((sum, item) => sum + item.shortlisted, 0),
-    hired: monthlyApplications.reduce((sum, item) => sum + item.hired, 0),
-  }), []);
+    applications: dashboard?.applications || 0,
+    shortlisted: dashboard?.shortlisted || 0,
+    interviews: dashboard?.interviews || 0,
+    hired: dashboard?.hired || 0,
+  }), [dashboard]);
 
-  const maxApplications = Math.max(...monthlyApplications.map((item) => item.applications));
+  const maxApplications = Math.max(1, ...monthlyApplications.map((item) => item.applications));
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-8">
@@ -92,11 +55,11 @@ export default function CompanyAnalytics() {
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {[
-            ['Total Applications', totals.applications, FileText, '+18%', 'vs previous period'],
-            ['Shortlisted', totals.shortlisted, UserCheck, '+12%', 'vs previous period'],
-            ['Interviews', 7, CalendarDays, '+9%', 'vs previous period'],
-            ['Hired', totals.hired, Users, '+25%', 'vs previous period'],
-          ].map(([label, value, Icon, change, sub]) => (
+            ['Total Applications', totals.applications, FileText],
+            ['Shortlisted', totals.shortlisted, UserCheck],
+            ['Interviews', totals.interviews, CalendarDays],
+            ['Hired', totals.hired, Users],
+          ].map(([label, value, Icon]) => (
             <div key={label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
@@ -106,10 +69,6 @@ export default function CompanyAnalytics() {
                 <div className="rounded-xl bg-slate-100 p-3 text-[#0f2447]">
                   <Icon size={20} />
                 </div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 text-xs">
-                <span className="font-semibold text-emerald-600">{change}</span>
-                <span className="text-slate-400">{sub}</span>
               </div>
             </div>
           ))}
@@ -163,12 +122,12 @@ export default function CompanyAnalytics() {
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
                       className="h-full rounded-full bg-[#22488f]"
-                      style={{ width: `${Math.max(5, (item.value / funnel[0].value) * 100)}%` }}
+                      style={{ width: `${funnel[0]?.value ? Math.max(5, (item.value / funnel[0].value) * 100) : 0}%` }}
                     />
                   </div>
                   {index < funnel.length - 1 && (
                     <p className="mt-1 text-right text-[11px] text-slate-400">
-                      {Math.round((funnel[index + 1].value / item.value) * 100) || 0}% conversion
+                      {item.value ? Math.round((funnel[index + 1].value / item.value) * 100) : 0}% conversion
                     </p>
                   )}
                 </div>
@@ -238,17 +197,7 @@ export default function CompanyAnalytics() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-blue-100 bg-[#eef2ff] p-5">
-          <div className="flex items-start gap-3">
-            <BarChart3 className="mt-0.5 text-[#22488f]" size={21} />
-            <div>
-              <p className="font-semibold text-[#0f2447]">Demo analytics data</p>
-              <p className="mt-1 text-sm text-slate-600">
-                These metrics are seeded demonstration values for the Company workspace.
-              </p>
-            </div>
-          </div>
-        </div>
+        {error && <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
       </div>
     </div>
   );

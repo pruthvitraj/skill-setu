@@ -61,6 +61,8 @@ const STATUS_META = {
   },
 };
 
+const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
 function itemsFrom(response) {
   return response?.data?.items || response?.items || [];
 }
@@ -245,6 +247,27 @@ export default function CompanyApplications() {
   function handleStatusChange(event) {
     setPage(1);
     setStatus(event.target.value);
+  }
+
+  async function scheduleInterview(application) {
+    if (!application?.student?._id || !application?.job?._id) return;
+
+    try {
+      setUpdatingId(application._id);
+      setActionError('');
+      await companyApi.interviews.create({
+        candidate: application.student._id,
+        job: application.job._id,
+        application: application._id,
+        scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        mode: 'online',
+        round: 'technical',
+      });
+      await updateStatus(application, STATUS.interview_scheduled);
+    } catch (requestError) {
+      setActionError(requestError?.message || 'Unable to schedule this interview.');
+      setUpdatingId(null);
+    }
   }
 
   async function updateStatus(application, nextStatus) {
@@ -745,6 +768,37 @@ export default function CompanyApplications() {
                 </div>
               </div>
 
+              {/* Submitted resume */}
+              {selected.resume && (
+                <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">Submitted resume</p>
+                      <p className="mt-1 text-sm text-slate-600">{selected.resume.fileName || 'Uploaded resume'}</p>
+                      {selected.resume.ats?.overall != null && (
+                        <p className="mt-1 text-xs font-semibold text-blue-700">ATS score: {selected.resume.ats.overall}%</p>
+                      )}
+                    </div>
+                    {selected.resume.fileKey && (
+                      <a
+                        href={`${API_ORIGIN}/uploads/${selected.resume.fileKey}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#22488f] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1a3872]"
+                      >
+                        <FileText size={14} />
+                        Open resume
+                      </a>
+                    )}
+                  </div>
+                  {selected.resume.parsed?.skills?.length > 0 && (
+                    <p className="mt-3 text-xs text-slate-600">
+                      Skills: {selected.resume.parsed.skills.join(', ')}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Current status */}
               <div>
                 <p className="mb-2 text-sm font-semibold text-slate-700">
@@ -825,12 +879,7 @@ export default function CompanyApplications() {
                     disabled={
                       updatingId === selected._id
                     }
-                    onClick={() =>
-                      updateStatus(
-                        selected,
-                        STATUS.interview_scheduled
-                      )
-                    }
+                    onClick={() => scheduleInterview(selected)}
                     className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Calendar size={16} />

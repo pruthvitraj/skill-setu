@@ -32,4 +32,8 @@ async function invite(req, res) {
   return success(res, 'Invitation sent', { drive }, 201);
 }
 
-module.exports = { me, update, dashboard, candidates, candidateDetails, universities, invite };
+async function drives(req, res) {
+  return success(res, 'OK', { items: await service.drives(req.user.id) });
+}
+
+module.exports = { me, update, dashboard, candidates, candidateDetails, universities, invite, drives };

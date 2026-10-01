@@ -15,6 +15,7 @@ router.get('/dashboard', asyncHandler(controller.dashboard));
 router.get('/candidates', asyncHandler(controller.candidates));
 router.get('/candidates/:id', asyncHandler(controller.candidateDetails));
 router.get('/universities', asyncHandler(controller.universities));
+router.get('/placement-drives', asyncHandler(controller.drives));
 router.post('/universities/:id/invite', validate(v.invite), asyncHandler(controller.invite));
 
 module.exports = router;

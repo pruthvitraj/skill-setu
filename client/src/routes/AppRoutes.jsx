@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2 } from 'lucide-react';
+import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2, CalendarDays } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentCourses from '../pages/student/StudentCourses';
@@ -36,6 +36,9 @@ import CompanyJobForm from '../pages/company/CompanyJobForm';
 import CompanyAnalyticsView from '../pages/company/CompanyAnalytics';
 import CompanyTeamView from '../pages/company/CompanyTeam';
 import CompanySettingsView from '../pages/company/CompanySettings';
+import CompanyDrives from '../pages/company/CompanyDrives';
+import NetworkPage from '../pages/common/NetworkPage';
+import MessagesPage from '../pages/common/MessagesPage';
 
 function HomePage() {
   return (
@@ -300,7 +303,7 @@ function LoginPage() {
 function RegisterPage() {
   const navigate = useNavigate();
   const { user, setSession } = useAuth();
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'student' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'student', universityName: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   if (user) {
@@ -326,7 +329,7 @@ function RegisterPage() {
       setBusy(false);
     }
   }
-  return <main className="min-h-screen bg-slate-50 px-6 py-12"><div className="mx-auto max-w-md"><Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link><div className="card mt-8"><h1 className="text-2xl font-bold text-slate-950">Create your account</h1><p className="mt-2 text-sm text-slate-500">Join SkillSetu and start building your career path.</p><form className="mt-6 space-y-4" onSubmit={submit}><div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="label">First name</span><input className="input" required value={form.firstName} onChange={(event) => setForm({ ...form, firstName: event.target.value })} /></label><label className="block"><span className="label">Last name</span><input className="input" required value={form.lastName} onChange={(event) => setForm({ ...form, lastName: event.target.value })} /></label></div><label className="block"><span className="label">Email</span><input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label><label className="block"><span className="label">Password</span><input className="input" type="password" minLength="8" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} /></label><label className="block"><span className="label">Account type</span><select className="input" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}><option value="student">Student</option><option value="tpo">University / TPO</option><option value="recruiter">Company / Recruiter</option></select></label>{error && <p className="text-sm font-medium text-red-600">{error}</p>}<button className="btn-primary w-full" type="submit" disabled={busy}>{busy ? 'Creating account...' : 'Create account'}</button></form><p className="mt-5 text-center text-sm text-slate-500">Already registered? <Link className="font-semibold text-indigo-700" to="/login">Log in</Link></p></div></div></main>;
+  return <main className="min-h-screen bg-slate-50 px-6 py-12"><div className="mx-auto max-w-md"><Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link><div className="card mt-8"><h1 className="text-2xl font-bold text-slate-950">Create your account</h1><p className="mt-2 text-sm text-slate-500">Join SkillSetu and start building your career path.</p><form className="mt-6 space-y-4" onSubmit={submit}><div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="label">First name</span><input className="input" required value={form.firstName} onChange={(event) => setForm({ ...form, firstName: event.target.value })} /></label><label className="block"><span className="label">Last name</span><input className="input" required value={form.lastName} onChange={(event) => setForm({ ...form, lastName: event.target.value })} /></label></div><label className="block"><span className="label">Email</span><input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label><label className="block"><span className="label">Password</span><input className="input" type="password" minLength="8" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} /></label><label className="block"><span className="label">Account type</span><select className="input" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}><option value="student">Student</option><option value="tpo">University / TPO</option><option value="recruiter">Company / Recruiter</option></select></label>{(form.role === 'student' || form.role === 'tpo') && <label className="block"><span className="label">University name</span><input className="input" required value={form.universityName} onChange={(event) => setForm({ ...form, universityName: event.target.value })} placeholder="Your university" /></label>}{error && <p className="text-sm font-medium text-red-600">{error}</p>}<button className="btn-primary w-full" type="submit" disabled={busy}>{busy ? 'Creating account...' : 'Create account'}</button></form><p className="mt-5 text-center text-sm text-slate-500">Already registered? <Link className="font-semibold text-indigo-700" to="/login">Log in</Link></p></div></div></main>;
 }
 
 function NotFoundPage() {
@@ -514,8 +517,11 @@ function CompanyRoute({ children }) {
   const links = [
     { path: '/company/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
     { path: '/company/jobs', label: 'Job Postings', icon: <Briefcase size={20} className="mr-4" /> },
+    { path: '/company/drives', label: 'Placement Drives', icon: <CalendarDays size={20} className="mr-4" /> },
     { path: '/company/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
     { path: '/company/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
+    { path: '/company/network', label: 'Network', icon: <Users size={20} className="mr-4" /> },
+    { path: '/company/messages', label: 'Messages', icon: <MessageCircle size={20} className="mr-4" /> },
     { path: '/company/team', label: 'Team', icon: <Users size={20} className="mr-4" /> },
     { path: '/company/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
   ];
@@ -751,6 +757,8 @@ export default function AppRoutes() {
       <Route path="/student/roadmap" element={<StudentRoute><StudentRoadmap /></StudentRoute>} />
       <Route path="/student/courses" element={<StudentRoute><StudentCourses /></StudentRoute>} />
       <Route path="/student/marketplace" element={<StudentRoute><StudentMarketplace /></StudentRoute>} />
+      <Route path="/student/network" element={<StudentRoute><NetworkPage role="student" /></StudentRoute>} />
+      <Route path="/student/messages" element={<StudentRoute><MessagesPage /></StudentRoute>} />
       <Route path="/tpo/dashboard" element={<TpoDashboardPage />} />
       <Route path="/tpo/drives" element={<TpoDrivesPage />} />
       <Route path="/tpo/students" element={<TpoStudentsPage />} />
@@ -770,10 +778,13 @@ export default function AppRoutes() {
       <Route path="/company/jobs" element={<CompanyJobsPage />} />
       <Route path="/company/jobs/new" element={<CompanyJobFormPage />} />
       <Route path="/company/jobs/:id/edit" element={<CompanyJobFormPage />} />
+      <Route path="/company/drives" element={<CompanyRoute><CompanyDrives /></CompanyRoute>} />
       <Route path="/company/applications" element={<CompanyApplicationsPage />} />
       <Route path="/company/analytics" element={<CompanyAnalyticsPage />} />
       <Route path="/company/team" element={<CompanyTeamPage />} />
       <Route path="/company/settings" element={<CompanySettingsPage />} />
+      <Route path="/company/network" element={<CompanyRoute><NetworkPage role="company" /></CompanyRoute>} />
+      <Route path="/company/messages" element={<CompanyRoute><MessagesPage /></CompanyRoute>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

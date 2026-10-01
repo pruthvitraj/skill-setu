@@ -12,6 +12,7 @@ const Job = require('../models/Job');
 const Application = require('../models/Application');
 const Interview = require('../models/Interview');
 const Notification = require('../models/Notification');
+const mongoose = require('mongoose');
 
 const { hashPassword } = require('../utils/password');
 const { connectDb } = require('../config/db');
@@ -29,18 +30,10 @@ const logger = require('../utils/logger');
 async function seed() {
   await connectDb();
 
-  console.log('Clearing existing SkillSetu demo data...');
-
-  await Promise.all([
-    Application.deleteMany({}),
-    Interview.deleteMany({}),
-    Notification.deleteMany({}),
-    Job.deleteMany({}),
-    User.deleteMany({ email: /@skillsetu\.dev$/ }),
-    Student.deleteMany({}),
-    Tpo.deleteMany({}),
-    Recruiter.deleteMany({}),
-  ]);
+  console.log('Removing all SkillSetu data; no demo records will be recreated...');
+  await mongoose.connection.dropDatabase();
+  console.log('SkillSetu database reset complete. Register real users to begin.');
+  process.exit(0);
 
   const companyNames = [
     'Nimbus Labs',

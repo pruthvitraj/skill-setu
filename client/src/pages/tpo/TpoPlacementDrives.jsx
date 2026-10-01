@@ -54,6 +54,12 @@ function formatDate(value) {
   });
 }
 
+function dateInputValue(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+}
+
 function getItems(response) {
   return response?.data?.items || response?.items || [];
 }
@@ -101,6 +107,12 @@ export default function TpoPlacementDrives() {
   const [selectedDrive, setSelectedDrive] = useState(null);
   const [reviewing, setReviewing] = useState(false);
   const [reviewError, setReviewError] = useState('');
+  const [reviewDate, setReviewDate] = useState('');
+  const [companies, setCompanies] = useState([]);
+  const [opportunities, setOpportunities] = useState([]);
+  const [requestForm, setRequestForm] = useState({ company: '', job: '', proposedDate: '', eligibility: '' });
+  const [requestBusy, setRequestBusy] = useState(false);
+  const [requestNotice, setRequestNotice] = useState('');
 
   const loadDrives = async (showRefresh = false) => {
     try {
@@ -121,7 +133,28 @@ export default function TpoPlacementDrives() {
 
   useEffect(() => {
     loadDrives();
+    Promise.all([tpoApi.companies(), tpoApi.internships()]).then(([companyResponse, jobResponse]) => {
+      setCompanies(getItems(companyResponse));
+      setOpportunities(getItems(jobResponse));
+    }).catch((err) => setError(err?.message || 'Unable to load companies and jobs.'));
   }, []);
+
+  const requestDrive = async (event) => {
+    event.preventDefault();
+    if (!requestForm.company || !requestForm.job) {
+      setError('Select a company and published job before requesting a drive.');
+      return;
+    }
+    try {
+      setRequestBusy(true); setError(''); setRequestNotice('');
+      await tpoApi.requestPlacementDrive(requestForm);
+      setRequestNotice('Drive request sent to the company.');
+      setRequestForm({ company: '', job: '', proposedDate: '', eligibility: '' });
+      await loadDrives(true);
+    } catch (err) {
+      setError(err?.message || 'Unable to request placement drive.');
+    } finally { setRequestBusy(false); }
+  };
 
   const stats = useMemo(() => {
     const requested = drives.filter(
@@ -190,8 +223,8 @@ export default function TpoPlacementDrives() {
 
       await tpoApi.reviewPlacementDrive(selectedDrive._id, {
         status,
-        ...(status === 'rescheduled' && selectedDrive.scheduledDate
-          ? { scheduledDate: selectedDrive.scheduledDate }
+        ...(['approved', 'rescheduled'].includes(status) && reviewDate
+          ? { scheduledDate: new Date(`${reviewDate}T09:00:00`).toISOString() }
           : {}),
       });
 
@@ -230,6 +263,26 @@ export default function TpoPlacementDrives() {
           Refresh
         </button>
       </div>
+
+      {(error || requestNotice) && <div className={`rounded-xl border p-3 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>{error || requestNotice}</div>}
+
+      <form className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" onSubmit={requestDrive}>
+        <h2 className="font-semibold text-slate-900">Request a drive from a company</h2>
+        <p className="mt-1 text-sm text-slate-500">Choose a published company job and send the request to its recruiter.</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <select className="input" value={requestForm.company} onChange={(event) => setRequestForm({ ...requestForm, company: event.target.value, job: '' })}>
+            <option value="">Select company</option>
+            {companies.map((company) => <option key={company._id} value={company._id}>{company.name}</option>)}
+          </select>
+          <select className="input" value={requestForm.job} onChange={(event) => setRequestForm({ ...requestForm, job: event.target.value })}>
+            <option value="">Select published job</option>
+            {opportunities.filter((job) => !requestForm.company || String(job.company?._id) === String(requestForm.company)).map((job) => <option key={job._id} value={job._id}>{job.title}</option>)}
+          </select>
+          <input className="input" type="date" value={requestForm.proposedDate} onChange={(event) => setRequestForm({ ...requestForm, proposedDate: event.target.value })} />
+          <input className="input" placeholder="Eligibility" value={requestForm.eligibility} onChange={(event) => setRequestForm({ ...requestForm, eligibility: event.target.value })} />
+        </div>
+        <button className="btn-primary mt-4" disabled={requestBusy}>{requestBusy ? 'Sending...' : 'Request placement drive'}</button>
+      </form>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
@@ -393,7 +446,7 @@ export default function TpoPlacementDrives() {
                       <td className="px-5 py-4 text-right">
                         <button
                           type="button"
-                          onClick={() => setSelectedDrive(drive)}
+                          onClick={() => { setSelectedDrive(drive); setReviewDate(dateInputValue(drive.scheduledDate || drive.proposedDate)); setReviewError(''); }}
                           className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-white"
                         >
                           Review
@@ -459,6 +512,16 @@ export default function TpoPlacementDrives() {
                   </p>
                 </div>
               </div>
+
+              <label className="block">
+                <span className="text-xs font-semibold text-slate-500">TPO scheduled date</span>
+                <input
+                  type="date"
+                  value={reviewDate}
+                  onChange={(event) => setReviewDate(event.target.value)}
+                  className="input mt-2 w-full"
+                />
+              </label>
 
               {selectedDrive.eligibility && (
                 <div>

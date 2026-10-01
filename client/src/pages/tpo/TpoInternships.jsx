@@ -287,6 +287,7 @@ export default function TpoInternships() {
                   <th className="px-6 py-4">Type</th>
                   <th className="px-6 py-4">Deadline</th>
                   <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Student status</th>
                   <th className="px-6 py-4">Action</th>
                 </tr>
               </thead>
@@ -328,6 +329,7 @@ export default function TpoInternships() {
                     ['status', 'applicationStatus'],
                     '—'
                   );
+                  const applicants = item.applicants || [];
 
                   const link = valueOf(
                     item,
@@ -342,6 +344,12 @@ export default function TpoInternships() {
                         <div className="mt-1 text-xs text-slate-500">
                           {valueOf(item, ['duration'], '')}
                         </div>
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {applicants.length
+                          ? applicants.map((applicant) => `${applicant.student?.user?.firstName || 'Student'}: ${String(applicant.status || 'applied').replace(/_/g, ' ')}`).join(', ')
+                          : 'No applications yet'}
                       </td>
 
                       <td className="px-6 py-4 text-sm text-slate-700">

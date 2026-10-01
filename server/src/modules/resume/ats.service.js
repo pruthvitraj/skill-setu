@@ -83,7 +83,7 @@ function scoreRules(parsed, targetRole = '') {
       'Use bullet points over paragraphs for better ATS parsing',
     ],
     summary: `Rule-based ATS analysis for "${targetRole || 'General Role'}". Overall score: ${overall}/100. Matched ${matchedKeywords.length}/${needed.length} role keywords. ${missingKeywords.length > 0 ? `Add missing skills to improve: ${missingKeywords.slice(0, 3).join(', ')}.` : 'Good keyword coverage!'}`,
-    disclaimer: 'AI scoring is temporarily unavailable — this score uses rule-based analysis. Upload again later for full AI-powered scoring.',
+    disclaimer: 'This rule-based ATS score is guidance, not a guarantee of interview or hiring outcomes. Upload again later for full AI-powered scoring.',
     scoredBy: 'rules',
   };
 }

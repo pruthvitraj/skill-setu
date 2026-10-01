@@ -1,5 +1,6 @@
 const Application = require('../../models/Application');
 const ApplicationHistory = require('../../models/ApplicationHistory');
+const Resume = require('../../models/Resume');
 const Job = require('../../models/Job');
 const Recruiter = require('../../models/Recruiter');
 const studentService = require('../student/student.service');
@@ -10,8 +11,13 @@ const { APPLICATION_STATUS, JOB_STATUS, ROLES } = require('../../utils/constants
 const { audit } = require('../../utils/audit');
 const { paginated } = require('../../utils/pagination');
 
-async function apply(userId, jobId, coverNote) {
+async function apply(userId, jobId, resumeId, coverNote) {
   const student = await studentService.getByUserId(userId);
+
+  const resume = await Resume.findOne({ _id: resumeId, student: student._id });
+  if (!resume) {
+    throw new AppError('Select one of your uploaded resumes before applying', 400, 'RESUME_REQUIRED');
+  }
 
   const job = await Job.findById(jobId);
 
@@ -22,6 +28,7 @@ async function apply(userId, jobId, coverNote) {
   const exists = await Application.findOne({
     student: student._id,
     job: job._id,
+    resume: resume._id,
   });
 
   if (exists) {
@@ -37,6 +44,7 @@ async function apply(userId, jobId, coverNote) {
   const application = await Application.create({
     student: student._id,
     job: job._id,
+    resume: resume._id,
     coverNote,
     matchScore: match.score,
     status: APPLICATION_STATUS.APPLIED,
@@ -78,7 +86,8 @@ async function myApplications(userId) {
 async function updateStatus(actor, applicationId, toStatus, note) {
   const application = await Application.findById(applicationId)
     .populate('student')
-    .populate('job');
+    .populate('job')
+    .populate('resume');
 
   if (!application) {
     throw new AppError('Application not found', 404, 'NOT_FOUND');
@@ -149,6 +158,22 @@ async function updateStatus(actor, applicationId, toStatus, note) {
     await application.student.save();
   }
 
+  if ([APPLICATION_STATUS.SELECTED, APPLICATION_STATUS.HIRED].includes(toStatus)) {
+    const Recruiter = require('../../models/Recruiter');
+    const Connection = require('../../models/Connection');
+    const recruiter = await Recruiter.findById(application.job.recruiter);
+    if (recruiter) {
+      await Connection.updateOne(
+        { student: application.student._id, recruiter: recruiter._id },
+        {
+          $set: { company: application.job.company, application: application._id },
+          $setOnInsert: { connectedAt: new Date() },
+        },
+        { upsert: true }
+      );
+    }
+  }
+
   return application;
 }
 
@@ -189,6 +214,7 @@ async function listForActor(actor, { status, q, page, limit }) {
   }
 
   const applications = await Application.find(filter)
+    .populate('resume', 'fileName fileKey parsed ats createdAt')
     .populate({
       path: 'student',
       populate: {
@@ -251,6 +277,7 @@ async function listForActor(actor, { status, q, page, limit }) {
 
 async function getOne(id, actor) {
   const application = await Application.findById(id)
+    .populate('resume', 'fileName fileKey parsed ats createdAt')
     .populate({
       path: 'student',
       populate: {

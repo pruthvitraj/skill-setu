@@ -43,6 +43,7 @@ export const companyApi = {
     list: () => api.get('/recruiters/universities'),
     invite: (id, payload) => api.post(`/recruiters/universities/${id}/invite`, payload),
   },
+  drives: () => api.get('/recruiters/placement-drives'),
   
   notifications: {
     list: (params) => api.get('/notifications', { params }),

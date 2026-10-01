@@ -1,59 +1,14 @@
 ﻿import { useMemo, useState } from 'react';
 import {
   Users,
-  UserPlus,
   Search,
   MoreHorizontal,
   ShieldCheck,
   Mail,
-  Briefcase,
 } from 'lucide-react';
 
-const initialMembers = [
-  {
-    id: 1,
-    name: 'Priya Shah',
-    email: 'priya.shah@skillsetu.dev',
-    role: 'Hiring Manager',
-    department: 'Engineering',
-    status: 'Active',
-    joined: '12 Jan 2026',
-    applications: 14,
-  },
-  {
-    id: 2,
-    name: 'Rahul Mehta',
-    email: 'rahul.mehta@skillsetu.dev',
-    role: 'Recruiter',
-    department: 'Talent Acquisition',
-    status: 'Active',
-    joined: '18 Feb 2026',
-    applications: 21,
-  },
-  {
-    id: 3,
-    name: 'Neha Kulkarni',
-    email: 'neha.kulkarni@skillsetu.dev',
-    role: 'Recruiter',
-    department: 'Talent Acquisition',
-    status: 'Active',
-    joined: '04 Mar 2026',
-    applications: 11,
-  },
-  {
-    id: 4,
-    name: 'Arjun Patil',
-    email: 'arjun.patil@skillsetu.dev',
-    role: 'Interviewer',
-    department: 'Engineering',
-    status: 'Active',
-    joined: '21 Mar 2026',
-    applications: 8,
-  },
-];
-
 export default function CompanyTeam() {
-  const [members, setMembers] = useState(initialMembers);
+  const [members] = useState([]);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState('');
 
@@ -73,24 +28,6 @@ export default function CompanyTeam() {
     });
   }, [members, query, role]);
 
-  function addDemoMember() {
-    const nextId = members.length + 1;
-
-    setMembers([
-      ...members,
-      {
-        id: nextId,
-        name: 'Simran Joshi',
-        email: 'simran.joshi@skillsetu.dev',
-        role: 'Recruiter',
-        department: 'Talent Acquisition',
-        status: 'Active',
-        joined: '01 Oct 2026',
-        applications: 0,
-      },
-    ]);
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-8">
       <div className="mx-auto max-w-[1400px]">
@@ -105,13 +42,6 @@ export default function CompanyTeam() {
             </p>
           </div>
 
-          <button
-            onClick={addDemoMember}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#22488f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1a3872]"
-          >
-            <UserPlus size={18} />
-            Add Team Member
-          </button>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -226,17 +156,6 @@ export default function CompanyTeam() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-blue-100 bg-[#eef2ff] p-5">
-          <div className="flex gap-3">
-            <Briefcase className="mt-0.5 text-[#22488f]" size={20} />
-            <div>
-              <p className="font-semibold text-[#0f2447]">Demo team data</p>
-              <p className="mt-1 text-sm text-slate-600">
-                These members are demonstration records for the Company workspace.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

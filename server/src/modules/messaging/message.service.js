@@ -3,6 +3,9 @@ const Conversation = require('../../models/Conversation');
 const Message = require('../../models/Message');
 const { AppError } = require('../../utils/AppError');
 const { ROLES } = require('../../utils/constants');
+const Connection = require('../../models/Connection');
+const Student = require('../../models/Student');
+const Recruiter = require('../../models/Recruiter');
 
 const allowed = {
   [ROLES.STUDENT]: [ROLES.TPO, ROLES.RECRUITER],
@@ -13,7 +16,18 @@ const allowed = {
 async function assertCanMessage(fromId, toId) {
   const [from, to] = await Promise.all([User.findById(fromId), User.findById(toId)]);
   if (!from || !to) throw new AppError('User not found', 404, 'NOT_FOUND');
-  if (!allowed[from.role]?.includes(to.role)) {
+  const isTpo = from.role === ROLES.TPO || to.role === ROLES.TPO;
+  const [student, recruiter] = await Promise.all([
+    Student.findOne({ user: fromId }).select('_id').lean(),
+    Recruiter.findOne({ user: fromId }).select('_id').lean(),
+  ]);
+  const otherStudent = await Student.findOne({ user: toId }).select('_id').lean();
+  const otherRecruiter = await Recruiter.findOne({ user: toId }).select('_id').lean();
+  const connected = await Connection.exists({
+    student: student?._id || otherStudent?._id,
+    recruiter: recruiter?._id || otherRecruiter?._id,
+  });
+  if (!allowed[from.role]?.includes(to.role) || (!isTpo && !connected)) {
     throw new AppError('You cannot message this user', 403, 'FORBIDDEN');
   }
 }

@@ -6,6 +6,7 @@ async function apply(req, res) {
   const application = await service.apply(
     req.user.id,
     req.body.jobId,
+    req.body.resumeId,
     req.body.coverNote
   );
 

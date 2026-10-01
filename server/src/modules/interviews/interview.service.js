@@ -4,13 +4,35 @@ const Recruiter = require('../../models/Recruiter');
 const studentService = require('../student/student.service');
 const { notify } = require('../notifications/notification.service');
 const { AppError } = require('../../utils/AppError');
-const { APPLICATION_STATUS, INTERVIEW_STATUS } = require('../../utils/constants');
+const { APPLICATION_STATUS, INTERVIEW_STATUS, ROLES } = require('../../utils/constants');
 
 async function schedule(userId, payload) {
   const recruiter = await Recruiter.findOne({ user: userId });
-  const interview = await Interview.create({ ...payload, recruiter: recruiter._id });
+  if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
+
+  let application;
   if (payload.application) {
-    await Application.findByIdAndUpdate(payload.application, { status: APPLICATION_STATUS.INTERVIEW_SCHEDULED });
+    application = await Application.findById(payload.application).populate('job');
+    if (
+      !application ||
+      !application.job ||
+      String(application.job.recruiter) !== String(recruiter._id) ||
+      String(application.student) !== String(payload.candidate) ||
+      String(application.job._id) !== String(payload.job)
+    ) {
+      throw new AppError('Application is not available for this interview', 404, 'NOT_FOUND');
+    }
+  }
+
+  const interview = await Interview.create({ ...payload, recruiter: recruiter._id });
+  if (application && application.status !== APPLICATION_STATUS.INTERVIEW_SCHEDULED) {
+    const applicationService = require('../applications/application.service');
+    await applicationService.updateStatus(
+      { id: userId, role: ROLES.RECRUITER },
+      application._id,
+      APPLICATION_STATUS.INTERVIEW_SCHEDULED,
+      'Interview scheduled'
+    );
   }
   const student = await require('../../models/Student').findById(payload.candidate);
   if (student) {

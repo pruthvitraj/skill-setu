@@ -41,6 +41,10 @@ async function placementDrives(req, res) {
   return success(res, 'OK', { items: await service.placementDrives(req.user.id) });
 }
 
+async function requestPlacementDrive(req, res) {
+  return success(res, 'Drive request sent', { drive: await service.requestPlacementDrive(req.user.id, req.body) }, 201);
+}
+
 async function reviewPlacementDrive(req, res) {
   return success(res, 'Drive updated', { drive: await service.reviewPlacementDrive(req.user.id, req.params.id, req.body) });
 }
@@ -79,6 +83,7 @@ module.exports = {
   createAnnouncement,
   companies,
   placementDrives,
+  requestPlacementDrive,
   reviewPlacementDrive,
   applications,
   updateApplicationStatus,

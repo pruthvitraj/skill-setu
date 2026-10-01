@@ -15,6 +15,7 @@ const messages = require('../modules/messaging/message.routes');
 const notifications = require('../modules/notifications/notification.routes');
 const analytics = require('../modules/analytics/analytics.routes');
 const posts = require('../modules/posts/post.routes');
+const network = require('../modules/network/network.routes');
 
 const router = express.Router();
 
@@ -35,5 +36,6 @@ router.use('/messages', messages);
 router.use('/notifications', notifications);
 router.use('/analytics', analytics);
 router.use('/posts', posts);
+router.use('/network', network);
 
 module.exports = router;

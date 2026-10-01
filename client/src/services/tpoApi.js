@@ -11,6 +11,7 @@ export const tpoApi = {
   companies: () => api.get('/tpo/companies'),
   placementAnalytics: () => api.get('/tpo/placement-analytics'),
   placementDrives: () => api.get('/tpo/placement-drives'),
+  requestPlacementDrive: (payload) => api.post('/tpo/placement-drives', payload),
   reviewPlacementDrive: (id, payload) => api.patch(`/tpo/placement-drives/${id}`, payload),
   applications: (params) => api.get('/tpo/applications', { params }),
   updateApplicationStatus: (id, payload) => api.patch(`/tpo/applications/${id}/status`, payload),

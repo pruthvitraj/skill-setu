@@ -19,6 +19,7 @@ router.get('/announcements', asyncHandler(controller.announcements));
 router.post('/announcements', validate(v.announcement), asyncHandler(controller.createAnnouncement));
 router.get('/companies', asyncHandler(controller.companies));
 router.get('/placement-drives', asyncHandler(controller.placementDrives));
+router.post('/placement-drives', validate(v.requestDrive), asyncHandler(controller.requestPlacementDrive));
 router.patch('/placement-drives/:id', asyncHandler(controller.reviewPlacementDrive));
 router.get('/applications', asyncHandler(controller.applications));
 router.patch('/applications/:id/status', asyncHandler(controller.updateApplicationStatus));

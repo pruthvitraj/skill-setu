@@ -7,10 +7,14 @@ const PlacementDrive = require('../../models/PlacementDrive');
 const Interview = require('../../models/Interview');
 const Application = require('../../models/Application');
 const Announcement = require('../../models/Announcement');
+const Job = require('../../models/Job');
+const Recruiter = require('../../models/Recruiter');
 const { AppError } = require('../../utils/AppError');
 const { paginated } = require('../../utils/pagination');
 const skillAnalytics = require('../skills/skillAnalytics.service');
 const driveService = require('../placement/drive.service');
+const { DRIVE_STATUS, JOB_STATUS } = require('../../utils/constants');
+const { notify } = require('../notifications/notification.service');
 
 async function getTpo(userId) {
   const tpo = await Tpo.findOne({ user: userId }).populate('university');
@@ -99,9 +103,27 @@ async function studentDetails(userId, studentId) {
 async function internships(userId) {
   const tpo = await getTpo(userId);
   const students = await Student.find({ university: tpo.university._id }).select('_id');
-  return Application.find({ student: { $in: students.map((s) => s._id) } })
-    .populate({ path: 'job', match: { jobType: 'internship' }, populate: { path: 'company', select: 'name' } })
-    .populate({ path: 'student', populate: { path: 'user', select: 'firstName lastName' } });
+  const studentIds = students.map((student) => student._id);
+  const jobs = await Job.find({ status: 'published' })
+    .populate('company', 'name')
+    .sort({ createdAt: -1 });
+  const applications = await Application.find({ student: { $in: studentIds }, job: { $in: jobs.map((job) => job._id) } })
+    .populate({ path: 'student', populate: { path: 'user', select: 'firstName lastName email' } });
+  const applicationsByJob = applications.reduce((groups, application) => {
+    const key = String(application.job);
+    (groups[key] ||= []).push(application);
+    return groups;
+  }, {});
+
+  return jobs.map((job) => ({
+    ...job.toObject(),
+    applicants: (applicationsByJob[String(job._id)] || []).map((application) => ({
+      student: application.student,
+      status: application.status,
+      matchScore: application.matchScore,
+      appliedAt: application.createdAt,
+    })),
+  }));
 }
 
 async function announcements(userId) {
@@ -116,8 +138,7 @@ async function createAnnouncement(userId, payload) {
 
 async function companies(userId) {
   const tpo = await getTpo(userId);
-  const drives = await PlacementDrive.find({ university: tpo.university._id }).distinct('company');
-  return Company.find({ _id: { $in: drives } }).sort({ name: 1 });
+  return Company.find().sort({ name: 1 });
 }
 
 async function placementDrives(userId) {
@@ -128,12 +149,41 @@ async function reviewPlacementDrive(userId, driveId, payload) {
   return driveService.review(userId, driveId, payload);
 }
 
+async function requestPlacementDrive(userId, payload) {
+  const tpo = await getTpo(userId);
+  const [company, job] = await Promise.all([
+    Company.findById(payload.company),
+    Job.findOne({ _id: payload.job, company: payload.company, status: JOB_STATUS.PUBLISHED }),
+  ]);
+  if (!company || !job) throw new AppError('Select a valid company and published job', 400, 'INVALID_DRIVE_REQUEST');
+  const recruiter = await Recruiter.findOne({ company: company._id });
+  if (!recruiter) throw new AppError('This company has no recruiter account', 400, 'RECRUITER_NOT_FOUND');
+  const drive = await PlacementDrive.create({
+    company: company._id,
+    recruiter: recruiter._id,
+    university: tpo.university._id,
+    job: job._id,
+    title: payload.title || job.title,
+    proposedDate: payload.proposedDate,
+    eligibility: payload.eligibility,
+    status: DRIVE_STATUS.REQUESTED,
+  });
+  await notify(recruiter.user, {
+    type: 'drive_request',
+    title: 'TPO requested a placement drive',
+    body: `${tpo.university.name} requested a drive for ${job.title}.`,
+    data: { driveId: drive._id },
+  });
+  return drive;
+}
+
 async function applications(userId, { status } = {}) {
   const tpo = await getTpo(userId);
-  const students = await Student.find({ university: tpo.university._id }).select('_id');
+  const students = await Student.find({ university: { $in: [tpo.university._id, null] } }).select('_id');
   const filter = { student: { $in: students.map((student) => student._id) } };
   if (status && status !== 'all') filter.status = status;
   return Application.find(filter)
+    .populate('resume', 'fileName fileKey parsed ats createdAt')
     .populate({ path: 'student', populate: { path: 'user', select: 'firstName lastName email' } })
     .populate({ path: 'job', populate: { path: 'company', select: 'name' } })
     .sort({ createdAt: -1 });
@@ -141,7 +191,7 @@ async function applications(userId, { status } = {}) {
 
 async function updateApplicationStatus(userId, applicationId, payload) {
   const tpo = await getTpo(userId);
-  const students = await Student.find({ university: tpo.university._id }).select('_id');
+  const students = await Student.find({ university: { $in: [tpo.university._id, null] } }).select('_id');
   const application = await Application.findOne({ _id: applicationId, student: { $in: students.map((student) => student._id) } });
   if (!application) throw new AppError('Application not found', 404, 'NOT_FOUND');
   const applicationService = require('../applications/application.service');
@@ -191,6 +241,7 @@ module.exports = {
   companies,
   placementDrives,
   reviewPlacementDrive,
+  requestPlacementDrive,
   applications,
   updateApplicationStatus,
   interviews,

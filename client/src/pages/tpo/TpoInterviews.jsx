@@ -187,7 +187,7 @@ function InterviewCard({ interview }) {
             <div>
               <p className="text-xs text-slate-400">Date</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-700">
-                {formatDate(interview.date)}
+                {formatDate(interview.scheduledAt || interview.date)}
               </p>
             </div>
           </div>
@@ -201,7 +201,7 @@ function InterviewCard({ interview }) {
             <div>
               <p className="text-xs text-slate-400">Time</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-700">
-                {interview.time || '—'}
+                {interview.time || (interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—')}
               </p>
             </div>
           </div>

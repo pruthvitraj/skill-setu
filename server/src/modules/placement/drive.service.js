@@ -33,6 +33,17 @@ async function review(tpoUserId, driveId, { status, scheduledDate, tpoNote }) {
   if (scheduledDate) drive.scheduledDate = scheduledDate;
   if (tpoNote) drive.tpoNote = tpoNote;
   await drive.save();
+  if (drive.recruiter) {
+    const recruiter = await Recruiter.findById(drive.recruiter).select('user');
+    if (recruiter?.user) {
+      await notify(recruiter.user, {
+        type: 'drive_update',
+        title: 'Placement drive updated',
+        body: `Your placement drive request is now ${status}.`,
+        data: { driveId: drive._id, status },
+      });
+    }
+  }
   return drive;
 }
 
