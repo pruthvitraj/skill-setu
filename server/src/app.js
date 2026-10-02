@@ -10,8 +10,9 @@ const { errorMiddleware, notFound } = require('./middleware/error.middleware');
 
 const app = express();
 
+app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-const allowedOrigins = new Set([env.clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173']);
+const allowedOrigins = new Set([env.clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173','https://skill-setu-xm1h.onrender.com']);
 app.use(cors({ origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin)), credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
