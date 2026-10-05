@@ -4,12 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: '#ffffff',
-        ink: '#15243b',
+        canvas: 'var(--ui-bg)',
+        ink: 'var(--ui-ink)',
       },
       fontFamily: {
-        sans: ['"Source Sans 3"', 'Segoe UI', 'system-ui', 'sans-serif'],
-        display: ['"Source Serif 4"', 'Georgia', 'serif'],
+        sans: ['Segoe UI', 'system-ui', 'sans-serif'],
+        display: ['Segoe UI', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         card: '0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04)',

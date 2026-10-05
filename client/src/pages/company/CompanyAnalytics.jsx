@@ -1,195 +1,40 @@
-﻿import { useEffect, useMemo, useState } from 'react';
-import {
-  TrendingUp,
-  Users,
-  Briefcase,
-  FileText,
-  UserCheck,
-  CalendarDays,
-} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { companyApi } from '../../services/companyApi';
+import PageHeader, { SectionHeading } from '../../components/common/PageHeader';
+import Button from '../../components/common/Button';
+import Feedback from '../../components/common/Feedback';
 
 export default function CompanyAnalytics() {
   const [loading, setLoading] = useState(true);
-  useEffect(() => { companyApi.dashboard().then(r => setDashboard(r.data)).catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
   const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState('');
-
-  const monthlyApplications = dashboard?.monthlyApplications || [];
-  const jobPerformance = dashboard?.jobPerformance || [];
-  const skillDemand = dashboard?.skillDemand || [];
-  const funnel = dashboard?.funnel || [];
-
-  const totals = useMemo(() => ({
-    applications: dashboard?.applications || 0,
-    shortlisted: dashboard?.shortlisted || 0,
-    interviews: dashboard?.interviews || 0,
-    hired: dashboard?.hired || 0,
-  }), [dashboard]);
-
-  const maxApplications = Math.max(1, ...monthlyApplications.map((item) => item.applications));
-
-  return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-8">
-      <div className="mx-auto max-w-[1400px]">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-              Company Workspace
-            </p>
-            <h1 className="mt-2 text-3xl font-bold text-[#0f2447]">Analytics</h1>
-            <p className="mt-2 text-slate-600">
-              Track hiring performance, candidate conversion and job activity.
-            </p>
-          </div>
-
-<p className="text-sm text-slate-600">Trends: last six months; totals: all recorded applications.</p>
-        </div>
-
-        {error && <p role="alert" className="mt-4 text-red-700">{error}</p>}
-        {loading && <p role="status">Loading analytics…</p>}
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            ['Total Applications', totals.applications, FileText],
-            ['Shortlisted', totals.shortlisted, UserCheck],
-            ['Interviews', totals.interviews, CalendarDays],
-            ['Hired', totals.hired, Users],
-          ].map(([label, value, Icon]) => (
-            <div key={label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-slate-500">{label}</p>
-                  <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
-                </div>
-                <div className="rounded-xl bg-slate-100 p-3 text-[#0f2447]">
-                  <Icon size={20} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-[#0f2447]">Application Trends</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Applications received over the selected period.
-                </p>
-              </div>
-              <TrendingUp size={21} className="text-[#22488f]" />
-            </div>
-
-            <div className="mt-8 flex h-64 items-end gap-3 md:gap-6">
-              {monthlyApplications.map((item) => (
-                <div key={item.month} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-600">
-                    {item.applications}
-                  </span>
-                  <div className="flex w-full items-end justify-center">
-                    <div
-                      className="w-full max-w-12 rounded-t-md bg-[#22488f] transition-all"
-                      style={{
-                        height: `${(item.applications / maxApplications) * 180}px`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-xs text-slate-500">{item.month}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#0f2447]">Current application stages</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Counts reflect current stages, not conversion rates.
-            </p>
-
-            <div className="mt-7 space-y-5">
-              {funnel.map((item, index) => (
-                <div key={item.label}>
-                  <div className="mb-2 flex justify-between text-sm">
-                    <span className="font-medium text-slate-700">{item.label}</span>
-                    <span className="font-bold text-slate-900">{item.value}</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className="h-full rounded-full bg-[#22488f]"
-                      style={{ width: `${funnel[0]?.value ? (item.value / funnel[0].value) * 100 : 0}%` }}
-                    />
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <Briefcase size={21} className="text-[#22488f]" />
-              <div>
-                <h2 className="text-lg font-bold text-[#0f2447]">Job Performance</h2>
-                <p className="text-sm text-slate-500">Performance by active posting.</p>
-              </div>
-            </div>
-
-            <div className="mt-5 overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400">
-                    <th className="pb-3">Job</th>
-                    <th className="pb-3">Apps</th>
-                    <th className="pb-3">Shortlisted</th>
-                    <th className="pb-3">Interviews</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {jobPerformance.map((job) => (
-                    <tr key={job.title} className="border-b border-slate-50 last:border-0">
-                      <td className="py-4 font-semibold text-slate-800">{job.title}</td>
-                      <td className="py-4 text-slate-600">{job.applications}</td>
-                      <td className="py-4 text-slate-600">{job.shortlisted}</td>
-                      <td className="py-4 text-slate-600">{job.interviews}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#0f2447]">Requested skills</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Most requested skills across your current jobs.
-            </p>
-
-            <div className="mt-6 space-y-5">
-              {skillDemand.map((item) => (
-                <div key={item.skill}>
-                  <div className="mb-2 flex justify-between">
-                    <span className="text-sm font-medium text-slate-700">{item.skill}</span>
-                    <span className="text-xs font-semibold text-slate-500">
-                      {item.demand} job requirements
-                    </span>
-                  </div>
-                  <div className="h-2 rounded-full bg-slate-100">
-                    <div
-                      className="h-2 rounded-full bg-[#22488f]"
-                      style={{ width: `${(item.demand / Math.max(1, ...skillDemand.map(s => s.demand))) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {error && <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+  const load = useCallback(async () => {
+    setLoading(true); setError('');
+    try { const response = await companyApi.dashboard(); setDashboard(response.data); }
+    catch (e) { setDashboard(null); setError(e.message || 'Unable to load analytics.'); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { load(); }, [load]);
+  const monthly = dashboard?.monthlyApplications || [];
+  const jobs = dashboard?.jobPerformance || [];
+  const skills = dashboard?.skillDemand || [];
+  const stages = dashboard?.funnel || [];
+  const unavailable = value => value == null ? 'Unavailable' : value;
+  return <div className="ui-page">
+    <PageHeader title="Analytics" description="Recorded applications, interview activity and job requirements for your company." />
+    <p className="ui-helper">Trends: last six months. Totals: all recorded applications. Stage counts are not conversion rates.</p>
+    {loading ? <Feedback kind="loading">Loading analytics…</Feedback> : error || !dashboard ? <Feedback kind="error" title="Analytics unavailable" action={<Button type="button" onClick={load}>Retry analytics</Button>}>{error || 'No analytics response was received.'} No totals are shown until the request succeeds.</Feedback> : <>
+      <section className="ui-section" aria-label="Recorded totals"><dl className="ui-totals">{[['Applications', dashboard.applications], ['Currently shortlisted', dashboard.shortlisted], ['Interviews', dashboard.interviews], ['Hired', dashboard.hired]].map(([label,value]) => <div key={label}><dt>{label}</dt><dd>{unavailable(value)}</dd></div>)}</dl></section>
+      <div className="ui-analytics-columns">
+        <section className="ui-section"><SectionHeading title="Application trends" description="Applications received in each of the last six months." />{monthly.length ? <ChartList rows={monthly.map(item => ({label:item.month,value:item.applications}))} unit="applications" /> : <Feedback kind="empty">No monthly application activity recorded.</Feedback>}</section>
+        <section className="ui-section"><SectionHeading title="Current application stages" description="Current lifecycle stages, not cumulative conversion." />{stages.length ? <ChartList rows={stages.map(item => ({label:item.label,value:item.value}))} unit="applications" /> : <Feedback kind="empty">No application stages recorded.</Feedback>}</section>
       </div>
-    </div>
-  );
+      <section className="ui-section"><SectionHeading title="Job activity" description="Recorded activity by posting; shortlist and interview counts follow the existing reporting definitions." />{jobs.length ? <div className="ui-table-scroll" role="region" aria-label="Job activity table" tabIndex={0}><table className="ui-table"><caption>Application and interview counts by job</caption><thead><tr>{['Job', 'Applications', 'Shortlisted', 'Interviews'].map(label => <th key={label} scope="col">{label}</th>)}</tr></thead><tbody>{jobs.map((job,i) => <tr key={job._id || `${job.title}-${i}`}><td>{job.title}</td><td>{unavailable(job.applications)}</td><td>{unavailable(job.shortlisted)}</td><td>{unavailable(job.interviews)}</td></tr>)}</tbody></table></div> : <Feedback kind="empty">No job activity recorded.</Feedback>}</section>
+      <section className="ui-section"><SectionHeading title="Requested skills" description="Requirements across your current jobs, not candidate competency scores." />{skills.length ? <ChartList rows={skills.map(item => ({label:item.skill,value:item.demand}))} unit="job requirements" /> : <Feedback kind="empty">No skill requirements recorded.</Feedback>}</section>
+    </>}
+  </div>;
+}
+function ChartList({ rows, unit }) {
+  const max = Math.max(1, ...rows.map(item => Number(item.value) || 0));
+  return <ul className="ui-chart-list">{rows.map((item,i) => <li key={`${item.label}-${i}`}><span>{item.label}</span><span>{item.value == null ? 'Unavailable' : `${item.value} ${unit}`}</span><div className="ui-chart-track" aria-hidden="true"><span style={{width:`${Math.min(100, (Number(item.value) || 0) / max * 100)}%`}} /></div></li>)}</ul>;
 }

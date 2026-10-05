@@ -54,8 +54,8 @@ export default function StudentSkills() {
     } catch (error) { setNotice(error.message || 'Unable to remove skill.'); } finally { setBusy(false); }
   }
 
-  if (state.loading) return <main className="p-6 text-sm text-slate-500">Loading your skills...</main>;
-  if (state.error) return <main className="p-6"><div className="card"><h1 className="text-xl font-bold">Skill management</h1><p className="mt-2 text-sm text-red-600">{state.error}</p><Button className="mt-4" type="button" onClick={load}>Try again</Button></div></main>;
+  if (state.loading) return <div className="p-6 text-sm text-slate-500">Loading your skills...</div>;
+  if (state.error) return <div className="p-6"><div className="card"><h1 className="text-xl font-bold">Skill management</h1><p className="mt-2 text-sm text-red-600">{state.error}</p><Button className="mt-4" type="button" onClick={load}>Try again</Button></div></div>;
 
   const profileSkills = state.student?.skills || [];
   const scores = state.tracker?.scores || [];
@@ -63,7 +63,7 @@ export default function StudentSkills() {
   const existingNames = new Set(profileSkills.map((skill) => skill.name.toLowerCase()));
   const availableSkills = state.catalog.filter((skill) => !existingNames.has(skill.name.toLowerCase()));
 
-  return <main className="min-h-screen bg-canvas"><div className="mx-auto max-w-6xl space-y-5 p-6">
+  return <div className="min-h-screen bg-canvas"><div className="mx-auto max-w-6xl space-y-5 p-6">
     <header><p className="text-sm font-semibold text-indigo-600">Student workspace</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Skill management</h1><p className="mt-2 text-sm text-slate-500">Maintain your profile skills and monitor evaluated competency evidence.</p></header>
     {notice && <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm text-indigo-700">{notice}</div>}
 
@@ -76,5 +76,5 @@ export default function StudentSkills() {
 
     <div className="grid gap-5 lg:grid-cols-2"><section className="card"><h2 className="text-lg font-bold text-slate-900">Evaluated skill scores</h2>{scores.length ? <div className="mt-4 space-y-3">{scores.map((score) => <div className="rounded-xl border border-slate-200 p-4" key={score._id || score.skill}><div className="flex items-center justify-between"><p className="font-semibold capitalize text-slate-900">{score.skill?.name || score.skillName || score.skill || 'Skill'}</p><p className="font-bold text-emerald-600">{score.overall ?? 0}</p></div><div className="mt-2 h-2 rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.min(100, score.overall || 0)}%` }} /></div></div>)}</div> : <div className="mt-4"><Empty>No assessed skill scores yet.</Empty></div>}</section><section className="card"><h2 className="text-lg font-bold text-slate-900">Available assessments</h2>{state.assessments.length ? <div className="mt-4 space-y-3">{state.assessments.map((assessment) => <div className="rounded-xl border border-slate-200 p-4" key={assessment._id}><p className="font-semibold text-slate-900">{assessment.title}</p><p className="mt-1 text-sm text-slate-500">{assessment.description || 'Skill assessment'} · {assessment.durationMinutes || 0} minutes</p></div>)}</div> : <div className="mt-4"><Empty>No assessments are available yet.</Empty></div>}</section></div>
     <p className="text-xs text-slate-500">{history.length ? `${history.length} tracker entries recorded.` : 'Assessment history will appear here after your first attempt.'}</p>
-  </div></main>;
+  </div></div>;
 }

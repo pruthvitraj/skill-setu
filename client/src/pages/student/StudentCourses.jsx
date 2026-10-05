@@ -32,12 +32,12 @@ export default function StudentCourses() {
 
   function search(event) { event.preventDefault(); load(1, skill); }
 
-  return <main className="min-h-screen bg-canvas"><div className="mx-auto max-w-6xl space-y-5 p-6">
+  return <div className="min-h-screen bg-canvas"><div className="mx-auto max-w-6xl space-y-5 p-6">
     <header><p className="text-sm font-semibold text-indigo-600">Student workspace</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Courses</h1><p className="mt-2 text-sm text-slate-500">Find focused learning resources for the skills you want to build next.</p></header>
     <section className="card"><form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={search}><label className="block flex-1"><span className="label">Filter by skill</span><input className="input" value={skill} onChange={(event) => setSkill(event.target.value)} placeholder="SQL, Python, React..." /></label><Button type="submit" disabled={loading}>Search courses</Button>{skill && <Button type="button" variant="ghost" onClick={() => { setSkill(''); load(1, ''); }}>Clear</Button>}</form></section>
     {error ? <section className="card"><p className="text-sm text-red-600">{error}</p><Button className="mt-4" type="button" onClick={() => load(pagination.page)}>Try again</Button></section> : loading ? <p className="p-6 text-sm text-slate-500">Loading courses...</p> : <>
       <section><div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="text-xl font-bold text-slate-900">Recommended for you</h2><p className="mt-1 text-sm text-slate-500">Based on your profile skills and target role.</p></div></div>{recommended.length ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{recommended.slice(0, 3).map((course) => <CourseCard course={course} key={course._id} />)}</div> : <Empty>No recommended courses yet.</Empty>}</section>
       <section><div className="mb-4 flex items-end justify-between gap-3"><div><h2 className="text-xl font-bold text-slate-900">Course catalog</h2><p className="mt-1 text-sm text-slate-500">{pagination.total || 0} course{pagination.total === 1 ? '' : 's'} available.</p></div></div>{courses.length ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{courses.map((course) => <CourseCard course={course} key={course._id} />)}</div> : <Empty>{skill ? 'No courses match this skill.' : 'No courses are available yet.'}</Empty>}<div className="mt-6 flex items-center justify-center gap-3"><Button type="button" variant="ghost" disabled={pagination.page <= 1 || loading} onClick={() => load(pagination.page - 1)}>Previous</Button><span className="text-sm text-slate-500">Page {pagination.page || 1} of {pagination.pages || 1}</span><Button type="button" variant="ghost" disabled={pagination.page >= pagination.pages || loading} onClick={() => load(pagination.page + 1)}>Next</Button></div></section>
     </>}
-  </div></main>;
+  </div></div>;
 }

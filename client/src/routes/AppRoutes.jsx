@@ -1,11 +1,11 @@
+import WorkspaceShell from '../layouts/WorkspaceShell';
 import CompanyInterviews from '../pages/company/CompanyInterviews';
 import NotificationsPage from '../pages/common/NotificationsPage';
 import StudentSettings from '../pages/student/StudentSettings';
 import ChallengesPage from '../pages/common/ChallengesPage';
 import AccountRecovery from '../pages/auth/AccountRecovery';
 import { useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2, CalendarDays } from 'lucide-react';
+import { Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentCourses from '../pages/student/StudentCourses';
@@ -346,223 +346,27 @@ function NotFoundPage() {
 }
 
 function StudentRoute({ children }) {
-  const { user, loading, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
-  
-  const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user;
-  
-  if (!currentUser) return <Navigate to="/login" replace />;
-  if (currentUser.role !== 'student') return <main className="p-6"><h1 className="text-xl font-bold">Student access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for student accounts.</p></main>;
-
-  async function handleLogout() {
-    await logout();
-    navigate('/', { replace: true });
-  }
-
-  const links = [
-    { path: '/student/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
-    { path: '/student/feed', label: 'Post / Feed', icon: <Rss size={20} className="mr-4" /> },
-    { path: '/student/resume', label: 'Resume ATS', icon: <FileText size={20} className="mr-4" /> },
-    { path: '/student/assessments', label: 'Practice & Assessments', icon: <ClipboardList size={20} className="mr-4" /> },
-    { path: '/student/challenges', label: 'Company Challenges', icon: <Briefcase size={20} className="mr-4" /> },
-    { path: '/student/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
-    { path: '/student/skills', label: 'Profile Skills', icon: <BookOpen size={20} className="mr-4" /> },
-    { path: '/student/skill-tracker', label: 'Skill Tracker', icon: <ClipboardList size={20} className="mr-4" /> },
-    { path: '/student/roadmap', label: 'Learning Roadmap', icon: <TrendingUp size={20} className="mr-4" /> },
-    { path: '/student/courses', label: 'Courses', icon: <BookOpen size={20} className="mr-4" /> },
-    { path: '/student/marketplace', label: 'Marketplace (Jobs)', icon: <Briefcase size={20} className="mr-4" /> },
-    { path: '/student/messages', label: 'Messages', icon: <MessageCircle size={20} className="mr-4" /> },
-    { path: '/student/network', label: 'Network', icon: <Users size={20} className="mr-4" /> },
-    { path: '/student/interviews', label: 'Interviews', icon: <Video size={20} className="mr-4" /> },
-    { path: '/student/notifications', label: 'Notifications', icon: <Bell size={20} className="mr-4" /> },
-    { path: '/student/profile', label: 'Profile', icon: <UserCircle size={20} className="mr-4" /> },
-    { path: '/student/settings', label: 'Account Settings', icon: <Settings size={20} className="mr-4" /> },
-  ];
-  
-  return (
-    <div className="student-shell">
-      <aside className="student-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
-        <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/student/dashboard">
-          <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-          </div>
-          SkillSetu
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1.5" aria-label="Student workspace">
-          {links.map((link) => {
-            const isActive = location.pathname === link.path || (link.path === '/student/dashboard' && location.pathname === '/student/dashboard');
-            return (
-              <Link 
-                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
-                to={link.path} 
-                aria-current={isActive ? 'page' : undefined} 
-                key={link.path}
-              >
-                {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#2563eb] rounded-r-md"></div>}
-                {link.icon}
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-8 border-t border-slate-200 pt-5 pb-5">
-          <div className="flex items-center gap-3 px-3">
-            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600">
-              {currentUser.firstName?.[0] || 'A'}
-            </div>
-            <div className="overflow-hidden flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900">{currentUser.firstName} {currentUser.lastName}</p>
-              <p className="text-xs text-slate-500 capitalize">{currentUser.role}</p>
-            </div>
-            <button onClick={handleLogout} title="Log out" className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        </div>
-      </aside>
-      <main className="student-content">{children}</main>
-    </div>
-  );
+  const { user, loading } = useAuth();
+  if (loading) return <main className="p-6"><p role="status">Loading session...</p></main>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'student') return <main className="p-6"><h1 className="text-xl font-bold">Student access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for student accounts.</p></main>;
+  return <WorkspaceShell role="student">{children}</WorkspaceShell>;
 }
 
 function TpoRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <main className="p-6">Loading session…</main>;
+  if (loading) return <main className="p-6"><p role="status">Loading session…</p></main>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== 'tpo') return <Navigate to="/" replace />;
   return <TpoLayout>{children}</TpoLayout>;
 }
 
 function CompanyRoute({ children }) {
-  const { user, loading, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
-  
-  const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user;
-  
-  if (!currentUser) return <Navigate to="/login" replace />;
-  if (currentUser.role !== 'recruiter') return <main className="p-6"><h1 className="text-xl font-bold">Company access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for company/recruiter accounts.</p></main>;
-
-  async function handleLogout() {
-    await logout();
-    navigate('/', { replace: true });
-  }
-
-  const links = [
-    { path: '/company/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
-    { path: '/company/challenges', label: 'Challenges', icon: <ClipboardList size={20} className="mr-4" /> },
-    { path: '/company/jobs', label: 'Job Postings', icon: <Briefcase size={20} className="mr-4" /> },
-    { path: '/company/drives', label: 'Placement Drives', icon: <CalendarDays size={20} className="mr-4" /> },
-    { path: '/company/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
-    { path: '/company/interviews', label: 'Interviews', icon: <Video size={20} className="mr-4" /> },
-    { path: '/company/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
-    { path: '/company/network', label: 'Network', icon: <Users size={20} className="mr-4" /> },
-    { path: '/company/messages', label: 'Messages', icon: <MessageCircle size={20} className="mr-4" /> },
-    { path: '/company/team', label: 'Team', icon: <Users size={20} className="mr-4" /> },
-    { path: '/company/notifications', label: 'Notifications', icon: <Bell size={20} className="mr-4" /> },
-    { path: '/company/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
-  ];
-
-  return (
-    <>
-      <style>{`
-        .company-shell {
-          display: grid;
-          grid-template-columns: 260px minmax(0, 1fr);
-          min-height: 100vh;
-          width: 100%;
-          background: #f8fafc;
-        }
-        .company-sidebar {
-          position: sticky;
-          top: 0;
-          height: 100vh;
-          min-height: 100vh;
-          box-sizing: border-box;
-          overflow-y: auto;
-          z-index: 20;
-        }
-        .company-content {
-          min-width: 0;
-          width: 100%;
-          min-height: 100vh;
-          overflow-x: hidden;
-          box-sizing: border-box;
-        }
-        .company-sidebar nav a {
-          position: relative;
-        }
-        @media (max-width: 900px) {
-          .company-shell {
-            display: block;
-          }
-          .company-sidebar {
-            position: relative;
-            height: auto;
-            min-height: auto;
-            border-right: 0;
-            border-bottom: 1px solid #e2e8f0;
-          }
-          .company-sidebar nav {
-            flex-direction: row;
-            flex-wrap: wrap;
-          }
-          .company-sidebar nav a {
-            flex: 1 1 180px;
-          }
-        }
-      `}</style>
-      <div className="company-shell">
-      <aside className="company-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
-        <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/company/dashboard">
-          <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
-            <Building2 size={16} />
-          </div>
-          SkillSetu Company
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1.5" aria-label="Company workspace">
-          {links.map((link) => {
-            const isActive = location.pathname === link.path || (link.path === '/company/dashboard' && location.pathname === '/company/dashboard');
-            return (
-              <Link 
-                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
-                to={link.path} 
-                aria-current={isActive ? 'page' : undefined} 
-                key={link.path}
-              >
-                {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#2563eb] rounded-r-md"></div>}
-                {link.icon}
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-8 border-t border-slate-200 pt-5 pb-5">
-          <div className="flex items-center gap-3 px-3">
-            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600">
-              {currentUser.firstName?.[0] || 'C'}
-            </div>
-            <div className="overflow-hidden flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900">{currentUser.firstName} {currentUser.lastName}</p>
-              <p className="text-xs text-slate-500 capitalize">Company</p>
-            </div>
-            <button onClick={handleLogout} title="Log out" className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        </div>
-      </aside>
-      <main className="company-content">{children}</main>
-      </div>
-    </>
-  );
+  const { user, loading } = useAuth();
+  if (loading) return <main className="p-6"><p role="status">Loading session...</p></main>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'recruiter') return <main className="p-6"><h1 className="text-xl font-bold">Company access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for company/recruiter accounts.</p></main>;
+  return <WorkspaceShell role="recruiter">{children}</WorkspaceShell>;
 }
 
 function TpoDashboard() {

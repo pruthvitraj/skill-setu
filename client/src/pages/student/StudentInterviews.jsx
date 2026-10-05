@@ -28,15 +28,15 @@ export default function StudentInterviews() {
 
   useEffect(() => { load(); }, []);
 
-  if (loading) return <main className="p-6 text-sm text-slate-500">Loading your interviews...</main>;
-  if (error) return <main className="p-6"><div className="card"><h1 className="text-xl font-bold">My interviews</h1><p className="mt-2 text-sm text-red-600">{error}</p><Button className="mt-4" type="button" onClick={load}>Try again</Button></div></main>;
+  if (loading) return <div className="p-6 text-sm text-slate-500">Loading your interviews...</div>;
+  if (error) return <div className="p-6"><div className="card"><h1 className="text-xl font-bold">My interviews</h1><p className="mt-2 text-sm text-red-600">{error}</p><Button className="mt-4" type="button" onClick={load}>Try again</Button></div></div>;
 
   const now = Date.now();
   const upcoming = interviews.filter((interview) => interview.scheduledAt && new Date(interview.scheduledAt).getTime() >= now && interview.status !== 'cancelled');
   const past = interviews.filter((interview) => !upcoming.includes(interview));
 
-  return <main className="min-h-screen bg-canvas"><div className="mx-auto max-w-5xl space-y-5 p-6">
+  return <div className="min-h-screen bg-canvas"><div className="mx-auto max-w-5xl space-y-5 p-6">
     <header><p className="text-sm font-semibold text-indigo-600">Student workspace</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">My interviews</h1><p className="mt-2 text-sm text-slate-500">Keep track of interview logistics, outcomes, and recruiter feedback.</p></header>
     {!interviews.length ? <section className="card"><Empty>You have no interviews scheduled yet.</Empty><a className="btn-primary mt-4 inline-flex" href="/student/applications">View applications</a></section> : <><section className="card"><div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold text-slate-900">Upcoming interviews</h2><span className="text-sm text-slate-500">{upcoming.length}</span></div><div className="mt-4 space-y-4">{upcoming.length ? upcoming.map((interview) => <InterviewCard interview={interview} key={interview._id} />) : <Empty>No upcoming interviews.</Empty>}</div></section><section className="card"><h2 className="text-xl font-bold text-slate-900">Interview history</h2><div className="mt-4 space-y-4">{past.length ? past.map((interview) => <InterviewCard interview={interview} key={interview._id} />) : <Empty>No past interviews.</Empty>}</div></section></>}
-  </div></main>;
+  </div></div>;
 }

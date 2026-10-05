@@ -1,0 +1,375 @@
+[
+  {
+    "role": "tpo",
+    "heading": "Students",
+    "mainCount": 1,
+    "scrollWidth": 375,
+    "viewButtons": 1,
+    "width": 390
+  },
+  {
+    "role": "tpo",
+    "heading": "Students",
+    "mainCount": 1,
+    "scrollWidth": 768,
+    "viewButtons": 1,
+    "width": 768
+  },
+  {
+    "role": "tpo",
+    "heading": "Students",
+    "mainCount": 1,
+    "scrollWidth": 1280,
+    "viewButtons": 1,
+    "width": 1280
+  },
+  {
+    "active": "/tpo/dashboard",
+    "mainCount": 1,
+    "route": "/tpo/dashboard"
+  },
+  {
+    "active": "/tpo/students",
+    "mainCount": 1,
+    "route": "/tpo/students"
+  },
+  {
+    "active": "/tpo/skills",
+    "mainCount": 1,
+    "route": "/tpo/skills"
+  },
+  {
+    "active": "/tpo/challenges",
+    "mainCount": 1,
+    "route": "/tpo/challenges"
+  },
+  {
+    "active": "/tpo/placement-drives",
+    "mainCount": 1,
+    "route": "/tpo/placement-drives"
+  },
+  {
+    "active": "/tpo/companies",
+    "mainCount": 1,
+    "route": "/tpo/companies"
+  },
+  {
+    "active": "/tpo/internships",
+    "mainCount": 1,
+    "route": "/tpo/internships"
+  },
+  {
+    "active": "/tpo/applications",
+    "mainCount": 1,
+    "route": "/tpo/applications"
+  },
+  {
+    "active": "/tpo/interviews",
+    "mainCount": 1,
+    "route": "/tpo/interviews"
+  },
+  {
+    "active": "/tpo/announcements",
+    "mainCount": 1,
+    "route": "/tpo/announcements"
+  },
+  {
+    "active": "/tpo/messages",
+    "mainCount": 1,
+    "route": "/tpo/messages"
+  },
+  {
+    "active": "/tpo/placement-analytics",
+    "mainCount": 1,
+    "route": "/tpo/placement-analytics"
+  },
+  {
+    "active": "/tpo/reports",
+    "mainCount": 1,
+    "route": "/tpo/reports"
+  },
+  {
+    "active": "/tpo/notifications",
+    "mainCount": 1,
+    "route": "/tpo/notifications"
+  },
+  {
+    "active": "/tpo/settings",
+    "mainCount": 1,
+    "route": "/tpo/settings"
+  },
+  {
+    "active": "/tpo/placement-drives",
+    "route": "/tpo/drives"
+  },
+  {
+    "active": "/tpo/placement-analytics",
+    "route": "/tpo/analytics"
+  },
+  {
+    "active": "/company/dashboard",
+    "mainCount": 1,
+    "route": "/company/dashboard"
+  },
+  {
+    "active": "/company/applications",
+    "mainCount": 1,
+    "route": "/company/applications"
+  },
+  {
+    "active": "/company/interviews",
+    "mainCount": 1,
+    "route": "/company/interviews"
+  },
+  {
+    "active": "/company/jobs",
+    "mainCount": 1,
+    "route": "/company/jobs"
+  },
+  {
+    "active": "/company/challenges",
+    "mainCount": 1,
+    "route": "/company/challenges"
+  },
+  {
+    "active": "/company/drives",
+    "mainCount": 1,
+    "route": "/company/drives"
+  },
+  {
+    "active": "/company/network",
+    "mainCount": 1,
+    "route": "/company/network"
+  },
+  {
+    "active": "/company/messages",
+    "mainCount": 1,
+    "route": "/company/messages"
+  },
+  {
+    "active": "/company/team",
+    "mainCount": 1,
+    "route": "/company/team"
+  },
+  {
+    "active": "/company/analytics",
+    "mainCount": 1,
+    "route": "/company/analytics"
+  },
+  {
+    "active": "/company/notifications",
+    "mainCount": 1,
+    "route": "/company/notifications"
+  },
+  {
+    "active": "/company/settings",
+    "mainCount": 1,
+    "route": "/company/settings"
+  },
+  {
+    "role": "company",
+    "heading": "Analytics",
+    "mainCount": 1,
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "role": "company",
+    "heading": "Analytics",
+    "mainCount": 1,
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "role": "company",
+    "heading": "Analytics",
+    "mainCount": 1,
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "analyticsError": "Analytics unavailable\n\nNetwork error No totals are shown until the request succeeds.\nRetry analytics",
+    "totals": 0
+  },
+  {
+    "analyticsRetryRecovered": "Applications\n2\nCurrently shortlisted\n0\nInterviews\n2\nHired\n0"
+  },
+  {
+    "active": "/company/jobs",
+    "route": "/company/jobs/new"
+  },
+  {
+    "active": "/company/jobs",
+    "route": "/company/jobs/6ac3f6e1934d01fcbb4e63dd/edit"
+  },
+  {
+    "active": "/company/jobs",
+    "route": "/company/jobs/6ac3f6e1934d01fcbb4e63dd"
+  },
+  {
+    "active": "/student/dashboard",
+    "mainCount": 1,
+    "route": "/student/dashboard"
+  },
+  {
+    "active": "/student/roadmap",
+    "mainCount": 1,
+    "route": "/student/roadmap"
+  },
+  {
+    "active": "/student/courses",
+    "mainCount": 1,
+    "route": "/student/courses"
+  },
+  {
+    "active": "/student/assessments",
+    "mainCount": 1,
+    "route": "/student/assessments"
+  },
+  {
+    "active": "/student/challenges",
+    "mainCount": 1,
+    "route": "/student/challenges"
+  },
+  {
+    "active": "/student/skills",
+    "mainCount": 1,
+    "route": "/student/skills"
+  },
+  {
+    "active": "/student/skill-tracker",
+    "mainCount": 1,
+    "route": "/student/skill-tracker"
+  },
+  {
+    "active": "/student/profile",
+    "mainCount": 1,
+    "route": "/student/profile"
+  },
+  {
+    "active": "/student/marketplace",
+    "mainCount": 1,
+    "route": "/student/marketplace"
+  },
+  {
+    "active": "/student/applications",
+    "mainCount": 1,
+    "route": "/student/applications"
+  },
+  {
+    "active": "/student/interviews",
+    "mainCount": 1,
+    "route": "/student/interviews"
+  },
+  {
+    "active": "/student/resume",
+    "mainCount": 1,
+    "route": "/student/resume"
+  },
+  {
+    "active": "/student/feed",
+    "mainCount": 1,
+    "route": "/student/feed"
+  },
+  {
+    "active": "/student/network",
+    "mainCount": 1,
+    "route": "/student/network"
+  },
+  {
+    "active": "/student/messages",
+    "mainCount": 1,
+    "route": "/student/messages"
+  },
+  {
+    "active": "/student/notifications",
+    "mainCount": 1,
+    "route": "/student/notifications"
+  },
+  {
+    "active": "/student/settings",
+    "mainCount": 1,
+    "route": "/student/settings"
+  },
+  {
+    "role": "student",
+    "exportVisible": true,
+    "heading": "My profile",
+    "mainCount": 1,
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "role": "student",
+    "exportVisible": true,
+    "heading": "My profile",
+    "mainCount": 1,
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "role": "student",
+    "exportVisible": true,
+    "heading": "My profile",
+    "mainCount": 1,
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "role": "student",
+    "reflowSupplement": true,
+    "mainCount": 1,
+    "scrollWidth": 625,
+    "width": 640
+  },
+  {
+    "role": "company",
+    "reflowSupplement": true,
+    "mainCount": 1,
+    "scrollWidth": 625,
+    "width": 640
+  },
+  {
+    "role": "tpo",
+    "final": true,
+    "mainCount": 1,
+    "scrollWidth": 375,
+    "viewVisible": true,
+    "width": 390
+  },
+  {
+    "role": "tpo",
+    "final": true,
+    "mainCount": 1,
+    "scrollWidth": 768,
+    "viewVisible": true,
+    "width": 768
+  },
+  {
+    "role": "tpo",
+    "final": true,
+    "mainCount": 1,
+    "scrollWidth": 1280,
+    "viewVisible": true,
+    "width": 1280
+  },
+  {
+    "role": "tpo",
+    "final": true,
+    "mainCount": 1,
+    "scrollWidth": 625,
+    "viewVisible": true,
+    "width": 640
+  },
+  {
+    "active": "/tpo/students",
+    "mainCount": 1,
+    "route": "/tpo/students/6ac3caca094984aeb36ccfee"
+  },
+  {
+    "profileDraftRetained": true,
+    "method": "Rendered First name textbox snapshot after menu Escape",
+    "practiceSelectionRetained": true,
+    "practiceMethod": "Rendered native radio checked state after menu Escape"
+  }
+]

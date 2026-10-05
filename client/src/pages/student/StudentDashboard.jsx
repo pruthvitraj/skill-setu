@@ -396,7 +396,7 @@ export default function StudentDashboard() {
               {[
                 ['/student/resume','📄 Upload / View Resume'],
                 ['/student/skill-tracker','📊 Skill Tracker'],
-                ['/student/roadmap','🗺 AI Roadmap'],
+                ['/student/roadmap','🗺 Learning roadmap'],
                 ['/student/marketplace','💼 Browse Jobs'],
                 ['/student/courses','📚 Courses'],
               ].map(([to,label])=>(

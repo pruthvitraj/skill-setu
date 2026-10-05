@@ -1,7 +1,20 @@
+import { SectionHeading } from './PageHeader';
+import Feedback from './Feedback';
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 export default function CompetencyEvidence({ studentId }) {
   const [data, setData] = useState(null); const [error, setError] = useState('');
   useEffect(() => { let active = true; setData(null); setError(''); api.get(studentId ? `/evidence/students/${studentId}` : '/evidence/me').then(r => { if (active) setData(r.data); }).catch(e => { if (active) setError(e.message || 'Unable to load evidence.'); }); return () => { active = false; }; }, [studentId]);
-  return <section className="mt-8 border-t border-slate-200 pt-6"><h2 className="text-xl font-semibold">Competency evidence</h2><p className="mt-2 text-sm text-slate-500">Practice results and self-reported skills are separate from evaluated evidence.</p>{error && <p role="alert" className="mt-4 text-red-700">{error}</p>}{!data && !error && <p className="mt-4 text-sm">Loading evidence…</p>}{data && <><div className="mt-4 divide-y divide-slate-200">{data.items.length ? data.items.map(e => <details key={e._id} className="py-4"><summary className="cursor-pointer font-medium">{e.skill} · {e.score}% <span className="ml-3 text-sm font-normal text-slate-500">{e.source === 'assessment' ? 'Controlled assessment' : 'Company rubric review'} · {new Date(e.evaluatedAt).toLocaleDateString()}</span></summary><dl className="mt-3 grid gap-2 text-sm"><div><dt className="inline font-semibold">Source: </dt><dd className="inline">{e.title} ({e.sourceId})</dd></div><div><dt className="inline font-semibold">Evaluator: </dt><dd className="inline">{e.evaluator}</dd></div><div><dt className="inline font-semibold">Method: </dt><dd className="inline">{e.method}</dd></div></dl>{e.rubric?.map((r, i) => <p key={i} className="mt-2 text-sm">{r.criterion}: {r.score}% (weight {r.weight}%)</p>)}{e.feedback && <p className="mt-3 text-sm">{e.feedback}</p>}<p className="mt-3 text-sm text-slate-500">{e.limitations}</p></details>) : <p className="py-5 text-sm text-slate-500">No evaluated evidence yet. Complete a controlled assessment or submit a company challenge for review.</p>}</div><p className="mt-4 text-xs text-slate-500">{data.policy}</p></>}</section>;
+  return <section className="ui-section" aria-labelledby="competency-evidence-heading">
+    <SectionHeading title={<span id="competency-evidence-heading">Competency evidence</span>} description="Practice results and self-reported skills are separate from evaluated evidence." />
+    {error && <Feedback kind="error">{error}</Feedback>}
+    {!data && !error && <Feedback kind="loading">Loading evidence…</Feedback>}
+    {data && <>{data.items.length ? data.items.map(e => <details key={e._id} className="ui-evidence-details">
+      <summary>{e.skill} · {e.score}%<span>{e.source === 'assessment' ? 'Controlled assessment' : 'Company rubric review'} · {new Date(e.evaluatedAt).toLocaleString()}</span></summary>
+      <dl><div><dt>Source</dt><dd>{e.title} ({e.sourceId})</dd></div><div><dt>Evaluator</dt><dd>{e.evaluator}</dd></div><div><dt>Method</dt><dd>{e.method}</dd></div><div><dt>Evaluated at</dt><dd>{new Date(e.evaluatedAt).toLocaleString()}</dd></div></dl>
+      {e.rubric?.map((row, i) => <p key={i}>{row.criterion}: {row.score}% (weight {row.weight}%)</p>)}
+      {e.feedback && <p>{e.feedback}</p>}<p className="ui-muted">{e.limitations}</p>
+    </details>) : <Feedback kind="empty" title="No evaluated evidence yet">Complete a controlled assessment or submit a company challenge for review.</Feedback>}
+    <p className="ui-helper">{data.policy}</p></>}
+  </section>;
 }
