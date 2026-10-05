@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: Number(process.env.PORT || 5001),
+  port: Number(process.env.PORT || 5000),
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/skillsetu',
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
@@ -29,5 +29,9 @@ const env = {
   },
   uploadMaxMb: Number(process.env.UPLOAD_MAX_MB || 5),
 };
+
+if (env.nodeEnv === 'production' && (!process.env.JWT_SECRET || env.jwtSecret === 'dev-only-change-me')) {
+  throw new Error('JWT_SECRET must be configured in production');
+}
 
 module.exports = env;

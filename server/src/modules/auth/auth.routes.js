@@ -10,10 +10,11 @@ const router = express.Router();
 
 router.post('/register', authLimiter, validate(v.registerSchema), asyncHandler(controller.register));
 router.post('/login', authLimiter, validate(v.loginSchema), asyncHandler(controller.login));
-router.post('/logout', asyncHandler(controller.logout));
+router.post('/logout', authMiddleware, asyncHandler(controller.logout));
 router.post('/forgot-password', authLimiter, validate(v.forgotSchema), asyncHandler(controller.forgot));
 router.post('/reset-password', validate(v.resetSchema), asyncHandler(controller.reset));
 router.post('/verify-email', validate(v.verifySchema), asyncHandler(controller.verify));
+router.patch('/me', authMiddleware, validate(v.profileSchema), asyncHandler(controller.updateMe));
 router.get('/me', authMiddleware, asyncHandler(controller.me));
 router.get('/sessions', authMiddleware, asyncHandler(controller.getSessions));
 router.delete('/sessions/:sessionId', authMiddleware, validate(v.revokeSessionSchema), asyncHandler(controller.revokeSession));

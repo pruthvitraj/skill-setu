@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const request = require('../src/app');
+const request = require('../../server/src/app');
 
 test('health route shape', async () => {
   const http = require('http');

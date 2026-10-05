@@ -29,11 +29,12 @@ async function parseBuffer(buffer, mimeType) {
       const data = await pdfParse(buffer);
       text = data.text || '';
     } catch {
-      text = buffer.toString('utf8');
+      throw new (require('../../utils/AppError').AppError)('Unable to read this PDF. Upload a readable text-based PDF.', 422, 'UNREADABLE_RESUME');
     }
   } else {
-    text = buffer.toString('utf8');
+    throw new (require('../../utils/AppError').AppError)('Upload a PDF resume.', 422, 'UNSUPPORTED_RESUME');
   }
+  if (!text.trim()) throw new (require('../../utils/AppError').AppError)('This PDF has no readable text.', 422, 'UNREADABLE_RESUME');
   return extract(text);
 }
 

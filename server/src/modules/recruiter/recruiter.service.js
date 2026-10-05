@@ -47,10 +47,10 @@ async function dashboard(userId) {
     counts[skill] = (counts[skill] || 0) + 1;
     return counts;
   }, {});
-  const students = await Student.find().limit(8).populate('user', 'firstName lastName');
+  const students = await Student.find({ 'privacy.showProfile': { $ne: false } }).populate('user', 'firstName lastName');
   const topJob = jobs[0];
   const topMatches = topJob
-    ? students.map((s) => ({ student: s, match: matching.matchStudentToJob(s, topJob) })).sort((a, b) => b.match.score - a.match.score)
+    ? students.map((s) => ({ student: require('../../utils/profilePrivacy').visibleStudent(s), match: s.privacy?.showScores === false ? { score: 0, reasons: ['Scores are private'] } : matching.matchStudentToJob(s, topJob) })).sort((a, b) => b.match.score - a.match.score)
     : [];
     return {
     totalJobs: jobs.length,
@@ -86,21 +86,23 @@ async function dashboard(userId) {
 
 async function candidates({ page = 1, limit = 10 }) {
   const [items, total] = await Promise.all([
-    Student.find()
+    Student.find({ 'privacy.showProfile': { $ne: false } })
       .populate('user', 'firstName lastName email')
       .populate('university', 'name')
       .skip((page - 1) * limit)
       .limit(limit),
-    Student.countDocuments(),
+    Student.countDocuments({ 'privacy.showProfile': { $ne: false } }),
   ]);
-  return { items, pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 } };
+  return { items: items.map(require('../../utils/profilePrivacy').visibleStudent), pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 } };
 }
 
-async function candidateDetails(id) {
-  const student = await Student.findById(id).populate('user', 'firstName lastName email').populate('university', 'name');
+async function candidateDetails(userId, id) {
+  const student = await Student.findOne({ _id: id, 'privacy.showProfile': { $ne: false } }).populate('user', 'firstName lastName email').populate('university', 'name');
   if (!student) throw new AppError('Not found', 404, 'NOT_FOUND');
-  const applications = await Application.find({ student: id }).populate('job', 'title');
-  return { student, applications };
+  const recruiter = await getRecruiter(userId);
+  const jobIds = await Job.find({ recruiter: recruiter._id }).distinct('_id');
+  const applications = await Application.find({ student: id, job: { $in: jobIds } }).populate('job', 'title');
+  return { student: require('../../utils/profilePrivacy').visibleStudent(student), applications };
 }
 
 async function universities() {
@@ -113,6 +115,11 @@ async function inviteUniversity(userId, universityId, payload) {
 
 async function drives(userId) {
   return driveService.listForRecruiter(userId);
+}
+
+async function team(userId) {
+  const recruiter = await getRecruiter(userId);
+  return Recruiter.find({ company: recruiter.company._id }).populate('user', 'firstName lastName email isActive');
 }
 
 async function updateMe(userId, patch) {
@@ -135,4 +142,5 @@ module.exports = {
   inviteUniversity,
   drives,
   updateMe,
+  team,
 };

@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       loading,
+      updateUser: setUser,
       setSession: (payload) => {
         localStorage.setItem('skillsetu_token', payload.token);
         setUser(payload.user);

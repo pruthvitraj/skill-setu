@@ -20,4 +20,5 @@ const createJob = z.object({
   }),
 });
 
-module.exports = { createJob };
+const updateJob = z.object({ body: createJob.shape.body.partial().strict() });
+module.exports = { createJob, updateJob };

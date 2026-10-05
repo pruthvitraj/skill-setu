@@ -37,11 +37,13 @@ async function listPublished({ q, skill, location, page, limit }) {
   return paginated(items, total, page, limit);
 }
 
-async function getPublic(id) {
-  const job = await Job.findOne({
-    _id: id,
-    status: JOB_STATUS.PUBLISHED,
-  }).populate('company');
+async function getPublic(id, actor) {
+  let filter = { _id: id, status: JOB_STATUS.PUBLISHED };
+  if (actor?.role === 'recruiter') {
+    const recruiter = await Recruiter.findOne({ user: actor.id });
+    if (recruiter) filter = { _id: id, $or: [{ status: JOB_STATUS.PUBLISHED }, { recruiter: recruiter._id }] };
+  }
+  const job = await Job.findOne(filter).populate('company');
 
   if (!job) {
     throw new AppError('Job not found', 404, 'NOT_FOUND');
@@ -143,6 +145,12 @@ async function remove(userId, jobId) {
     throw new AppError('Job not found', 404, 'NOT_FOUND');
   }
 
+  const linked = await Promise.all([
+    require('../../models/Application').exists({ job: job._id }),
+    require('../../models/Interview').exists({ job: job._id }),
+    require('../../models/PlacementDrive').exists({ job: job._id }),
+  ]);
+  if (linked.some(Boolean)) throw new AppError('This job has linked records. Close it instead of deleting it.', 409, 'JOB_HAS_RECORDS');
   await Job.deleteOne({ _id: job._id });
 
   return {
@@ -169,14 +177,15 @@ async function matches(userId, jobId) {
 
   const students = await Student.find({
     placementStatus: { $ne: 'not_interested' },
+    'privacy.showProfile': { $ne: false },
   })
     .populate('user', 'firstName lastName email')
-    .limit(50);
+    ;
 
   return students
     .map((student) => ({
-      student,
-      match: matching.matchStudentToJob(student, job),
+      student: require('../../utils/profilePrivacy').visibleStudent(student),
+      match: student.privacy?.showScores === false ? { score: 0, reasons: ['Scores are private'] } : matching.matchStudentToJob(student, job),
     }))
     .sort((a, b) => b.match.score - a.match.score);
 }

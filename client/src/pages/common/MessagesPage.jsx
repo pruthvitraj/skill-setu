@@ -22,16 +22,18 @@ export default function MessagesPage() {
 
   async function open(conversation) {
     setSelected(conversation);
-    const response = await messageApi.thread(conversation._id);
-    setMessages(response.data.items || []);
+    try {
+      const response = await messageApi.thread(conversation._id);
+      setMessages(response.data.items || []); setError('');
+    } catch (requestError) { setMessages([]); setError(requestError.message || 'Unable to load conversation.'); }
   }
 
   async function send(event) {
     event.preventDefault();
-    const receiver = selected?.participants?.find((participant) => participant._id !== user?._id);
+    const receiver = selected?.participants?.find((participant) => participant._id !== user?.id);
     const receiverId = receiver?._id || recipientId;
     if (!receiverId || !body.trim()) return;
-    try { const response = await messageApi.send({ receiverId, body: body.trim() }); setBody(''); setRecipientId(''); await load(); const conversationId = response.data.message.conversation; const thread = await messageApi.thread(conversationId); setMessages(thread.data.items || []); setSelected({ _id: conversationId, participants: [{ _id: user?._id }, { _id: receiverId }] }); } catch (requestError) { setError(requestError.message || 'Unable to send message.'); }
+    try { const response = await messageApi.send({ receiverId, body: body.trim() }); setBody(''); setRecipientId(''); await load(); const conversationId = response.data.message.conversation; const thread = await messageApi.thread(conversationId); setMessages(thread.data.items || []); setSelected({ _id: conversationId, participants: [{ _id: user?.id }, { _id: receiverId }] }); } catch (requestError) { setError(requestError.message || 'Unable to send message.'); }
   }
 
   return <main className="min-h-screen bg-canvas"><div className="mx-auto grid max-w-6xl gap-5 p-6 lg:grid-cols-[280px_1fr]">

@@ -81,7 +81,7 @@ export default function TpoStudentDetails() {
 
             <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
               <Mail className="h-4 w-4" />
-              {user.email || data?.email || '—'}
+              {user.email || data?.email || 'â€”'}
             </p>
           </div>
         </div>
@@ -97,21 +97,21 @@ export default function TpoStudentDetails() {
             <div>
               <p className="text-slate-400">Batch</p>
               <p className="mt-1 font-semibold text-slate-800">
-                {data?.batch || '—'}
+                {data?.batch || 'â€”'}
               </p>
             </div>
 
             <div>
               <p className="text-slate-400">Placement Status</p>
               <p className="mt-1 font-semibold capitalize text-slate-800">
-                {data?.placementStatus?.replaceAll('_', ' ') || '—'}
+                {data?.placementStatus?.replaceAll('_', ' ') || 'â€”'}
               </p>
             </div>
 
             <div>
               <p className="text-slate-400">Interview Status</p>
               <p className="mt-1 font-semibold capitalize text-slate-800">
-                {data?.interviewStatus?.replaceAll('_', ' ') || '—'}
+                {data?.interviewStatus?.replaceAll('_', ' ') || 'â€”'}
               </p>
             </div>
           </div>
@@ -119,12 +119,13 @@ export default function TpoStudentDetails() {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="font-bold text-slate-900">
-            Student Data
+            Skills
           </h2>
 
-          <pre className="mt-5 max-h-96 overflow-auto rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-200">
-            {JSON.stringify(data, null, 2)}
-          </pre>
+          <ul className="mt-5 space-y-3 text-sm">
+            {data?.skills?.map(skill => <li key={skill._id || skill.name} className="flex justify-between"><span>{skill.name}</span><span className="capitalize text-slate-500">{skill.level}</span></li>)}
+            {!data?.skills?.length && <li className="text-slate-500">No skills added yet.</li>}
+          </ul>
         </div>
       </div>
     </div>

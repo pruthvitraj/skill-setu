@@ -104,7 +104,7 @@ async function internships(userId) {
   const tpo = await getTpo(userId);
   const students = await Student.find({ university: tpo.university._id }).select('_id');
   const studentIds = students.map((student) => student._id);
-  const jobs = await Job.find({ status: 'published' })
+  const jobs = await Job.find({ status: 'published', jobType: 'internship' })
     .populate('company', 'name')
     .sort({ createdAt: -1 });
   const applications = await Application.find({ student: { $in: studentIds }, job: { $in: jobs.map((job) => job._id) } })
@@ -179,7 +179,7 @@ async function requestPlacementDrive(userId, payload) {
 
 async function applications(userId, { status } = {}) {
   const tpo = await getTpo(userId);
-  const students = await Student.find({ university: { $in: [tpo.university._id, null] } }).select('_id');
+  const students = await Student.find({ university: tpo.university._id }).select('_id');
   const filter = { student: { $in: students.map((student) => student._id) } };
   if (status && status !== 'all') filter.status = status;
   return Application.find(filter)
@@ -191,7 +191,7 @@ async function applications(userId, { status } = {}) {
 
 async function updateApplicationStatus(userId, applicationId, payload) {
   const tpo = await getTpo(userId);
-  const students = await Student.find({ university: { $in: [tpo.university._id, null] } }).select('_id');
+  const students = await Student.find({ university: tpo.university._id }).select('_id');
   const application = await Application.findOne({ _id: applicationId, student: { $in: students.map((student) => student._id) } });
   if (!application) throw new AppError('Application not found', 404, 'NOT_FOUND');
   const applicationService = require('../applications/application.service');
@@ -226,7 +226,16 @@ async function skills(userId) {
 
 async function reports(userId, type) {
   const dash = await dashboard(userId);
-  return { type, generatedAt: new Date(), summary: dash };
+  const tpo = await getTpo(userId);
+  const studentIds = await Student.find({ university: tpo.university._id }).distinct('_id');
+  const result = { type, generatedAt: new Date(), summary: dash };
+  if (type === 'placement') result.students = await Student.find({ university: tpo.university._id }).populate('user', 'firstName lastName');
+  else if (type === 'department') result.departments = await Student.aggregate([{ $match: { university: tpo.university._id } }, { $group: { _id: '$department', students: { $sum: 1 }, placed: { $sum: { $cond: [{ $eq: ['$placementStatus', 'placed'] }, 1, 0] } } } }]);
+  else if (type === 'company' || type === 'drive') result.drives = await placementDrives(userId);
+  else if (type === 'internship') result.opportunities = await internships(userId);
+  else if (type === 'interview') result.interviews = await interviews(userId);
+  else throw new AppError('Unsupported report type', 422, 'INVALID_REPORT');
+  return result;
 }
 
 module.exports = {

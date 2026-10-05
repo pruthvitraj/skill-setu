@@ -22,7 +22,7 @@ app.use(cors({ origin: (origin, callback) => callback(null, !origin || allowedOr
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(apiLimiter);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', require('./middleware/auth.middleware').authMiddleware, require('./middleware/asyncHandler').asyncHandler(require('./middleware/privateUpload.middleware').privateUpload), express.static(path.join(__dirname, '../uploads')));
 app.use('/api', routes);
 app.use(notFound);
 app.use(errorMiddleware);

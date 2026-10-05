@@ -11,6 +11,6 @@ const router = express.Router();
 router.use(authMiddleware);
 router.get('/', asyncHandler(controller.list));
 router.post('/', requireRoles(ROLES.RECRUITER), validate(v.create), asyncHandler(controller.create));
-router.patch('/:id', requireRoles(ROLES.RECRUITER), asyncHandler(controller.update));
+router.patch('/:id', requireRoles(ROLES.RECRUITER), validate(v.update), asyncHandler(controller.update));
 
 module.exports = router;

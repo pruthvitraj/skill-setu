@@ -7,6 +7,9 @@ const { notify } = require('../notifications/notification.service');
 
 async function requestDrive(userId, payload) {
   const recruiter = await Recruiter.findOne({ user: userId });
+  if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
+  if (!await require('../../models/University').exists({ _id: payload.university })) throw new AppError('Institution not found', 404, 'NOT_FOUND');
+  if (payload.job && !await require('../../models/Job').exists({ _id: payload.job, recruiter: recruiter._id })) throw new AppError('Job not found', 404, 'NOT_FOUND');
   const drive = await PlacementDrive.create({
     ...payload,
     recruiter: recruiter._id,
@@ -27,6 +30,7 @@ async function requestDrive(userId, payload) {
 
 async function review(tpoUserId, driveId, { status, scheduledDate, tpoNote }) {
   const tpo = await Tpo.findOne({ user: tpoUserId });
+  if (!tpo) throw new AppError('TPO profile not found', 404, 'NOT_FOUND');
   const drive = await PlacementDrive.findOne({ _id: driveId, university: tpo.university });
   if (!drive) throw new AppError('Drive not found', 404, 'NOT_FOUND');
   drive.status = status;
@@ -49,6 +53,7 @@ async function review(tpoUserId, driveId, { status, scheduledDate, tpoNote }) {
 
 async function listForTpo(tpoUserId) {
   const tpo = await Tpo.findOne({ user: tpoUserId });
+  if (!tpo) throw new AppError('TPO profile not found', 404, 'NOT_FOUND');
   return PlacementDrive.find({ university: tpo.university })
     .populate('company', 'name')
     .populate('job', 'title')
@@ -57,6 +62,7 @@ async function listForTpo(tpoUserId) {
 
 async function listForRecruiter(userId) {
   const recruiter = await Recruiter.findOne({ user: userId });
+  if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
   return PlacementDrive.find({ recruiter: recruiter._id }).populate('university', 'name').sort({ createdAt: -1 });
 }
 

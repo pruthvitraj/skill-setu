@@ -17,13 +17,13 @@ async function list(req, res) {
 }
 
 async function getOne(req, res) {
-  const job = await service.getPublic(req.params.id);
+  const job = await service.getPublic(req.params.id, req.user);
 
   return success(res, 'OK', { job });
 }
 
 async function create(req, res) {
-  const job = await service.create(req.user.id, req.body);
+  const job = await service.create(req.user.id, req.validated.body);
 
   return success(res, 'Job created', { job }, 201);
 }
@@ -32,7 +32,7 @@ async function update(req, res) {
   const job = await service.update(
     req.user.id,
     req.params.id,
-    req.body
+    req.validated.body
   );
 
   return success(res, 'Job updated', { job });

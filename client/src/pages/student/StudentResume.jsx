@@ -101,9 +101,9 @@ export default function StudentResume() {
     e.target.value = '';
     if (!file) return;
     const ext = (file.name || '').split('.').pop().toLowerCase();
-    const validExts = ['pdf', 'doc', 'docx'];
+    const validExts = ['pdf'];
     const okMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/x-pdf'];
-    if (!validExts.includes(ext) && !okMimes.includes(file.type)) return setErr('Choose PDF, DOC, or DOCX only.');
+    if (!validExts.includes(ext) || file.type !== 'application/pdf') return setErr('Choose a PDF resume.');
     if (file.size > 5 * 1024 * 1024) return setErr('File must be under 5 MB.');
     setBusy(true); setErr(''); setMsg('Uploading and analysing with AI…');
     try {
@@ -154,8 +154,8 @@ export default function StudentResume() {
         <p style={{ fontSize: 15, fontWeight: 700, color: '#1d4ed8', margin: '0 0 4px' }}>
           {busy ? 'Analysing with AI…' : 'Click to upload your Resume'}
         </p>
-        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>PDF, DOC, DOCX — max 5 MB</p>
-        <input ref={inputRef} type="file" className="sr-only" accept=".pdf,.doc,.docx" onChange={upload} />
+        <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>PDF — max 5 MB</p>
+        <input ref={inputRef} type="file" className="sr-only" accept=".pdf" onChange={upload} />
       </div>
 
       {resumes.length === 0 ? (

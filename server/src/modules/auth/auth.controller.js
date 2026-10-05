@@ -58,6 +58,12 @@ async function me(req, res) {
   return success(res, 'OK', { user: authService.publicUser(user) });
 }
 
+async function updateMe(req, res) {
+  const User = require('../../models/User');
+  const user = await User.findByIdAndUpdate(req.user.id, req.validated.body, { new: true, runValidators: true });
+  return success(res, 'Profile saved', { user: authService.publicUser(user) });
+}
+
 async function getSessions(req, res) {
   const sessions = await sessionService.getActiveSessions(req.user.id);
   const currentSid = req.user.sid;
@@ -87,4 +93,4 @@ async function revokeAllSessions(req, res) {
   return success(res, 'All sessions revoked');
 }
 
-module.exports = { register, login, logout, forgot, reset, verify, me, getSessions, revokeSession, revokeAllSessions };
+module.exports = { register, login, logout, forgot, reset, verify, me, updateMe, getSessions, revokeSession, revokeAllSessions };

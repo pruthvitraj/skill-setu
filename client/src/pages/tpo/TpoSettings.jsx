@@ -1,4 +1,4 @@
-﻿
+
 import React, { useEffect, useState } from 'react';
 import {
   User,
@@ -126,9 +126,11 @@ export default function TpoSettings() {
     setError('');
 
     try {
-      const response = await api.get('/auth/me');
-      const user = response?.data || response?.user || response;
+      const response = await api.get('/tpo/settings');
+      const user = response?.data?.user || response?.user || response;
 
+      setNotifications(current => ({ ...current, ...user.notificationPreferences }));
+      setPreferences(current => ({ ...current, ...user.preferences }));
       setProfile({
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
@@ -246,7 +248,8 @@ export default function TpoSettings() {
         confirm: '',
       });
 
-      setMessage('Password changed successfully.');
+      localStorage.removeItem('skillsetu_token');
+      window.location.href = '/login';
     } catch (err) {
       setError(err?.message || 'Unable to change password.');
     } finally {
@@ -255,9 +258,10 @@ export default function TpoSettings() {
   }
 
   function logout() {
-    localStorage.removeItem('skillsetu_token');
-    localStorage.removeItem('skillsetu_user');
-    window.location.href = '/login';
+    api.post('/auth/logout').finally(() => {
+      localStorage.removeItem('skillsetu_token');
+      window.location.href = '/login';
+    });
   }
 
   if (loading) {

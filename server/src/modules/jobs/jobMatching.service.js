@@ -1,7 +1,7 @@
 function skillOverlap(required = [], studentSkills = []) {
-  const have = studentSkills.map((s) => (s.name || s).toLowerCase());
+  const have = studentSkills.map((s) => (s.name || s).trim().toLowerCase());
   if (!required.length) return 50;
-  const hits = required.filter((r) => have.some((h) => h.includes(r.toLowerCase()) || r.toLowerCase().includes(h)));
+  const hits = required.filter((r) => have.includes(r.trim().toLowerCase()));
   return Math.round((hits.length / required.length) * 100);
 }
 

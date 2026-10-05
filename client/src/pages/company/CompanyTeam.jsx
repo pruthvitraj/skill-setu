@@ -1,4 +1,5 @@
-﻿import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import api from '../../services/api';
 import {
   Users,
   Search,
@@ -8,7 +9,10 @@ import {
 } from 'lucide-react';
 
 export default function CompanyTeam() {
-  const [members] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => { api.get('/recruiters/team').then(response => setMembers(response.data.items.map(item => ({ id: item._id, name: `${item.user?.firstName || ''} ${item.user?.lastName || ''}`.trim(), email: item.user?.email || '', department: item.designation || '', role: 'Recruiter', status: item.user?.isActive ? 'Active' : 'Inactive' })))).catch(e => setError(e.message || 'Unable to load team.')).finally(() => setLoading(false)); }, []);
   const [query, setQuery] = useState('');
   const [role, setRole] = useState('');
 
@@ -31,6 +35,8 @@ export default function CompanyTeam() {
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-8">
       <div className="mx-auto max-w-[1400px]">
+        {loading && <p role="status">Loading team...</p>}
+        {error && <p role="alert" className="text-red-700">{error}</p>}
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
@@ -38,7 +44,7 @@ export default function CompanyTeam() {
             </p>
             <h1 className="mt-2 text-3xl font-bold text-[#0f2447]">Team</h1>
             <p className="mt-2 text-slate-600">
-              Manage recruiters, hiring managers and interviewers.
+              View recruiters associated with your company.
             </p>
           </div>
 

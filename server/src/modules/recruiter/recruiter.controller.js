@@ -20,7 +20,7 @@ async function candidates(req, res) {
 }
 
 async function candidateDetails(req, res) {
-  return success(res, 'OK', await service.candidateDetails(req.params.id));
+  return success(res, 'OK', await service.candidateDetails(req.user.id, req.params.id));
 }
 
 async function universities(req, res) {

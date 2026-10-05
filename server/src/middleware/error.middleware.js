@@ -4,13 +4,13 @@ const logger = require('../utils/logger');
 function errorMiddleware(err, req, res, next) {
   if (res.headersSent) return next(err);
 
-  const status = err.status || 500;
+  const status = err.code === 11000 ? 409 : err.name === 'CastError' || err.name === 'ValidationError' ? 422 : err.status || 500;
   const errorCode = err.errorCode || (status === 500 ? 'INTERNAL_ERROR' : 'ERROR');
   if (status >= 500) logger.error(err.stack || err.message);
 
   res.status(status).json({
     success: false,
-    message: status === 500 ? 'Something went wrong' : err.message,
+    message: err.code === 11000 ? 'This record already exists' : status === 500 ? 'Something went wrong' : err.message,
     errorCode,
   });
 }

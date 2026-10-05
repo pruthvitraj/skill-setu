@@ -107,7 +107,7 @@ async function network({ page = 1, limit = 10, q }) {
     .skip(skip)
     .limit(limit);
   const total = await Student.countDocuments(filter);
-  return { items: students, pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 } };
+  return { items: students.map(require('../../utils/profilePrivacy').visibleStudent), pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 } };
 }
 
 module.exports = {

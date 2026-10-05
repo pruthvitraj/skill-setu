@@ -20,6 +20,11 @@ async function submitAttempt(userId, assessmentId, answers) {
   const assessment = await Assessment.findById(assessmentId);
   if (!assessment) throw new AppError('Assessment not found', 404, 'NOT_FOUND');
 
+  if (!assessment.questions.length) throw new AppError('Assessment has no questions', 400, 'EMPTY_ASSESSMENT');
+  const indexes = new Set(answers.map(a => a.questionIndex));
+  if (answers.length !== assessment.questions.length || indexes.size !== answers.length || answers.some(a => !assessment.questions[a.questionIndex] || a.selectedIndex >= assessment.questions[a.questionIndex].options.length)) {
+    throw new AppError('Provide one valid answer for every question', 422, 'INVALID_ANSWERS');
+  }
   let correct = 0;
   const topicMap = {};
   assessment.questions.forEach((q, i) => {

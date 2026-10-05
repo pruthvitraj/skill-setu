@@ -6,16 +6,16 @@ const { AppError } = require('../../utils/AppError');
 async function generate(userId, targetRole) {
   const student = await studentService.getByUserId(userId);
   if (!targetRole) throw new AppError('Select a single target role', 400, 'TARGET_REQUIRED');
-  await Roadmap.updateMany({ student: student._id }, { active: false });
-  student.targetRole = targetRole;
-  await student.save();
   const generated = await ai.generate({ student, targetRole });
-  return Roadmap.create({
+  const roadmap = await Roadmap.create({
     student: student._id,
     targetRole,
     active: true,
     ...generated,
   });
+  await Roadmap.updateMany({ student: student._id, _id: { $ne: roadmap._id } }, { active: false });
+  student.targetRole = targetRole; await student.save();
+  return roadmap;
 }
 
 async function current(userId) {

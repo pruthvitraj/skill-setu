@@ -9,6 +9,11 @@ const v = require('./tpo.validation');
 
 const router = express.Router();
 router.use(authMiddleware, requireRoles(ROLES.TPO));
+router.get('/settings', asyncHandler(require('./settings.controller').get));
+router.patch('/settings/profile', validate(require('./settings.controller').schemas.profile), asyncHandler(require('./settings.controller').profile));
+router.patch('/settings/notifications', validate(require('./settings.controller').schemas.notifications), asyncHandler(require('./settings.controller').notifications));
+router.patch('/settings/preferences', validate(require('./settings.controller').schemas.preferences), asyncHandler(require('./settings.controller').preferences));
+router.patch('/settings/password', validate(require('./settings.controller').schemas.password), asyncHandler(require('./settings.controller').password));
 router.get('/dashboard', asyncHandler(controller.dashboard));
 router.get('/student-filters', asyncHandler(controller.studentFilters));
 router.get('/students', asyncHandler(controller.students));
@@ -20,9 +25,9 @@ router.post('/announcements', validate(v.announcement), asyncHandler(controller.
 router.get('/companies', asyncHandler(controller.companies));
 router.get('/placement-drives', asyncHandler(controller.placementDrives));
 router.post('/placement-drives', validate(v.requestDrive), asyncHandler(controller.requestPlacementDrive));
-router.patch('/placement-drives/:id', asyncHandler(controller.reviewPlacementDrive));
+router.patch('/placement-drives/:id', validate(require('../placement/placement.validation').review), asyncHandler(controller.reviewPlacementDrive));
 router.get('/applications', asyncHandler(controller.applications));
-router.patch('/applications/:id/status', asyncHandler(controller.updateApplicationStatus));
+router.patch('/applications/:id/status', validate(require('../applications/application.validation').status), asyncHandler(controller.updateApplicationStatus));
 router.get('/interviews', asyncHandler(controller.interviews));
 router.get('/placement-analytics', asyncHandler(controller.placementAnalytics));
 router.get('/skills/analytics', asyncHandler(controller.skills));

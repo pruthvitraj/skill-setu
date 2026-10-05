@@ -44,6 +44,12 @@ async function register(payload) {
   const existing = await User.findOne({ email: payload.email.toLowerCase() });
   if (existing) throw new AppError('Email already registered', 409, 'EMAIL_TAKEN');
 
+  if (payload.role === ROLES.TPO && payload.universityName && await University.exists({ name: payload.universityName })) {
+    throw new AppError('An existing institution requires an authorized invitation', 403, 'INVITATION_REQUIRED');
+  }
+  if (payload.role === ROLES.RECRUITER && payload.companyName && await Company.exists({ name: payload.companyName })) {
+    throw new AppError('An existing company requires an authorized invitation', 403, 'INVITATION_REQUIRED');
+  }
   const passwordHash = await hashPassword(payload.password);
   const verify = tokenHash();
   const user = await User.create({
@@ -87,7 +93,9 @@ async function register(payload) {
     html: `<p>Verify: ${env.clientUrl}/verify-email?token=${verify.raw}</p>`,
   });
 
-  return { user: publicUser(user), token: signToken({ sub: user._id.toString(), role: user.role }) };
+  const sid = crypto.randomBytes(32).toString('hex');
+  await sessionService.createSession(user._id.toString(), sid);
+  return { user: publicUser(user), token: signToken({ sub: user._id.toString(), role: user.role, sid, av: user.authVersion || 0 }) };
 }
 
 async function login({ email, password, userAgent, ip }) {
@@ -98,7 +106,7 @@ async function login({ email, password, userAgent, ip }) {
   if (!user.isActive) throw new AppError('Account disabled', 403, 'DISABLED');
 
   const sessionId = crypto.randomBytes(32).toString('hex');
-  const token = signToken({ sub: user._id.toString(), role: user.role, sid: sessionId });
+  const token = signToken({ sub: user._id.toString(), role: user.role, sid: sessionId, av: user.authVersion || 0 });
 
   await sessionService.createSession(user._id.toString(), sessionId, { userAgent, ip });
 
@@ -129,7 +137,9 @@ async function resetPassword(rawToken, password) {
   user.passwordHash = await hashPassword(password);
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
+  user.authVersion = (user.authVersion || 0) + 1;
   await user.save();
+  await sessionService.deleteAllSessions(user._id.toString());
 }
 
 async function verifyEmail(rawToken) {
@@ -152,6 +162,7 @@ function publicUser(user) {
     role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
+    phone: user.phone,
     isEmailVerified: user.isEmailVerified,
   };
 }

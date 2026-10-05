@@ -10,6 +10,10 @@ async function schedule(userId, payload) {
   const recruiter = await Recruiter.findOne({ user: userId });
   if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
 
+  const job = await require('../../models/Job').findOne({ _id: payload.job, recruiter: recruiter._id });
+  const candidate = await require('../../models/Student').findById(payload.candidate);
+  if (!job || !candidate) throw new AppError('Candidate or job not available', 404, 'NOT_FOUND');
+
   let application;
   if (payload.application) {
     application = await Application.findById(payload.application).populate('job');
@@ -24,6 +28,7 @@ async function schedule(userId, payload) {
     }
   }
 
+  if (application && ['rejected', 'selected', 'hired'].includes(application.status)) throw new AppError('This application is no longer available for an interview', 409, 'INVALID_TRANSITION');
   const interview = await Interview.create({ ...payload, recruiter: recruiter._id });
   if (application && application.status !== APPLICATION_STATUS.INTERVIEW_SCHEDULED) {
     const applicationService = require('../applications/application.service');
@@ -53,14 +58,17 @@ async function listForStudent(userId) {
 
 async function listForRecruiter(userId) {
   const recruiter = await Recruiter.findOne({ user: userId });
+  if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
   return Interview.find({ recruiter: recruiter._id })
     .populate({ path: 'candidate', populate: { path: 'user', select: 'firstName lastName' } })
     .populate('job', 'title')
     .sort({ scheduledAt: -1 });
 }
 
-async function update(id, patch) {
-  const interview = await Interview.findByIdAndUpdate(id, patch, { new: true });
+async function update(userId, id, patch) {
+  const recruiter = await Recruiter.findOne({ user: userId });
+  if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
+  const interview = await Interview.findOneAndUpdate({ _id: id, recruiter: recruiter._id }, patch, { new: true, runValidators: true });
   if (!interview) throw new AppError('Interview not found', 404, 'NOT_FOUND');
   if (patch.result && patch.result !== 'pending') {
     interview.status = INTERVIEW_STATUS.COMPLETED;

@@ -15,6 +15,8 @@ async function authMiddleware(req, res, next) {
     const user = await User.findById(payload.sub);
     if (!user || !user.isActive) throw new AppError('Invalid session', 401, 'UNAUTHORIZED');
 
+    if (!payload.sid || (payload.av || 0) !== (user.authVersion || 0)) throw new AppError('Sign in again', 401, 'SESSION_EXPIRED');
+
     // Validate session if session ID present
     if (payload.sid) {
       const sessionCheck = await sessionService.validateSession(payload.sub, payload.sid);

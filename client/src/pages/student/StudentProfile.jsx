@@ -1,8 +1,9 @@
+import api from '../../services/api';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function StudentProfile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const [form, setForm] = useState({
     firstName: user?.firstName || '',
@@ -12,6 +13,8 @@ export default function StudentProfile() {
   });
 
   const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -24,9 +27,13 @@ export default function StudentProfile() {
     setSaved(false);
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    setSaved(true);
+  async function handleSubmit(event) {
+    event.preventDefault(); setBusy(true); setSaved(false); setError('');
+    try {
+      const response = await api.patch('/auth/me', { firstName: form.firstName, lastName: form.lastName, phone: form.phone });
+      updateUser(response.data.user); setSaved(true);
+    } catch (e) { setError(e.message || 'Unable to save profile.'); }
+    finally { setBusy(false); }
   }
 
   const initials =
@@ -63,6 +70,7 @@ export default function StudentProfile() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {error && <p role="alert" className="mb-4 text-red-700">{error}</p>}
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <label
@@ -111,6 +119,7 @@ export default function StudentProfile() {
                 <input
                   id="email"
                   name="email"
+                  readOnly
                   type="email"
                   value={form.email}
                   onChange={handleChange}
@@ -140,6 +149,7 @@ export default function StudentProfile() {
             <div className="mt-8 flex items-center gap-4 border-t border-slate-200 pt-6">
               <button
                 type="submit"
+                disabled={busy}
                 className="rounded-lg bg-[#22488f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1a3872]"
               >
                 Save Changes

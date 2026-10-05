@@ -4,7 +4,7 @@ const prompt = require('../../integrations/ai/prompts/roadmap.prompt');
 
 const ROLE_PHASES_MATRIX = [
   {
-    keywords: ['data', 'engg', 'engineer', 'etl', 'pipeline', 'warehouse', 'spark'],
+    keywords: ['data engineer', 'data analyst', 'data science', 'etl', 'pipeline', 'warehouse', 'spark'],
     phases: [
       { title: 'Advanced SQL & Data Modeling', type: 'assessment', description: 'Joins, window functions, schema design, and query optimization' },
       { title: 'Python for Data Engineering', type: 'course', description: 'Pandas, NumPy, script automation, and API data extraction' },
@@ -24,7 +24,7 @@ const ROLE_PHASES_MATRIX = [
     ],
   },
   {
-    keywords: ['backend', 'node', 'express', 'api', 'server', 'java', 'python', 'go'],
+    keywords: ['backend', 'node', 'express', 'api', 'server', 'java developer', 'python developer', 'golang'],
     phases: [
       { title: 'Core Backend Languages & RDBMS', type: 'course', description: 'Node.js/Python/Java, RESTful API principles, and SQL databases' },
       { title: 'Authentication, Security & ORMs', type: 'practice', description: 'JWT, OAuth2, Prisma/Mongoose, and data validation' },

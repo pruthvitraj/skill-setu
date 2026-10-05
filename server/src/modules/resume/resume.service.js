@@ -8,14 +8,14 @@ const studentService = require('../student/student.service');
 
 async function uploadResume(userId, file) {
   const student = await studentService.getByUserId(userId);
+  const parsed = await parseBuffer(file.buffer, file.mimetype);
+  const analysis = await ats.analyze(parsed, student.targetRole || '');
   const stored = await saveBuffer({
     buffer: file.buffer,
     mimeType: file.mimetype,
     originalName: file.originalname,
     folder: 'resumes',
   });
-  const parsed = await parseBuffer(file.buffer, file.mimetype);
-  const analysis = await ats.analyze(parsed, student.targetRole || '');
   const resume = await Resume.create({
     student: student._id,
     fileKey: stored.key,

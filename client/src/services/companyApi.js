@@ -27,16 +27,14 @@ export const companyApi = {
   
   interviews: {
     list: (params) => api.get('/interviews', { params }),
-    get: (id) => api.get(`/interviews/${id}`),
     create: (data) => api.post('/interviews', data),
     update: (id, data) => api.patch(`/interviews/${id}`, data),
-    delete: (id) => api.delete(`/interviews/${id}`),
   },
   
   messages: {
-    conversations: () => api.get('/messages/conversations'),
-    messages: (conversationId) => api.get(`/messages/conversations/${conversationId}`),
-    send: (conversationId, body) => api.post(`/messages/conversations/${conversationId}`, { body }),
+    conversations: () => api.get('/messages'),
+    messages: (conversationId) => api.get(`/messages/${conversationId}`),
+    send: (receiverId, body) => api.post('/messages', { receiverId, body }),
   },
   
   universities: {
@@ -48,12 +46,12 @@ export const companyApi = {
   notifications: {
     list: (params) => api.get('/notifications', { params }),
     markRead: (id) => api.patch(`/notifications/${id}/read`),
-    markAllRead: () => api.patch('/notifications/read-all'),
+    markAllRead: () => api.post('/notifications/read-all'),
   },
   
   analytics: {
-    overview: () => api.get('/analytics/recruiter/overview'),
-    jobs: () => api.get('/analytics/recruiter/jobs'),
-    pipeline: () => api.get('/analytics/recruiter/pipeline'),
+    overview: () => api.get('/analytics/me'),
+    jobs: () => api.get('/analytics/me'),
+    pipeline: () => api.get('/analytics/me'),
   },
 };

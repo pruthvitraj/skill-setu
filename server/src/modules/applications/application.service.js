@@ -28,7 +28,6 @@ async function apply(userId, jobId, resumeId, coverNote) {
   const exists = await Application.findOne({
     student: student._id,
     job: job._id,
-    resume: resume._id,
   });
 
   if (exists) {
@@ -81,7 +80,7 @@ async function myApplications(userId) {
  * Update application status.
  *
  * Recruiters can only update applications belonging to their own jobs.
- * TPO can update applications globally.
+ * TPO can update applications only within their institution.
  */
 async function updateStatus(actor, applicationId, toStatus, note) {
   const application = await Application.findById(applicationId)
@@ -117,7 +116,17 @@ async function updateStatus(actor, applicationId, toStatus, note) {
     throw new AppError('Forbidden', 403, 'FORBIDDEN');
   }
 
+  if (actor.role === ROLES.TPO) {
+    const tpo = await require('../tpo/tpo.service').getTpo(actor.id);
+    if (String(application.student.university) !== String(tpo.university._id)) throw new AppError('Application not found', 404, 'NOT_FOUND');
+  }
+
   const from = application.status;
+  const flow = require('../../../../shared/constants/applicationStatus').APPLICATION_FLOW;
+  if (from !== toStatus && (from === APPLICATION_STATUS.HIRED || from === APPLICATION_STATUS.REJECTED || (toStatus !== APPLICATION_STATUS.REJECTED && flow.indexOf(toStatus) < flow.indexOf(from)))) {
+    throw new AppError('This application cannot move to that status', 409, 'INVALID_TRANSITION');
+  }
+  if (from === toStatus) return application;
 
   application.status = toStatus;
   await application.save();
@@ -153,10 +162,13 @@ async function updateStatus(actor, applicationId, toStatus, note) {
     });
   }
 
-  if (toStatus === APPLICATION_STATUS.HIRED) {
-    application.student.placementStatus = 'placed';
+  const active = await Application.exists({ student: application.student._id, status: { $nin: [APPLICATION_STATUS.REJECTED, APPLICATION_STATUS.HIRED] } });
+  const hired = await Application.exists({ student: application.student._id, status: APPLICATION_STATUS.HIRED });
+  if (application.student.placementStatus !== 'not_interested') {
+    application.student.placementStatus = hired ? 'placed' : active ? 'in_process' : 'available';
     await application.student.save();
   }
+  if (toStatus === APPLICATION_STATUS.REJECTED) await require('../../models/Connection').deleteMany({ application: application._id });
 
   if ([APPLICATION_STATUS.SELECTED, APPLICATION_STATUS.HIRED].includes(toStatus)) {
     const Recruiter = require('../../models/Recruiter');
@@ -182,7 +194,7 @@ async function updateStatus(actor, applicationId, toStatus, note) {
  *   - only applications belonging to their jobs
  *
  * TPO:
- *   - all applications
+ *   - only applications from their institution
  */
 async function listForActor(actor, { status, q, page, limit }) {
   let filter = {};
@@ -207,6 +219,11 @@ async function listForActor(actor, { status, q, page, limit }) {
     filter.job = {
       $in: jobs.map((job) => job._id),
     };
+  }
+
+  if (actor.role === ROLES.TPO) {
+    const tpo = await require('../tpo/tpo.service').getTpo(actor.id);
+    filter.student = { $in: await require('../../models/Student').find({ university: tpo.university._id }).distinct('_id') };
   }
 
   if (status) {
@@ -329,8 +346,10 @@ async function getOne(id, actor) {
     }
   }
 
-  // TPO access remains unrestricted here, matching
-  // the existing TPO application-management route.
+  if (actor.role === ROLES.TPO) {
+    const tpo = await require('../tpo/tpo.service').getTpo(actor.id);
+    if (String(application.student.university) !== String(tpo.university._id)) throw new AppError('Not found', 404, 'NOT_FOUND');
+  }
 
   return {
     application,

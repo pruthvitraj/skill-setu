@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+import AccountRecovery from '../pages/auth/AccountRecovery';
+import { useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Rss, FileText, ClipboardList, TrendingUp, BookOpen, Briefcase, MessageCircle, Users, Video, Bell, UserCircle, Settings, BarChart3, Building2, CalendarDays } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -349,7 +350,7 @@ function StudentRoute({ children }) {
   if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
   
   const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user || (token ? { firstName: 'Aarav', lastName: 'Deshmukh', role: 'student' } : null);
+  const currentUser = user;
   
   if (!currentUser) return <Navigate to="/" replace />;
   if (currentUser.role !== 'student') return <main className="p-6"><h1 className="text-xl font-bold">Student access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for student accounts.</p></main>;
@@ -429,7 +430,7 @@ function TpoRoute({ children }) {
   if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
   
   const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user || (token ? { firstName: 'Dr. Priya', lastName: 'Sharma', role: 'tpo' } : null);
+  const currentUser = user;
   
   if (!currentUser) return <Navigate to="/" replace />;
   if (currentUser.role !== 'tpo') return <Navigate to="/" replace />;
@@ -504,7 +505,7 @@ function CompanyRoute({ children }) {
   if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
   
   const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user || (token ? { firstName: 'Rajesh', lastName: 'Kumar', role: 'recruiter' } : null);
+  const currentUser = user;
   
   if (!currentUser) return <Navigate to="/" replace />;
   if (currentUser.role !== 'recruiter') return <main className="p-6"><h1 className="text-xl font-bold">Company access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for company/recruiter accounts.</p></main>;
@@ -743,6 +744,8 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/verify-email" element={<AccountRecovery mode="verify" />} />
+      <Route path="/reset-password" element={<AccountRecovery mode="reset" />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboard /></StudentRoute>} />

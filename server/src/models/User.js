@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema(
     passwordResetToken: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
     isActive: { type: Boolean, default: true },
+    authVersion: { type: Number, default: 0 },
+    notificationPreferences: { type: mongoose.Schema.Types.Mixed, default: {} },
+    preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
 );

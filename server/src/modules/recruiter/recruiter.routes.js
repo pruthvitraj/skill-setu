@@ -9,6 +9,7 @@ const v = require('./recruiter.validation');
 
 const router = express.Router();
 router.use(authMiddleware, requireRoles(ROLES.RECRUITER));
+router.get('/team', asyncHandler(async (req, res) => require('../../utils/response').success(res, 'OK', { items: await require('./recruiter.service').team(req.user.id) })));
 router.get('/me', asyncHandler(controller.me));
 router.patch('/me', asyncHandler(controller.update));
 router.get('/dashboard', asyncHandler(controller.dashboard));

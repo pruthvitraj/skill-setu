@@ -249,6 +249,16 @@ export default function CompanyApplications() {
     setStatus(event.target.value);
   }
 
+  async function openResume(resume) {
+    try {
+      const response = await fetch(`${API_ORIGIN}/uploads/${resume.fileKey}`, { credentials: 'include', headers: { Authorization: `Bearer ${localStorage.getItem('skillsetu_token')}` } });
+      if (!response.ok) throw new Error('Unable to download resume.');
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a'); link.href = url; link.download = resume.fileName || 'resume.pdf'; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) { setActionError(error.message); }
+  }
+
   async function scheduleInterview(application) {
     if (!application?.student?._id || !application?.job?._id) return;
 
@@ -780,15 +790,14 @@ export default function CompanyApplications() {
                       )}
                     </div>
                     {selected.resume.fileKey && (
-                      <a
-                        href={`${API_ORIGIN}/uploads/${selected.resume.fileKey}`}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => openResume(selected.resume)}
                         className="inline-flex items-center gap-2 rounded-lg bg-[#22488f] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1a3872]"
                       >
                         <FileText size={14} />
-                        Open resume
-                      </a>
+                        Download resume
+                      </button>
                     )}
                   </div>
                   {selected.resume.parsed?.skills?.length > 0 && (

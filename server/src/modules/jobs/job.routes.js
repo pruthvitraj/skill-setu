@@ -43,6 +43,7 @@ router.post(
 router.patch(
   '/:id',
   requireRoles(ROLES.RECRUITER),
+  validate(v.updateJob),
   asyncHandler(controller.update)
 );
 
