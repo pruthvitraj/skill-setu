@@ -111,11 +111,8 @@ export default function CompanyJobForm() {
         setLoading(true);
         setError('');
 
-        // The public GET /jobs/:id only returns published jobs. For recruiter editing,
-        // load the authenticated recruiter's own jobs and select the requested job.
-        const response = await companyApi.jobs.list({ page: 1, limit: 100 });
-        const jobs = normalizeList(response);
-        const job = jobs.find((item) => String(item._id) === String(id));
+        const response = await companyApi.jobs.get(id);
+        const job = normalizeJob(response);
 
         if (!job) {
           throw new Error('Job posting not found in your company account.');

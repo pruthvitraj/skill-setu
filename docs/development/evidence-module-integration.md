@@ -1,3 +1,5 @@
+> Historical implementation notes. Current live MongoDB and three-role browser validation: [core-workflow-audit.md](core-workflow-audit.md).
+
 # Evidence modules and student digital card
 
 This change extends the existing MERN application and its three roles. It does not add a simulation engine or a second student passport.

@@ -8,11 +8,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('skillsetu_token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
     authApi
       .me()
       .then((res) => setUser(res.data.user))
@@ -21,6 +16,12 @@ export function AuthProvider({ children }) {
         setUser(null);
       })
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const expired = () => setUser(null);
+    window.addEventListener('skillsetu-session-expired', expired);
+    return () => window.removeEventListener('skillsetu-session-expired', expired);
   }, []);
 
   const value = useMemo(

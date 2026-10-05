@@ -69,7 +69,7 @@ export default function TpoCompanies() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Companies</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Companies connected with your university for hiring and placement opportunities.
+            Public company directory. Placement requests establish campus relationships.
           </p>
         </div>
 
@@ -93,10 +93,10 @@ export default function TpoCompanies() {
         </div>
 
         <div className="card">
-          <p className="text-sm text-slate-500">Companies With Hiring Activity</p>
+          <p className="text-sm text-slate-500">Companies with published openings</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
             {items.filter((item) =>
-              getValue(item, ['active', 'isActive'], false)
+              getValue(item, ['activeJobs'], false)
             ).length}
           </p>
         </div>
@@ -241,7 +241,7 @@ export default function TpoCompanies() {
                                 : 'bg-slate-100 text-slate-600'
                             }`}
                           >
-                            {hiring ? 'Active' : 'Inactive'}
+                            {hiring} published opening{hiring===1?'':'s'}
                           </span>
                         )}
                       </td>

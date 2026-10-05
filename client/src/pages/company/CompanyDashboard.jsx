@@ -155,11 +155,11 @@ function HiringFunnel({ funnel = [], applications = 0 }) {
     <Card>
       <div className="border-b border-slate-100 px-6 py-5">
         <h2 className="text-lg font-bold text-slate-950">
-          Hiring Funnel
+          Current application stages
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          Candidate progression through your recruitment pipeline
+          Applications by their current recorded stage
         </p>
       </div>
 
@@ -389,7 +389,7 @@ export default function CompanyDashboard() {
           title="Shortlisted"
           value={shortlisted}
           icon={UserCheck}
-          helper={`${interviews} interviews scheduled`}
+          helper={`${interviews} interview records`}
         />
 
         <StatCard
@@ -511,7 +511,7 @@ export default function CompanyDashboard() {
                 >
                   <div className="min-w-0">
                     <Link
-                      to={`/company/jobs/${job._id}`}
+                      to={`/company/jobs/${job._id}/edit`}
                       className="font-semibold text-slate-900 hover:text-blue-600"
                     >
                       {job.title || 'Untitled Job'}

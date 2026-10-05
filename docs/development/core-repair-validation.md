@@ -1,3 +1,5 @@
+> Historical implementation notes. Current live MongoDB and three-role browser validation: [core-workflow-audit.md](core-workflow-audit.md).
+
 # Core workflow repair
 
 Branch: fix/core-workflows. Base: 0728249.

@@ -1,3 +1,4 @@
+import Modal from '../../components/common/Modal';
 import CompetencyEvidence from '../../components/common/CompetencyEvidence';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -200,6 +201,8 @@ export default function CompanyApplications() {
 
   const [updatingId, setUpdatingId] = useState(null);
   const [actionError, setActionError] = useState('');
+  const [interviewDraft, setInterviewDraft] = useState(null);
+  const [interviewForm, setInterviewForm] = useState({ scheduledAt: '', round: 'technical', mode: 'online', meetingLink: '', location: '' });
 
   async function loadApplications(showRefresh = false) {
     try {
@@ -260,25 +263,19 @@ export default function CompanyApplications() {
     } catch (error) { setActionError(error.message); }
   }
 
-  async function scheduleInterview(application) {
-    if (!application?.student?._id || !application?.job?._id) return;
-
+  function scheduleInterview(application) {
+    setActionError(''); setInterviewForm({ scheduledAt: '', round: 'technical', mode: 'online', meetingLink: '', location: '' }); setInterviewDraft(application);
+  }
+  async function confirmInterview(event) {
+    event.preventDefault(); if (!interviewDraft || updatingId) return;
+    const scheduled = new Date(interviewForm.scheduledAt);
+    if (!interviewForm.scheduledAt || !Number.isFinite(scheduled.getTime()) || scheduled <= new Date()) { setActionError('Choose a future interview time.'); return; }
+    setUpdatingId(interviewDraft._id); setActionError('');
     try {
-      setUpdatingId(application._id);
-      setActionError('');
-      await companyApi.interviews.create({
-        candidate: application.student._id,
-        job: application.job._id,
-        application: application._id,
-        scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        mode: 'online',
-        round: 'technical',
-      });
-      await updateStatus(application, STATUS.interview_scheduled);
-    } catch (requestError) {
-      setActionError(requestError?.message || 'Unable to schedule this interview.');
-      setUpdatingId(null);
-    }
+      await companyApi.interviews.create({ candidate: interviewDraft.student._id, job: interviewDraft.job._id, application: interviewDraft._id, ...interviewForm, scheduledAt: scheduled.toISOString() });
+      await loadApplications(true); setSelected(null); setInterviewDraft(null);
+    } catch (e) { setActionError(e.message || 'Unable to schedule interview.'); }
+    finally { setUpdatingId(null); }
   }
 
   async function updateStatus(application, nextStatus) {
@@ -963,6 +960,17 @@ export default function CompanyApplications() {
           </div>
         </div>
       )}
+      <Modal open={Boolean(interviewDraft)} title="Schedule interview" onClose={() => { if (!updatingId) setInterviewDraft(null); }}>
+        <form className="space-y-4" onSubmit={confirmInterview}>
+          <p className="text-sm">{interviewDraft?.student?.user?.firstName} · {interviewDraft?.job?.title}</p>
+          {actionError && <p role="alert" className="text-red-700">{actionError}</p>}
+          <label className="block">Date and time (local)<input className="input" type="datetime-local" required value={interviewForm.scheduledAt} onChange={e => setInterviewForm({ ...interviewForm, scheduledAt: e.target.value })} /></label>
+          <label className="block">Round<select className="input" value={interviewForm.round} onChange={e => setInterviewForm({ ...interviewForm, round: e.target.value })}>{['technical','hr','aptitude','final'].map(r => <option key={r}>{r}</option>)}</select></label>
+          <label className="block">Mode<select className="input" value={interviewForm.mode} onChange={e => setInterviewForm({ ...interviewForm, mode: e.target.value })}><option>online</option><option>offline</option></select></label>
+          {interviewForm.mode === 'online' ? <label className="block">Meeting link<input required type="url" className="input" value={interviewForm.meetingLink} onChange={e => setInterviewForm({ ...interviewForm, meetingLink: e.target.value })} /></label> : <label className="block">Location<input required className="input" value={interviewForm.location} onChange={e => setInterviewForm({ ...interviewForm, location: e.target.value })} /></label>}
+          <button disabled={Boolean(updatingId)} className="btn-primary" type="submit">{updatingId ? 'Scheduling…' : 'Confirm interview'}</button>
+        </form>
+      </Modal>
     </div>
   );
 }

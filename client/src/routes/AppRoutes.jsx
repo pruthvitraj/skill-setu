@@ -1,3 +1,4 @@
+import CompanyInterviews from '../pages/company/CompanyInterviews';
 import NotificationsPage from '../pages/common/NotificationsPage';
 import StudentSettings from '../pages/student/StudentSettings';
 import ChallengesPage from '../pages/common/ChallengesPage';
@@ -109,12 +110,10 @@ function HomePage() {
 
             {/* Right Mock Card */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl relative z-10">
-              <h3 className="text-base font-bold text-[#0f2447] font-serif">Try it: see the gap for a sample student</h3>
+              <h3 className="text-base font-bold text-[#0f2447] font-serif">Illustration: skill gaps for a sample student</h3>
               
               <div className="mt-4 flex flex-wrap gap-2">
-                <button className="rounded-md bg-[#22488f] px-3 py-1.5 text-sm text-white">Data Engineer</button>
-                <button className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">Frontend Developer</button>
-                <button className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">Cloud Engineer</button>
+                <span className="rounded-md bg-[#22488f] px-3 py-1.5 text-sm text-white">Data Engineer example</span>
               </div>
 
               <div className="mt-6 space-y-4">
@@ -164,7 +163,7 @@ function HomePage() {
                 { title: 'Skill gap', desc: 'Know exactly which skills to close first, with clear priorities.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> },
                 { title: 'Learning roadmap', desc: 'A week-by-week path of courses, assessments and projects.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
                 { title: 'Study planner', desc: 'Set your weekly hours and see when you could be role-ready.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> },
-                { title: 'Verified skills', desc: 'Turn self-declared skills into proof through quizzes and projects.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> },
+                { title: 'Evaluated evidence', desc: 'Turn self-declared skills into proof through quizzes and projects.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> },
                 { title: 'Skill-based matching', desc: 'Recruiters and placement cells see the same match score you do.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> }
               ].map((feature, i) => (
                 <div key={i} className="card hover:border-slate-300 transition-colors">
@@ -180,7 +179,7 @@ function HomePage() {
             <div className="mt-32 max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-[#0f2447] mb-8 font-serif">Frequently asked questions</h2>
               <div className="space-y-4">
-                {['Is the data in this prototype real?', 'How is the match percentage calculated?', 'How does a skill become verified?', 'Who can use SkillSetu?'].map((q, i) => (
+                {['Is the data in this prototype real?', 'How is the match percentage calculated?', 'How is skill evidence recorded?', 'Who can use SkillSetu?'].map((q, i) => (
                   <details key={i} className="group border-b border-slate-200 pb-4">
                     <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-[#0f2447] text-sm">
                       {q}
@@ -297,6 +296,7 @@ function LoginPage() {
               {busy ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
+          <Link className="mt-4 block text-sm text-blue-700 underline" to="/forgot-password">Forgot password?</Link>
           <p className="mt-5 text-center text-sm text-slate-500">New to SkillSetu? <Link className="font-semibold text-indigo-700" to="/register">Create an account</Link></p>
         </div>
       </div>
@@ -355,7 +355,7 @@ function StudentRoute({ children }) {
   const token = localStorage.getItem('skillsetu_token');
   const currentUser = user;
   
-  if (!currentUser) return <Navigate to="/" replace />;
+  if (!currentUser) return <Navigate to="/login" replace />;
   if (currentUser.role !== 'student') return <main className="p-6"><h1 className="text-xl font-bold">Student access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for student accounts.</p></main>;
 
   async function handleLogout() {
@@ -372,7 +372,7 @@ function StudentRoute({ children }) {
     { path: '/student/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
     { path: '/student/skills', label: 'Profile Skills', icon: <BookOpen size={20} className="mr-4" /> },
     { path: '/student/skill-tracker', label: 'Skill Tracker', icon: <ClipboardList size={20} className="mr-4" /> },
-    { path: '/student/roadmap', label: 'AI Roadmap', icon: <TrendingUp size={20} className="mr-4" /> },
+    { path: '/student/roadmap', label: 'Learning Roadmap', icon: <TrendingUp size={20} className="mr-4" /> },
     { path: '/student/courses', label: 'Courses', icon: <BookOpen size={20} className="mr-4" /> },
     { path: '/student/marketplace', label: 'Marketplace (Jobs)', icon: <Briefcase size={20} className="mr-4" /> },
     { path: '/student/messages', label: 'Messages', icon: <MessageCircle size={20} className="mr-4" /> },
@@ -430,78 +430,11 @@ function StudentRoute({ children }) {
 }
 
 function TpoRoute({ children }) {
-  const { user, loading, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  if (loading) return <main className="p-6 text-sm text-slate-500">Loading session...</main>;
-  
-  const token = localStorage.getItem('skillsetu_token');
-  const currentUser = user;
-  
-  if (!currentUser) return <Navigate to="/" replace />;
-  if (currentUser.role !== 'tpo') return <Navigate to="/" replace />;
-
-  async function handleLogout() {
-    await logout();
-    navigate('/', { replace: true });
-  }
-
-  const links = [
-    { path: '/tpo/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
-    { path: '/tpo/drives', label: 'Placement Drives', icon: <Briefcase size={20} className="mr-4" /> },
-    { path: '/tpo/students', label: 'Students', icon: <Users size={20} className="mr-4" /> },
-    { path: '/tpo/reports', label: 'Reports', icon: <FileText size={20} className="mr-4" /> },
-    { path: '/tpo/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
-    { path: '/tpo/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
-  ];
-
+  const { user, loading } = useAuth();
+  if (loading) return <main className="p-6">Loading session…</main>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'tpo') return <Navigate to="/" replace />;
   return <TpoLayout>{children}</TpoLayout>;
-
-  return (
-    <div className="tpo-shell">
-      <aside className="tpo-sidebar flex flex-col pt-4 px-3 border-r border-slate-200 bg-white">
-        <Link className="mb-8 flex items-center gap-2 px-3 text-xl font-bold text-[#0f2447]" to="/tpo/dashboard">
-          <div className="flex h-7 w-7 items-center justify-center rounded bg-[#0f2447] text-white">
-            <Building2 size={16} />
-          </div>
-          SkillSetu TPO
-        </Link>
-        <nav className="flex-1 flex flex-col gap-1.5" aria-label="TPO workspace">
-          {links.map((link) => {
-            const isActive = location.pathname === link.path || (link.path === '/tpo/dashboard' && location.pathname === '/tpo/dashboard');
-            return (
-              <Link 
-                className={`relative flex items-center rounded-lg px-4 py-2.5 text-[15px] transition ${isActive ? "bg-[#eef2ff] text-[#1d4ed8] font-semibold" : "text-[#334155] hover:bg-[#f8fafc]"}`} 
-                to={link.path} 
-                aria-current={isActive ? 'page' : undefined} 
-                key={link.path}
-              >
-                {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#2563eb] rounded-r-md"></div>}
-                {link.icon}
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-8 border-t border-slate-200 pt-5 pb-5">
-          <div className="flex items-center gap-3 px-3">
-            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600">
-              {currentUser.firstName?.[0] || 'T'}
-            </div>
-            <div className="overflow-hidden flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900">{currentUser.firstName} {currentUser.lastName}</p>
-              <p className="text-xs text-slate-500 capitalize">TPO</p>
-            </div>
-            <button onClick={handleLogout} title="Log out" className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        </div>
-      </aside>
-      <main className="tpo-content">{children}</main>
-    </div>
-  );
 }
 
 function CompanyRoute({ children }) {
@@ -514,7 +447,7 @@ function CompanyRoute({ children }) {
   const token = localStorage.getItem('skillsetu_token');
   const currentUser = user;
   
-  if (!currentUser) return <Navigate to="/" replace />;
+  if (!currentUser) return <Navigate to="/login" replace />;
   if (currentUser.role !== 'recruiter') return <main className="p-6"><h1 className="text-xl font-bold">Company access only</h1><p className="mt-2 text-slate-600">This workspace is reserved for company/recruiter accounts.</p></main>;
 
   async function handleLogout() {
@@ -528,10 +461,12 @@ function CompanyRoute({ children }) {
     { path: '/company/jobs', label: 'Job Postings', icon: <Briefcase size={20} className="mr-4" /> },
     { path: '/company/drives', label: 'Placement Drives', icon: <CalendarDays size={20} className="mr-4" /> },
     { path: '/company/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
+    { path: '/company/interviews', label: 'Interviews', icon: <Video size={20} className="mr-4" /> },
     { path: '/company/analytics', label: 'Analytics', icon: <BarChart3 size={20} className="mr-4" /> },
     { path: '/company/network', label: 'Network', icon: <Users size={20} className="mr-4" /> },
     { path: '/company/messages', label: 'Messages', icon: <MessageCircle size={20} className="mr-4" /> },
     { path: '/company/team', label: 'Team', icon: <Users size={20} className="mr-4" /> },
+    { path: '/company/notifications', label: 'Notifications', icon: <Bell size={20} className="mr-4" /> },
     { path: '/company/settings', label: 'Settings', icon: <Settings size={20} className="mr-4" /> },
   ];
 
@@ -753,6 +688,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/verify-email" element={<AccountRecovery mode="verify" />} />
+      <Route path="/forgot-password" element={<AccountRecovery mode="forgot" />} />
       <Route path="/reset-password" element={<AccountRecovery mode="reset" />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -793,11 +729,16 @@ export default function AppRoutes() {
       <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
       <Route path="/company/jobs" element={<CompanyJobsPage />} />
       <Route path="/company/jobs/new" element={<CompanyJobFormPage />} />
+      <Route path="/company/jobs/:id" element={<CompanyJobFormPage />} />
       <Route path="/company/jobs/:id/edit" element={<CompanyJobFormPage />} />
       <Route path="/company/drives" element={<CompanyRoute><CompanyDrives /></CompanyRoute>} />
       <Route path="/company/applications" element={<CompanyApplicationsPage />} />
+      <Route path="/company/interviews" element={<CompanyRoute><CompanyInterviews /></CompanyRoute>} />
       <Route path="/company/analytics" element={<CompanyAnalyticsPage />} />
       <Route path="/company/team" element={<CompanyTeamPage />} />
+      <Route path="/company/notifications" element={<CompanyRoute><NotificationsPage /></CompanyRoute>} />
+      <Route path="/tpo/notifications" element={<TpoRoute><NotificationsPage /></TpoRoute>} />
+      <Route path="/tpo/messages" element={<TpoRoute><MessagesPage /></TpoRoute>} />
       <Route path="/company/settings" element={<CompanySettingsPage />} />
       <Route path="/company/network" element={<CompanyRoute><NetworkPage role="company" /></CompanyRoute>} />
       <Route path="/company/messages" element={<CompanyRoute><MessagesPage /></CompanyRoute>} />

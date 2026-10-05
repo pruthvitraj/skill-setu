@@ -81,13 +81,13 @@ export default function CompanyTeam() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search team members..."
+                aria-label="Search team members" placeholder="Search team members..."
                 className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-400"
               />
             </div>
 
             <select
-              value={role}
+              aria-label="Filter team role" value={role}
               onChange={(e) => setRole(e.target.value)}
               className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-700 outline-none"
             >
@@ -127,12 +127,7 @@ export default function CompanyTeam() {
                     <p className="text-xs text-slate-400">Department</p>
                     <p className="mt-1 font-medium text-slate-700">{member.department}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-400">Activity</p>
-                    <p className="mt-1 font-medium text-slate-700">
-                      {member.applications} reviews
-                    </p>
-                  </div>
+
                   <div>
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                       <ShieldCheck size={12} />
@@ -140,13 +135,6 @@ export default function CompanyTeam() {
                     </span>
                   </div>
                 </div>
-
-                <button
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                  title="More actions"
-                >
-                  <MoreHorizontal size={19} />
-                </button>
               </div>
             ))}
 

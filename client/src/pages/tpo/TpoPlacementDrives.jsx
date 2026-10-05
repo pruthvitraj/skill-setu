@@ -270,15 +270,15 @@ export default function TpoPlacementDrives() {
         <h2 className="font-semibold text-slate-900">Request a drive from a company</h2>
         <p className="mt-1 text-sm text-slate-500">Choose a published company job and send the request to its recruiter.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <select className="input" value={requestForm.company} onChange={(event) => setRequestForm({ ...requestForm, company: event.target.value, job: '' })}>
+          <select aria-label="Company" className="input" value={requestForm.company} onChange={(event) => setRequestForm({ ...requestForm, company: event.target.value, job: '' })}>
             <option value="">Select company</option>
             {companies.map((company) => <option key={company._id} value={company._id}>{company.name}</option>)}
           </select>
-          <select className="input" value={requestForm.job} onChange={(event) => setRequestForm({ ...requestForm, job: event.target.value })}>
+          <select aria-label="Published job" className="input" value={requestForm.job} onChange={(event) => setRequestForm({ ...requestForm, job: event.target.value })}>
             <option value="">Select published job</option>
             {opportunities.filter((job) => !requestForm.company || String(job.company?._id) === String(requestForm.company)).map((job) => <option key={job._id} value={job._id}>{job.title}</option>)}
           </select>
-          <input className="input" type="date" value={requestForm.proposedDate} onChange={(event) => setRequestForm({ ...requestForm, proposedDate: event.target.value })} />
+          <input aria-label="Proposed date" className="input" type="date" value={requestForm.proposedDate} onChange={(event) => setRequestForm({ ...requestForm, proposedDate: event.target.value })} />
           <input className="input" placeholder="Eligibility" value={requestForm.eligibility} onChange={(event) => setRequestForm({ ...requestForm, eligibility: event.target.value })} />
         </div>
         <button className="btn-primary mt-4" disabled={requestBusy}>{requestBusy ? 'Sending...' : 'Request placement drive'}</button>
@@ -519,6 +519,7 @@ export default function TpoPlacementDrives() {
                   type="date"
                   value={reviewDate}
                   onChange={(event) => setReviewDate(event.target.value)}
+                  disabled={['completed','rejected','cancelled'].includes(selectedDrive.status)}
                   className="input mt-2 w-full"
                 />
               </label>
@@ -582,9 +583,10 @@ export default function TpoPlacementDrives() {
                 </div>
               )}
 
-              {selectedDrive.status !== 'requested' && (
+              {['approved','rescheduled','active'].includes(selectedDrive.status) && <div className="flex flex-wrap gap-3">{['rescheduled','active','completed','cancelled'].filter(status=>status!==selectedDrive.status).map(status=><button type="button" key={status} disabled={reviewing} className="btn-ghost border" onClick={()=>reviewDrive(status)}>{status==='rescheduled'?'Reschedule':status==='active'?'Start drive':status==='completed'?'Complete drive':'Cancel drive'}</button>)}</div>}
+              {['completed','rejected','cancelled'].includes(selectedDrive.status) && (
                 <p className="rounded-xl bg-slate-50 p-3 text-center text-xs text-slate-500">
-                  This drive has already been reviewed.
+                  This drive has ended.
                 </p>
               )}
             </div>

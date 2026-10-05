@@ -42,7 +42,7 @@ export default function StudentProfile() {
     `${form.firstName?.[0] || ''}${form.lastName?.[0] || ''}`.toUpperCase() || 'S';
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-8">
+    <div className="bg-slate-50">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#0f2447]">
@@ -54,7 +54,8 @@ export default function StudentProfile() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <StudentDigitalCard />
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-8 flex items-center gap-4 border-b border-slate-200 pb-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#22488f] text-xl font-bold text-white">
               {initials}
@@ -164,9 +165,9 @@ export default function StudentProfile() {
               )}
             </div>
           </form>
-          <StudentDigitalCard />
-          <CompetencyEvidence />
+
         </div>
+        <CompetencyEvidence />
       </div>
     </div>
   );

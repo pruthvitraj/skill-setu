@@ -53,7 +53,11 @@ function SHead({ title, to, link='View all →' }) {
 
 /* ─── Post Card ──────────────────────────────────────────────── */
 function PostCard({ post }) {
-  const [liked, setLiked] = useState(false);
+  const { user } = useAuth();
+  const [liked, setLiked] = useState((post.likes || []).some(id => String(id._id || id) === String(user?.id)));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  async function toggleLike() { setBusy(true); setError(''); try { await (liked ? postApi.unlike(post._id) : postApi.like(post._id)); setLiked(!liked); } catch(e) { setError(e.message || 'Unable to update like.'); } finally { setBusy(false); } }
   const fn = post.author?.firstName || '?';
   const ln = post.author?.lastName || '';
   return (
@@ -74,13 +78,8 @@ function PostCard({ post }) {
             background:'#eff6ff', color:'#3b82f6', fontSize:11, fontWeight:600 }}>#{t}</span>)}
         </div>
       )}
-      <div style={{ display:'flex', gap:16, borderTop:'1px solid #f1f5f9', paddingTop:10 }}>
-        {[['❤️','🤍','Like',liked,()=>setLiked(v=>!v)],['💬',null,'Comment',false,null],['↗',null,'Share',false,null]].map(([a,b,l,on,fn])=>(
-          <button key={l} onClick={fn||undefined} style={{ background:'none', border:'none',
-            cursor:'pointer', fontSize:13, fontWeight:600, color: on?'#ef4444':'#94a3b8',
-            display:'flex', alignItems:'center', gap:4 }}>{on&&b?b:a} {l}</button>
-        ))}
-      </div>
+      <button type="button" disabled={busy} aria-pressed={liked} onClick={toggleLike} className="text-sm text-blue-700">{liked ? 'Unlike' : 'Like'}</button>
+      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
     </Card>
   );
 }
@@ -89,6 +88,7 @@ function PostCard({ post }) {
 function Compose({ user, onPosted }) {
   const [body, setBody] = useState('');
   const [tags, setTags] = useState('');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(e) {
     e.preventDefault();
@@ -97,11 +97,12 @@ function Compose({ user, onPosted }) {
     try {
       await postApi.create({ body: body.trim(), tags: tags.split(',').map(t=>t.trim()).filter(Boolean) });
       setBody(''); setTags(''); onPosted?.();
-    } finally { setBusy(false); }
+    } catch(e) { setError(e.message || 'Unable to publish post.'); } finally { setBusy(false); }
   }
   return (
     <Card style={{ marginBottom:18 }}>
       <form onSubmit={submit}>
+        {error && <p role="alert" className="text-red-700">{error}</p>}
         <div style={{ display:'flex', gap:12 }}>
           <Avatar name={user?.firstName||'?'} size={38} />
           <div style={{ flex:1 }}>
@@ -137,8 +138,8 @@ function ResumeMatch({ resume, dashData }) {
   const skills = resume?.parsed?.skills || [];
   if (!resume && !jobs.length) return null;
   return (
-    <Card style={{ marginBottom:18, background:'linear-gradient(135deg,#fef9f0,#fff7ed)' }}>
-      <SHead title="🎯 Your Resume Matches" to="/student/resume" link="Full ATS →" />
+    <Card style={{ marginBottom:18, background:'#fff' }}>
+      <SHead title="Resume guidance & open jobs" to="/student/resume" link="Full ATS →" />
       {resume?.ats?.overall && (
         <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
           <div style={{ flex:1, height:8, background:'#e0e7ff', borderRadius:8, overflow:'hidden' }}>
@@ -150,7 +151,7 @@ function ResumeMatch({ resume, dashData }) {
       )}
       {jobs.length > 0 && (
         <div>
-          <p style={{ fontSize:12, color:'#92400e', fontWeight:600, marginBottom:8 }}>Companies you match:</p>
+          <p style={{ fontSize:12, color:'#92400e', fontWeight:600, marginBottom:8 }}>Recently published jobs (not personalized matches):</p>
           <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
             {jobs.slice(0,3).map(j=>(
               <div key={j._id} style={{ display:'flex', justifyContent:'space-between',
@@ -196,15 +197,16 @@ export default function StudentDashboard() {
   const [posts, setPosts] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [postsLoading, setPostsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     Promise.all([
-      studentApi.dashboard().then(r=>setDash(r.data)).catch(()=>{}),
-      resumeApi.latest().then(r=>setResume(r.data?.resume)).catch(()=>{}),
-      notificationApi.list({ limit:10 }).then(r=>setNotifs(r.data?.items||r.data||[])).catch(()=>{}),
+      studentApi.dashboard().then(r=>setDash(r.data)).catch(e=>setError(e.message || 'Unable to load dashboard.')),
+      resumeApi.latest().then(r=>setResume(r.data?.resume)).catch(e=>setError(e.message || 'Unable to load dashboard.')),
+      notificationApi.list({ limit:10 }).then(r=>setNotifs(r.data?.items||r.data||[])).catch(e=>setError(e.message || 'Unable to load dashboard.')),
     ]).finally(()=>setLoading(false));
   }, []);
 
@@ -216,7 +218,7 @@ export default function StudentDashboard() {
       append ? setPosts(p=>[...p,...items]) : setPosts(items);
       const pag = r.data?.pagination;
       setHasMore(pag ? pg < pag.pages : false);
-    } finally { setPostsLoading(false); }
+    } catch(e) { setError(e.message || 'Unable to load feed.'); } finally { setPostsLoading(false); }
   };
   useEffect(()=>{ loadPosts(1); }, []);
 
@@ -236,6 +238,7 @@ export default function StudentDashboard() {
         @media(max-width:900px){ .dash-grid{grid-template-columns:1fr;} }
       `}</style>
       <div style={{ maxWidth:1100, padding:'28px 24px 48px' }}>
+        {error && <p role="alert" className="mb-4 text-red-700">{error}</p>}
         {/* Header row */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24 }}>
           <div>
@@ -385,7 +388,7 @@ export default function StudentDashboard() {
             )}
 
             {/* Quick actions */}
-            <div style={{ background:'linear-gradient(135deg,#0f2447,#22488f)',
+            <div style={{ background:'#0f2447',
               borderRadius:14, padding:'18px 20px' }}>
               <h3 style={{ fontSize:15, fontWeight:700, color:'#fff', margin:'0 0 12px', fontFamily:'Georgia,serif' }}>
                 🚀 Quick Actions

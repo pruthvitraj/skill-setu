@@ -231,9 +231,9 @@ export default function TpoSkills() {
 
         <StatCard
           icon={CheckCircle2}
-          label="Assessment Participation"
+          label="Evidence coverage"
           value={`${data?.participation ?? 0}%`}
-          helper="Students with skill assessment data"
+          helper="Students with recorded competency evidence"
           accent="green"
         />
 
@@ -413,7 +413,7 @@ export default function TpoSkills() {
                         </p>
 
                         <p className="mt-1 text-xs text-slate-500">
-                          {item.count ?? item.students ?? 0} students assessed
+                          {item.count ?? item.students ?? 0} students evaluated
                         </p>
                       </div>
                     </div>
@@ -470,7 +470,7 @@ export default function TpoSkills() {
                     </div>
                   ))
                 ) : (
-                  <EmptyState message="No skill gaps identified." />
+                  <EmptyState message="A target competency threshold has not been configured; skill gaps are not calculated." />
                 )}
               </div>
             </div>
@@ -485,7 +485,7 @@ export default function TpoSkills() {
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    Placement readiness by department.
+                    Recorded skill evidence by department.
                   </p>
                 </div>
 

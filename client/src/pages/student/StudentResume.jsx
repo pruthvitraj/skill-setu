@@ -105,13 +105,13 @@ export default function StudentResume() {
     const okMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/x-pdf'];
     if (!validExts.includes(ext) || file.type !== 'application/pdf') return setErr('Choose a PDF resume.');
     if (file.size > 5 * 1024 * 1024) return setErr('File must be under 5 MB.');
-    setBusy(true); setErr(''); setMsg('Uploading and analysing with AI…');
+    setBusy(true); setErr(''); setMsg('Uploading and analyzing resume…');
     try {
       const res = await resumeApi.upload(file);
       const uploaded = res.data.resume;
       setData({ resumes: [uploaded, ...resumes] });
       setSelected(uploaded);
-      setMsg('✅ Resume uploaded and AI-analysed!');
+      setMsg(`Resume uploaded. ${uploaded.ats?.scoredBy === 'rules' ? 'Rule-based' : 'AI heuristic'} analysis saved.`);
     } catch (e2) { setMsg(''); setErr(e2.message || 'Upload failed.'); }
     finally { setBusy(false); }
   }
@@ -134,7 +134,7 @@ export default function StudentResume() {
         📄 Resume &amp; ATS Score
       </h1>
       <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 24px' }}>
-        Upload your resume to get an AI-powered ATS analysis with keyword matching, skill gaps, and actionable recommendations.
+        Upload a readable PDF for keyword and structure guidance. The result identifies its evaluator and limitations; it is not an employer ATS decision.
       </p>
 
       {(msg || err) && (
@@ -145,14 +145,14 @@ export default function StudentResume() {
 
       {/* Upload zone */}
       <div
-        onClick={() => inputRef.current?.click()}
+        role="button" tabIndex={0} aria-label="Upload PDF resume" onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }} onClick={() => inputRef.current?.click()}
         style={{ border: '2px dashed #bfdbfe', borderRadius: 16, padding: '36px 24px', textAlign: 'center', cursor: 'pointer', background: '#eff6ff', marginBottom: 28, transition: 'border-color 0.2s' }}
         onMouseEnter={e => e.currentTarget.style.borderColor = '#3b82f6'}
         onMouseLeave={e => e.currentTarget.style.borderColor = '#bfdbfe'}
       >
         <p style={{ fontSize: 36, margin: '0 0 8px' }}>📎</p>
         <p style={{ fontSize: 15, fontWeight: 700, color: '#1d4ed8', margin: '0 0 4px' }}>
-          {busy ? 'Analysing with AI…' : 'Click to upload your Resume'}
+          {busy ? 'Analyzing resume…' : 'Click to upload your Resume'}
         </p>
         <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>PDF — max 5 MB</p>
         <input ref={inputRef} type="file" className="sr-only" accept=".pdf" onChange={upload} />
@@ -164,13 +164,13 @@ export default function StudentResume() {
           <p style={{ fontWeight: 600, fontSize: 15 }}>No resumes uploaded yet.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24 }}>
+        <div className="resume-layout">
 
           {/* Left: history */}
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0f2447', margin: '0 0 12px', fontFamily: 'Georgia,serif' }}>Upload History</h2>
             {resumes.map(r => (
-              <div key={r._id} onClick={() => setSelected(r)}
+              <div key={r._id} role="button" tabIndex={0} aria-label={`View analysis for ${r.fileName}`} onKeyDown={e => { if (e.key === 'Enter') setSelected(r); }} onClick={() => setSelected(r)}
                 style={{ border: `2px solid ${active?._id === r._id ? '#3b82f6' : '#e2e8f0'}`, background: active?._id === r._id ? '#eff6ff' : '#fff', borderRadius: 12, padding: '12px 14px', marginBottom: 8, cursor: 'pointer' }}>
                 <p style={{ margin: 0, fontWeight: 600, fontSize: 13, color: '#0f2447' }}>{r.fileName}</p>
                 <p style={{ margin: '2px 0 6px', fontSize: 11, color: '#94a3b8' }}>Uploaded {fmt(r.createdAt)}</p>
@@ -218,7 +218,7 @@ export default function StudentResume() {
 
               {/* AI Summary */}
               {ats.summary && (
-                <Section title="📋 AI Summary">
+                <Section title="Analysis summary">
                   <p style={{ fontSize: 13, color: '#334155', margin: 0, lineHeight: 1.6 }}>{ats.summary}</p>
                 </Section>
               )}

@@ -132,9 +132,9 @@ function StatCard({ icon: Icon, label, value, helper }) {
 }
 
 function InterviewCard({ interview }) {
-  const studentName = getStudentName(interview.student);
-  const studentEmail = getStudentEmail(interview.student);
-  const companyName = getCompanyName(interview.company);
+  const studentName = getStudentName(interview.candidate);
+  const studentEmail = getStudentEmail(interview.candidate);
+  const companyName = getCompanyName(interview.job?.company);
 
   const isOnline =
     String(interview.mode || '').toLowerCase() === 'online';
@@ -346,13 +346,13 @@ export default function TpoInterviews() {
 
     return interviews.filter((item) => {
       const studentName =
-        getStudentName(item.student).toLowerCase();
+        getStudentName(item.candidate).toLowerCase();
 
       const studentEmail =
-        getStudentEmail(item.student).toLowerCase();
+        getStudentEmail(item.candidate).toLowerCase();
 
       const companyName =
-        getCompanyName(item.company).toLowerCase();
+        getCompanyName(item.job?.company).toLowerCase();
 
       const round =
         String(item.round || '').toLowerCase();
@@ -406,8 +406,8 @@ export default function TpoInterviews() {
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            Manage student interviews, schedules, rounds and
-            interview outcomes.
+            View student interviews, schedules, rounds and
+            recorded outcomes.
           </p>
         </div>
 

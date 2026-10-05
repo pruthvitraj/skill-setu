@@ -1,0 +1,26 @@
+{
+  "database": "skillsetu_audit_1791228188742",
+  "checks": [
+    "migration twice preserves legacy values and never creates evidence",
+    "orphan student receives stable card profile without invented institution",
+    "practice is repeatable and isolated from competency evidence",
+    "concurrent controlled start resumes one persisted deadline without answer key",
+    "controlled ownership, immutable final score, one evidence record and retake denial",
+    "expired attempts fail on the server",
+    "company challenge creates immutable submission under duplicate requests",
+    "review ownership, rubric score, immutable retry and sourced evidence",
+    "institution and privacy boundaries cover evidence and submitted work",
+    "job ownership, application duplication, resume retention and expiry",
+    "interview scheduling validates ownership, dates and duplicate requests",
+    "institution messaging and notifications return accurate errors",
+    "drive request/review boundaries, duplicate prevention and reporting",
+    "profile/settings save and unavailable email never claims delivery",
+    "real PDF parsing and scoped announcement/report/analytics contracts",
+    "concurrent interview creation has one scheduled record",
+    "roadmap provenance, completion and expired sessions",
+    "logout invalidates database session"
+  ],
+  "createdAt": "2026-10-05T19:23:18.950Z",
+  "studentId": "6ac3f91ebfae2ee21d931430",
+  "browserAssessmentId": "6ac3f91ebfae2ee21d931440"
+}

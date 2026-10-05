@@ -10,7 +10,8 @@ import {
 import { companyApi } from '../../services/companyApi';
 
 export default function CompanyAnalytics() {
-  const [period, setPeriod] = useState('6 months');
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { companyApi.dashboard().then(r => setDashboard(r.data)).catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
   const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState('');
 
@@ -42,17 +43,11 @@ export default function CompanyAnalytics() {
             </p>
           </div>
 
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none"
-          >
-            <option>6 months</option>
-            <option>12 months</option>
-            <option>Current year</option>
-          </select>
+<p className="text-sm text-slate-600">Trends: last six months; totals: all recorded applications.</p>
         </div>
 
+        {error && <p role="alert" className="mt-4 text-red-700">{error}</p>}
+        {loading && <p role="status">Loading analytics…</p>}
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {[
             ['Total Applications', totals.applications, FileText],
@@ -96,7 +91,7 @@ export default function CompanyAnalytics() {
                     <div
                       className="w-full max-w-12 rounded-t-md bg-[#22488f] transition-all"
                       style={{
-                        height: `${Math.max(18, (item.applications / maxApplications) * 180)}px`,
+                        height: `${(item.applications / maxApplications) * 180}px`,
                       }}
                     />
                   </div>
@@ -107,9 +102,9 @@ export default function CompanyAnalytics() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#0f2447]">Hiring Funnel</h2>
+            <h2 className="text-lg font-bold text-[#0f2447]">Current application stages</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Candidate progression across your hiring process.
+              Counts reflect current stages, not conversion rates.
             </p>
 
             <div className="mt-7 space-y-5">
@@ -122,14 +117,10 @@ export default function CompanyAnalytics() {
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
                       className="h-full rounded-full bg-[#22488f]"
-                      style={{ width: `${funnel[0]?.value ? Math.max(5, (item.value / funnel[0].value) * 100) : 0}%` }}
+                      style={{ width: `${funnel[0]?.value ? (item.value / funnel[0].value) * 100 : 0}%` }}
                     />
                   </div>
-                  {index < funnel.length - 1 && (
-                    <p className="mt-1 text-right text-[11px] text-slate-400">
-                      {item.value ? Math.round((funnel[index + 1].value / item.value) * 100) : 0}% conversion
-                    </p>
-                  )}
+
                 </div>
               ))}
             </div>
@@ -171,7 +162,7 @@ export default function CompanyAnalytics() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#0f2447]">Candidate Skill Demand</h2>
+            <h2 className="text-lg font-bold text-[#0f2447]">Requested skills</h2>
             <p className="mt-1 text-sm text-slate-500">
               Most requested skills across your current jobs.
             </p>
@@ -182,13 +173,13 @@ export default function CompanyAnalytics() {
                   <div className="mb-2 flex justify-between">
                     <span className="text-sm font-medium text-slate-700">{item.skill}</span>
                     <span className="text-xs font-semibold text-slate-500">
-                      {item.demand} candidates
+                      {item.demand} job requirements
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-100">
                     <div
                       className="h-2 rounded-full bg-[#22488f]"
-                      style={{ width: `${(item.demand / 18) * 100}%` }}
+                      style={{ width: `${(item.demand / Math.max(1, ...skillDemand.map(s => s.demand))) * 100}%` }}
                     />
                   </div>
                 </div>

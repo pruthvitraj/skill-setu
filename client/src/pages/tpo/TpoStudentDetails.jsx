@@ -68,6 +68,7 @@ export default function TpoStudentDetails() {
         <ArrowLeft className="h-4 w-4" />
         Back to Students
       </Link>
+      {user._id && <Link className="inline-block text-blue-700 underline" to={`/tpo/messages?userId=${user._id}`}>Message student</Link>}
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">

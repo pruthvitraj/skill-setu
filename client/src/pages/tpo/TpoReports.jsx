@@ -156,8 +156,7 @@ function PrimitiveValue({ value, field }) {
   }
 
   if (
-    field?.toLowerCase().includes('date') ||
-    field?.toLowerCase().includes('at')
+    /(?:Date|At)$/.test(field || '') || ['date', 'scheduledAt', 'startedAt', 'expiresAt'].includes(field)
   ) {
     return <span>{formatDate(value)}</span>;
   }
@@ -168,6 +167,8 @@ function PrimitiveValue({ value, field }) {
 
   return <span>{String(value)}</span>;
 }
+
+function reportColumns(rows) { return [...new Set(rows.flatMap(row => Object.keys(row)))].filter(field => field !== '_id' && field !== 'id').slice(0,8); }
 
 function GenericReport({ data }) {
   if (!data || typeof data !== 'object') {
@@ -229,9 +230,7 @@ function GenericReport({ data }) {
                       <table className="w-full min-w-[520px] text-left text-sm">
                         <thead>
                           <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400">
-                            {Object.keys(value[0] || {})
-                              .filter((field) => field !== '_id' && field !== 'id')
-                              .slice(0, 8)
+                            {reportColumns(value)
                               .map((field) => (
                                 <th key={field} className="px-3 py-3 font-semibold">
                                   {titleCase(field)}
@@ -246,12 +245,7 @@ function GenericReport({ data }) {
                               key={row.id || row._id || rowIndex}
                               className="border-b border-slate-50 last:border-0"
                             >
-                              {Object.entries(row)
-                                .filter(
-                                  ([field]) =>
-                                    field !== '_id' && field !== 'id'
-                                )
-                                .slice(0, 8)
+                              {reportColumns(value).map(field => [field,row[field]])
                                 .map(([field, cell]) => (
                                   <td
                                     key={field}
@@ -383,8 +377,8 @@ function StudentReport({ data }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Skills Tracked" value={skills.length} icon={BarChart3} />
         <StatCard
-          label="Assessment Average"
-          value={`${data?.averageAssessmentScore ?? 0}%`}
+          label="Evidence Average"
+          value={data?.evidenceAverage == null ? 'Not evaluated' : `${data.evidenceAverage}%`}
           icon={ClipboardList}
         />
         <StatCard
@@ -418,13 +412,7 @@ function StudentReport({ data }) {
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">Skill Growth</p>
-            <p className="mt-2 text-2xl font-bold text-slate-950">
-              {data?.skillGrowth > 0 ? '+' : ''}
-              {data?.skillGrowth ?? 0}
-            </p>
-          </div>
+
         </div>
       </Section>
 
@@ -446,16 +434,16 @@ function StudentReport({ data }) {
                       {skill.skill || 'Skill'}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {titleCase(skill.level || 'beginner')}
+                      Latest evaluated evidence
                     </p>
                   </div>
 
                   <span className="font-bold text-slate-900">
-                    {skill.score ?? 0}%
+                    {skill.overall}%
                   </span>
                 </div>
 
-                <ProgressBar value={skill.score} />
+                <ProgressBar value={skill.overall} />
               </div>
             ))}
           </div>
@@ -478,7 +466,7 @@ function StudentReport({ data }) {
                   <th className="px-3 py-3">Assessment</th>
                   <th className="px-3 py-3">Skill</th>
                   <th className="px-3 py-3">Score</th>
-                  <th className="px-3 py-3">Difficulty</th>
+                  <th className="px-3 py-3">Mode</th>
                   <th className="px-3 py-3">Date</th>
                 </tr>
               </thead>
@@ -490,19 +478,19 @@ function StudentReport({ data }) {
                     className="border-b border-slate-50 last:border-0"
                   >
                     <td className="px-3 py-4 font-medium text-slate-800">
-                      {item.assessment || 'Assessment'}
+                      {item.assessment?.title || 'Assessment'}
                     </td>
                     <td className="px-3 py-4 text-slate-600">
                       {item.skill || '—'}
                     </td>
                     <td className="px-3 py-4 font-semibold text-slate-800">
-                      {item.score ?? 0}%
+                      {item.score == null ? 'Not submitted' : `${item.score}%`}
                     </td>
                     <td className="px-3 py-4 text-slate-600">
-                      {titleCase(item.difficulty || '—')}
+                      {item.mode === 'verified' ? 'Controlled assessment' : item.mode === 'practice' ? 'Practice' : 'Legacy'}
                     </td>
                     <td className="px-3 py-4 text-slate-500">
-                      {formatDate(item.date)}
+                      {formatDate(item.submittedAt || item.startedAt || item.createdAt)}
                     </td>
                   </tr>
                 ))}
@@ -540,10 +528,10 @@ function StudentReport({ data }) {
                     className="border-b border-slate-50 last:border-0"
                   >
                     <td className="px-3 py-4 font-medium text-slate-800">
-                      {item.job || 'Job'}
+                      {item.job?.title || (typeof item.job==='string' ? item.job : 'Job')}
                     </td>
                     <td className="px-3 py-4 text-slate-600">
-                      {item.company || 'Company'}
+                      {item.job?.company?.name || (typeof item.company==='string' ? item.company : item.company?.name) || 'Company'}
                     </td>
                     <td className="px-3 py-4">
                       <StatusBadge value={item.status} />
@@ -577,7 +565,7 @@ function StudentReport({ data }) {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-semibold text-slate-900">
-                      {item.job || 'Job'}
+                      {item.job?.title || (typeof item.job==='string' ? item.job : 'Job')}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
                       {item.round ? `Round: ${item.round}` : 'Interview'}

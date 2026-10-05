@@ -14,6 +14,8 @@ const links = [
   { path: '/tpo/interviews', label: 'Interviews', icon: BriefcaseBusiness },
   { path: '/tpo/placement-analytics', label: 'Placement Analytics', icon: BarChart3 },
   { path: '/tpo/announcements', label: 'Announcements', icon: Megaphone },
+  { path: '/tpo/messages', label: 'Messages', icon: Users },
+  { path: '/tpo/notifications', label: 'Notifications', icon: Bell },
   { path: '/tpo/reports', label: 'Reports', icon: FileBarChart2 },
 ];
 

@@ -74,6 +74,7 @@ const Toggle = ({ label, description, checked, onChange }) => (
 );
 
 export default function TpoSettings() {
+  const [emailVerified, setEmailVerified] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -129,6 +130,7 @@ export default function TpoSettings() {
       const response = await api.get('/tpo/settings');
       const user = response?.data?.user || response?.user || response;
 
+      setEmailVerified(Boolean(user.isEmailVerified));
       setNotifications(current => ({ ...current, ...user.notificationPreferences }));
       setPreferences(current => ({ ...current, ...user.preferences }));
       setProfile({
@@ -279,7 +281,7 @@ export default function TpoSettings() {
           Account Settings
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Manage your TPO account, security, notifications and application preferences.
+          Manage your TPO account, profile and account security.
         </p>
       </div>
 
@@ -376,88 +378,7 @@ export default function TpoSettings() {
         </div>
       </Section>
 
-      <Section
-        icon={Bell}
-        title="Notifications"
-        description="Choose which events should generate notifications."
-      >
-        <div className="grid gap-3 md:grid-cols-2">
-          <Toggle
-            label="Placement drive requests"
-            description="Receive new company drive requests."
-            checked={notifications.placementDrives}
-            onChange={(v) => updateNotification('placementDrives', v)}
-          />
-
-          <Toggle
-            label="Interview updates"
-            description="Interview scheduling and changes."
-            checked={notifications.interviews}
-            onChange={(v) => updateNotification('interviews', v)}
-          />
-
-          <Toggle
-            label="Application updates"
-            description="Student application activity."
-            checked={notifications.applications}
-            onChange={(v) => updateNotification('applications', v)}
-          />
-
-          <Toggle
-            label="Placement updates"
-            description="Selection and placement events."
-            checked={notifications.placements}
-            onChange={(v) => updateNotification('placements', v)}
-          />
-
-          <Toggle
-            label="Company notifications"
-            description="Recruiter and company activity."
-            checked={notifications.companies}
-            onChange={(v) => updateNotification('companies', v)}
-          />
-
-          <Toggle
-            label="Announcements"
-            description="Platform and university announcements."
-            checked={notifications.announcements}
-            onChange={(v) => updateNotification('announcements', v)}
-          />
-
-          <Toggle
-            label="System notifications"
-            description="Important system events."
-            checked={notifications.system}
-            onChange={(v) => updateNotification('system', v)}
-          />
-
-          <Toggle
-            label="Email notifications"
-            description="Allow notification emails."
-            checked={notifications.email}
-            onChange={(v) => updateNotification('email', v)}
-          />
-
-          <Toggle
-            label="In-app notifications"
-            description="Show notifications inside SkillSetu."
-            checked={notifications.inApp}
-            onChange={(v) => updateNotification('inApp', v)}
-          />
-        </div>
-
-        <div className="mt-5 flex justify-end">
-          <button
-            type="button"
-            onClick={saveNotifications}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-          >
-            <Save size={16} />
-            {saving ? 'Saving...' : 'Save Notifications'}
-          </button>
-        </div>
-      </Section>
+      <p className="text-sm text-slate-600">Event notifications are available in Notifications. Subscription preferences are not available.</p>
 
       <Section
         icon={Shield}
@@ -524,84 +445,7 @@ export default function TpoSettings() {
         </div>
       </Section>
 
-      <Section
-        icon={Palette}
-        title="Application Preferences"
-        description="Customize how SkillSetu behaves for your account."
-      >
-        <div className="grid gap-5 md:grid-cols-2">
-          <label>
-            <span className="mb-2 block text-sm font-medium text-slate-700">
-              Theme
-            </span>
-            <select
-              value={preferences.theme}
-              onChange={(e) => updatePreference('theme', e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-slate-400"
-            >
-              <option value="system">System default</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
 
-          <label>
-            <span className="mb-2 block text-sm font-medium text-slate-700">
-              Language
-            </span>
-            <select
-              value={preferences.language}
-              onChange={(e) => updatePreference('language', e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-slate-400"
-            >
-              <option>English</option>
-            </select>
-          </label>
-
-          <label>
-            <span className="mb-2 block text-sm font-medium text-slate-700">
-              Date format
-            </span>
-            <select
-              value={preferences.dateFormat}
-              onChange={(e) => updatePreference('dateFormat', e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-slate-400"
-            >
-              <option>DD/MM/YYYY</option>
-              <option>MM/DD/YYYY</option>
-              <option>YYYY-MM-DD</option>
-            </select>
-          </label>
-
-          <label>
-            <span className="mb-2 block text-sm font-medium text-slate-700">
-              Items per page
-            </span>
-            <select
-              value={preferences.pageSize}
-              onChange={(e) => updatePreference('pageSize', e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-slate-400"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="mt-5 flex justify-end">
-          <button
-            type="button"
-            onClick={savePreferences}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-          >
-            <Save size={16} />
-            {saving ? 'Saving...' : 'Save Preferences'}
-          </button>
-        </div>
-      </Section>
 
       <Section
         icon={Mail}
@@ -619,7 +463,7 @@ export default function TpoSettings() {
 
           <div className="rounded-xl border border-slate-100 p-4">
             <p className="text-xs text-slate-500">Email status</p>
-            <p className="mt-1 font-medium text-slate-900">Verified</p>
+            <p className="mt-1 font-medium text-slate-900">{emailVerified ? 'Verified' : 'Not verified'}</p>
           </div>
 
           <div className="rounded-xl border border-slate-100 p-4">

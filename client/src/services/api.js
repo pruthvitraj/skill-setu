@@ -13,7 +13,13 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => res.data,
-  (err) => Promise.reject(err.response?.data || { success: false, message: 'Network error', errorCode: 'NETWORK' })
+  (err) => {
+    if (err.response?.status === 401 && !err.config?.url?.includes('/auth/login')) {
+      localStorage.removeItem('skillsetu_token');
+      window.dispatchEvent(new Event('skillsetu-session-expired'));
+    }
+    return Promise.reject(err.response?.data || { success: false, message: 'Network error', errorCode: 'NETWORK' });
+  }
 );
 
 export default api;
