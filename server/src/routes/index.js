@@ -26,6 +26,8 @@ router.use('/tpo', tpo);
 router.use('/recruiters', recruiters);
 router.use('/resumes', resumes);
 router.use('/skills', skills);
+router.use('/evidence', require('../modules/evidence/evidence.routes'));
+router.use('/challenges', require('../modules/challenges/challenge.routes'));
 router.use('/roadmaps', roadmaps);
 router.use('/courses', courses);
 router.use('/jobs', jobs);

@@ -1,3 +1,6 @@
+import NotificationsPage from '../pages/common/NotificationsPage';
+import StudentSettings from '../pages/student/StudentSettings';
+import ChallengesPage from '../pages/common/ChallengesPage';
 import AccountRecovery from '../pages/auth/AccountRecovery';
 import { useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -364,6 +367,10 @@ function StudentRoute({ children }) {
     { path: '/student/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
     { path: '/student/feed', label: 'Post / Feed', icon: <Rss size={20} className="mr-4" /> },
     { path: '/student/resume', label: 'Resume ATS', icon: <FileText size={20} className="mr-4" /> },
+    { path: '/student/assessments', label: 'Practice & Assessments', icon: <ClipboardList size={20} className="mr-4" /> },
+    { path: '/student/challenges', label: 'Company Challenges', icon: <Briefcase size={20} className="mr-4" /> },
+    { path: '/student/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
+    { path: '/student/skills', label: 'Profile Skills', icon: <BookOpen size={20} className="mr-4" /> },
     { path: '/student/skill-tracker', label: 'Skill Tracker', icon: <ClipboardList size={20} className="mr-4" /> },
     { path: '/student/roadmap', label: 'AI Roadmap', icon: <TrendingUp size={20} className="mr-4" /> },
     { path: '/student/courses', label: 'Courses', icon: <BookOpen size={20} className="mr-4" /> },
@@ -517,6 +524,7 @@ function CompanyRoute({ children }) {
 
   const links = [
     { path: '/company/dashboard', label: 'Dashboard', icon: <Home size={20} className="mr-4" /> },
+    { path: '/company/challenges', label: 'Challenges', icon: <ClipboardList size={20} className="mr-4" /> },
     { path: '/company/jobs', label: 'Job Postings', icon: <Briefcase size={20} className="mr-4" /> },
     { path: '/company/drives', label: 'Placement Drives', icon: <CalendarDays size={20} className="mr-4" /> },
     { path: '/company/applications', label: 'Applications', icon: <FileText size={20} className="mr-4" /> },
@@ -750,9 +758,14 @@ export default function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboard /></StudentRoute>} />
       <Route path="/student/feed" element={<StudentRoute><StudentFeed /></StudentRoute>} />
+      <Route path="/student/settings" element={<StudentRoute><StudentSettings /></StudentRoute>} />
+      <Route path="/student/notifications" element={<StudentRoute><NotificationsPage /></StudentRoute>} />
       <Route path="/student/profile" element={<StudentRoute><StudentProfile /></StudentRoute>} />
       <Route path="/student/resume" element={<StudentRoute><StudentResume /></StudentRoute>} />
       <Route path="/student/skills" element={<StudentRoute><StudentSkills /></StudentRoute>} />
+      <Route path="/student/challenges" element={<StudentRoute><ChallengesPage /></StudentRoute>} />
+      <Route path="/tpo/challenges" element={<TpoRoute><ChallengesPage /></TpoRoute>} />
+      <Route path="/company/challenges" element={<CompanyRoute><ChallengesPage /></CompanyRoute>} />
       <Route path="/student/assessments" element={<StudentRoute><StudentAssessments /></StudentRoute>} />
       <Route path="/student/applications" element={<StudentRoute><StudentApplications /></StudentRoute>} />
       <Route path="/student/interviews" element={<StudentRoute><StudentInterviews /></StudentRoute>} />

@@ -9,7 +9,7 @@ const { ROLES } = require('../../utils/constants');
 async function forUser(reqUser) {
   if (reqUser.role === ROLES.STUDENT) {
     const student = await studentService.getByUserId(reqUser.id);
-    const scores = await SkillScore.find({ student: student._id });
+    const scores = await SkillScore.find({ student: student._id, evidenceBased: true });
     const apps = await Application.aggregate([{ $match: { student: student._id } }, { $group: { _id: '$status', n: { $sum: 1 } } }]);
     return { skillProgress: scores, applicationStatus: apps, atsScore: student.atsScore };
   }

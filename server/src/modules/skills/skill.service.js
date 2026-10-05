@@ -1,6 +1,5 @@
 const Assessment = require('../../models/Assessment');
 const AssessmentAttempt = require('../../models/AssessmentAttempt');
-const SkillScore = require('../../models/SkillScore');
 const Skill = require('../../models/Skill');
 const studentService = require('../student/student.service');
 const { AppError } = require('../../utils/AppError');
@@ -22,7 +21,7 @@ async function submitAttempt(userId, assessmentId, answers) {
 
   if (!assessment.questions.length) throw new AppError('Assessment has no questions', 400, 'EMPTY_ASSESSMENT');
   const indexes = new Set(answers.map(a => a.questionIndex));
-  if (answers.length !== assessment.questions.length || indexes.size !== answers.length || answers.some(a => !assessment.questions[a.questionIndex] || a.selectedIndex >= assessment.questions[a.questionIndex].options.length)) {
+  if (answers.length !== assessment.questions.length || indexes.size !== answers.length || answers.some(a => !Number.isInteger(a.questionIndex) || !Number.isInteger(a.selectedIndex) || a.selectedIndex < 0 || !assessment.questions[a.questionIndex] || a.selectedIndex >= assessment.questions[a.questionIndex].options.length)) {
     throw new AppError('Provide one valid answer for every question', 422, 'INVALID_ANSWERS');
   }
   let correct = 0;
@@ -50,30 +49,20 @@ async function submitAttempt(userId, assessmentId, answers) {
     score,
     topicScores,
     difficulty: 'mixed',
+    mode: 'practice', status: 'submitted', submittedAt: new Date(),
   });
-
-  const skillScore = await SkillScore.findOneAndUpdate(
-    { student: student._id, skill: assessment.skill },
-    {},
-    { upsert: true, new: true }
-  );
-  skillScore.overall = score;
-  skillScore.topics = topicScores.map((t) => ({ name: t.topic, score: t.score }));
-  skillScore.history.push({ score, at: new Date() });
-  await skillScore.save();
-
-  const all = await SkillScore.find({ student: student._id });
-  student.skillScore = Math.round(all.reduce((s, x) => s + x.overall, 0) / (all.length || 1));
-  await student.save();
 
   return { attempt, score, topicScores };
 }
 
 async function tracker(userId) {
   const student = await studentService.getByUserId(userId);
-  const scores = await SkillScore.find({ student: student._id });
+  const records = (await require('../evidence/evidence.service').profile(student._id)).items;
+  const latest = new Map();
+  for (const e of records) if (!latest.has(e.skill)) latest.set(e.skill, { _id: e._id, skill: e.skill, overall: e.score, topics: [] });
+  const scores = [...latest.values()];
   const history = await AssessmentAttempt.find({ student: student._id }).sort({ createdAt: -1 }).limit(20);
-  return { scores, history, overall: student.skillScore };
+  return { scores, history, overall: scores.length ? Math.round(scores.reduce((sum, s) => sum + s.overall, 0) / scores.length) : 0 };
 }
 
 async function catalog() {

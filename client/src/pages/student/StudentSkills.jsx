@@ -64,7 +64,7 @@ export default function StudentSkills() {
   const availableSkills = state.catalog.filter((skill) => !existingNames.has(skill.name.toLowerCase()));
 
   return <main className="min-h-screen bg-canvas"><div className="mx-auto max-w-6xl space-y-5 p-6">
-    <header><p className="text-sm font-semibold text-indigo-600">Student workspace</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Skill management</h1><p className="mt-2 text-sm text-slate-500">Maintain your profile skills and monitor verified skill performance.</p></header>
+    <header><p className="text-sm font-semibold text-indigo-600">Student workspace</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Skill management</h1><p className="mt-2 text-sm text-slate-500">Maintain your profile skills and monitor evaluated competency evidence.</p></header>
     {notice && <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm text-indigo-700">{notice}</div>}
 
     <div className="grid gap-4 sm:grid-cols-3"><div className="card"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Profile skills</p><p className="mt-2 text-3xl font-bold text-indigo-600">{profileSkills.length}</p></div><div className="card"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Assessed skills</p><p className="mt-2 text-3xl font-bold text-emerald-600">{scores.length}</p></div><div className="card"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Overall skill score</p><p className="mt-2 text-3xl font-bold text-amber-600">{state.tracker?.overall ?? 0}</p></div></div>

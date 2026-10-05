@@ -4,7 +4,7 @@ const Student = require('../../models/Student');
 async function universitySkillAnalytics(universityId) {
   const students = await Student.find({ university: universityId }).select('_id department batch');
   const ids = students.map((s) => s._id);
-  const scores = await SkillScore.find({ student: { $in: ids } });
+  const scores = await SkillScore.find({ student: { $in: ids }, evidenceBased: true });
 
   const bySkill = {};
   scores.forEach((s) => {

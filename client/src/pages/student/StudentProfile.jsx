@@ -1,3 +1,5 @@
+import CompetencyEvidence from '../../components/common/CompetencyEvidence';
+import StudentDigitalCard from '../../components/common/StudentDigitalCard';
 import api from '../../services/api';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -162,6 +164,8 @@ export default function StudentProfile() {
               )}
             </div>
           </form>
+          <StudentDigitalCard />
+          <CompetencyEvidence />
         </div>
       </div>
     </div>

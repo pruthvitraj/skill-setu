@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const links = [
   { path: '/tpo/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/tpo/students', label: 'Students', icon: Users },
+  { path: '/tpo/challenges', label: 'Company Challenges', icon: ClipboardCheck },
   { path: '/tpo/skills', label: 'Skill Analytics', icon: BarChart3 },
   { path: '/tpo/internships', label: 'Internships', icon: GraduationCap },
   { path: '/tpo/companies', label: 'Companies', icon: Building2 },

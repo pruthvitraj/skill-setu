@@ -1,3 +1,4 @@
+import CompetencyEvidence from '../../components/common/CompetencyEvidence';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Mail, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
@@ -87,6 +88,7 @@ export default function TpoStudentDetails() {
         </div>
       </div>
 
+      <CompetencyEvidence studentId={id} />
       <div className="grid gap-6 md:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="font-bold text-slate-900">

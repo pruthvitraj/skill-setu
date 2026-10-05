@@ -1,3 +1,4 @@
+import CompetencyEvidence from '../../components/common/CompetencyEvidence';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Search,
@@ -778,6 +779,7 @@ export default function CompanyApplications() {
                 </div>
               </div>
 
+              {selected.student?._id && <CompetencyEvidence studentId={selected.student._id} />}
               {/* Submitted resume */}
               {selected.resume && (
                 <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
