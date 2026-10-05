@@ -7,7 +7,7 @@ async function me(req, res) {
 }
 
 async function update(req, res) {
-  return success(res, 'Updated', { recruiter: await service.updateMe(req.user.id, req.body) });
+  return success(res, 'Updated', { recruiter: await service.updateMe(req.user.id, req.validated.body) });
 }
 
 async function dashboard(req, res) {
@@ -28,8 +28,8 @@ async function universities(req, res) {
 }
 
 async function invite(req, res) {
-  const drive = await service.inviteUniversity(req.user.id, req.params.id, req.body);
-  return success(res, 'Invitation sent', { drive }, 201);
+  const drive = await service.inviteUniversity(req.user.id, req.params.id, req.validated.body);
+  return success(res, 'Placement drive request saved', { drive }, 201);
 }
 
 async function drives(req, res) {

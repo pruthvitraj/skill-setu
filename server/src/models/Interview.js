@@ -20,4 +20,6 @@ const interviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+interviewSchema.index({ application: 1 }, { unique: true, partialFilterExpression: { status: 'scheduled', application: { $type: 'objectId' } } });
+
 module.exports = mongoose.model('Interview', interviewSchema);

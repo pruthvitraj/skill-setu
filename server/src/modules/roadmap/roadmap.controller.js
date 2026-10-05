@@ -12,7 +12,7 @@ async function current(req, res) {
 }
 
 async function toggle(req, res) {
-  const roadmap = await service.toggleItem(req.user.id, req.params.itemId, Boolean(req.body.completed));
+  const roadmap = await service.toggleItem(req.user.id, req.params.itemId, req.body.completed);
   return success(res, 'Updated', { roadmap });
 }
 

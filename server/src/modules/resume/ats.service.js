@@ -31,10 +31,10 @@ function scoreRules(parsed, targetRole = '') {
   const skills = (parsed.skills || []).map((s) => s.toLowerCase());
   const allText = text + ' ' + skills.join(' ');
 
-  const matchedKeywords = needed.filter((k) => allText.includes(k));
-  const missingKeywords = needed.filter((k) => !allText.includes(k));
+  const matchedKeywords = needed.filter((k) => require('../../utils/text').hasTerm(allText, k));
+  const missingKeywords = needed.filter((k) => !require('../../utils/text').hasTerm(allText, k));
   const matchedSkills = (parsed.skills || []).filter((s) =>
-    needed.some((k) => s.toLowerCase().includes(k) || k.includes(s.toLowerCase()))
+    needed.some((k) => s.trim().toLowerCase() === k)
   );
   const missingSkills = missingKeywords.slice(0, 6);
 
@@ -83,7 +83,7 @@ function scoreRules(parsed, targetRole = '') {
       'Use bullet points over paragraphs for better ATS parsing',
     ],
     summary: `Rule-based ATS analysis for "${targetRole || 'General Role'}". Overall score: ${overall}/100. Matched ${matchedKeywords.length}/${needed.length} role keywords. ${missingKeywords.length > 0 ? `Add missing skills to improve: ${missingKeywords.slice(0, 3).join(', ')}.` : 'Good keyword coverage!'}`,
-    disclaimer: 'This rule-based ATS score is guidance, not a guarantee of interview or hiring outcomes. Upload again later for full AI-powered scoring.',
+    disclaimer: 'This rule-based ATS score is guidance, not a guarantee of interview or hiring outcomes. The score uses keyword and section heuristics; it does not verify experience or skills.',
     scoredBy: 'rules',
   };
 }

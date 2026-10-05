@@ -90,3 +90,19 @@ test('invalid assessment answers are rejected before saving a result', async t =
   t.mock.method(Assessment, 'findById', async () => ({ questions: [{ options: ['a', 'b'], correctIndex: 0 }] }));
   await assert.rejects(require('../src/modules/skills/skill.service').submitAttempt('user', 'assessment', [{ questionIndex: 0, selectedIndex: 7 }]), { errorCode: 'INVALID_ANSWERS' });
 });
+
+test('readable PDF buffers parse on supported Node versions', async () => {
+  const parsed = await parseBuffer(require('fs').readFileSync(require('path').join(__dirname, 'fixtures/resume.pdf')), 'application/pdf');
+  assert.ok(parsed.rawText.includes('Audit Student'));
+  assert.ok(parsed.skills.includes('sql'));
+});
+test('logout invokes persistent session revocation and clears cookie', async t => {
+  const auth = require('../src/modules/auth/auth.service');
+  let revoked;
+  t.mock.method(auth, 'logout', async (user, sid) => { revoked = { user, sid }; });
+  let cleared;
+  const res = { clearCookie(name) { cleared = name; }, status() { return this; }, json(body) { return body; } };
+  const result = await require('../src/modules/auth/auth.controller').logout({ user: { sub: 'user', sid: 'session' } }, res);
+  assert.deepEqual(revoked, { user: 'user', sid: 'session' });
+  assert.ok(cleared); assert.equal(result.success, true);
+});

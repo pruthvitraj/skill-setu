@@ -37,7 +37,18 @@ async function submit(userId, id, body) {
   if (!c) throw new AppError('Challenge is closed or deadline passed', 409, 'CHALLENGE_CLOSED');
   const student = await Student.findOne({ user: userId });
   if (!student) throw new AppError('Student not found', 404, 'NOT_FOUND');
-  return Submission.create({ ...body, challenge: c._id, student: student._id, submittedAt: new Date() });
+  const existing = await Submission.findOne({ challenge: c._id, student: student._id });
+  if (existing) {
+    if (existing.url !== body.url || existing.rationale !== body.rationale) throw new AppError('Final submissions cannot be changed', 409, 'SUBMISSION_FINAL');
+    return existing;
+  }
+  try { return await Submission.create({ ...body, challenge: c._id, student: student._id, submittedAt: new Date() }); }
+  catch (err) {
+    if (err.code !== 11000) throw err;
+    const saved = await Submission.findOne({ challenge: c._id, student: student._id });
+    if (!saved || saved.url !== body.url || saved.rationale !== body.rationale) throw new AppError('Final submissions cannot be changed', 409, 'SUBMISSION_FINAL');
+    return saved;
+  }
 }
 async function submissions(user, id) {
   const c = user.role === 'recruiter' ? await owned(user.id, id) : await Challenge.findById(id);

@@ -4,6 +4,7 @@ const conversationSchema = new mongoose.Schema(
   {
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
     lastMessageAt: Date,
+    pairKey: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }
 );

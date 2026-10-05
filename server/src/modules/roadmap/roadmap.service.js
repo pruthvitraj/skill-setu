@@ -5,7 +5,8 @@ const { AppError } = require('../../utils/AppError');
 
 async function generate(userId, targetRole) {
   const student = await studentService.getByUserId(userId);
-  if (!targetRole) throw new AppError('Select a single target role', 400, 'TARGET_REQUIRED');
+  if (typeof targetRole !== 'string' || !targetRole.trim() || targetRole.length>200) throw new AppError('Select a single target role', 400, 'TARGET_REQUIRED');
+  targetRole = targetRole.trim();
   const generated = await ai.generate({ student, targetRole });
   const roadmap = await Roadmap.create({
     student: student._id,
@@ -24,6 +25,7 @@ async function current(userId) {
 }
 
 async function toggleItem(userId, itemId, completed) {
+  if(typeof completed!=='boolean')throw new AppError('Completion must be true or false',422,'INVALID_COMPLETION');
   const student = await studentService.getByUserId(userId);
   const roadmap = await Roadmap.findOne({ student: student._id, active: true });
   if (!roadmap) throw new AppError('No active roadmap', 404, 'NOT_FOUND');

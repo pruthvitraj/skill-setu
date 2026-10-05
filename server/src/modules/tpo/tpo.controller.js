@@ -29,7 +29,7 @@ async function announcements(req, res) {
 }
 
 async function createAnnouncement(req, res) {
-  const item = await service.createAnnouncement(req.user.id, req.body);
+  const item = await service.createAnnouncement(req.user.id, req.validated.body);
   return success(res, 'Announcement published', { item }, 201);
 }
 
@@ -42,11 +42,11 @@ async function placementDrives(req, res) {
 }
 
 async function requestPlacementDrive(req, res) {
-  return success(res, 'Drive request sent', { drive: await service.requestPlacementDrive(req.user.id, req.body) }, 201);
+  return success(res, 'Drive request sent', { drive: await service.requestPlacementDrive(req.user.id, req.validated.body) }, 201);
 }
 
 async function reviewPlacementDrive(req, res) {
-  return success(res, 'Drive updated', { drive: await service.reviewPlacementDrive(req.user.id, req.params.id, req.body) });
+  return success(res, 'Drive updated', { drive: await service.reviewPlacementDrive(req.user.id, req.params.id, req.validated.body) });
 }
 
 async function applications(req, res) {
@@ -54,7 +54,7 @@ async function applications(req, res) {
 }
 
 async function updateApplicationStatus(req, res) {
-  return success(res, 'Status updated', { application: await service.updateApplicationStatus(req.user.id, req.params.id, req.body) });
+  return success(res, 'Status updated', { application: await service.updateApplicationStatus(req.user.id, req.params.id, req.validated.body) });
 }
 
 async function interviews(req, res) {
@@ -71,13 +71,13 @@ async function skills(req, res) {
 
 async function studentReportCard(req, res) {
   const data = await service.studentDetails(req.user.id, req.params.id || req.params.studentId);
-  const scores = await require('../../models/SkillScore').find({ student: data.student._id });
+  const scores = await require('../../models/SkillScore').find({ student: data.student._id, evidenceBased: true });
   const [assessments, interviews] = await Promise.all([
-    require('../../models/AssessmentAttempt').find({ student: data.student._id }).sort({ createdAt: -1 }),
+    require('../../models/AssessmentAttempt').find({ student: data.student._id }).populate('assessment','title').sort({ createdAt: -1 }),
     require('../../models/Interview').find({ candidate: data.student._id }).populate('job', 'title'),
   ]);
   const applicationCounts = data.applications.reduce((counts, item) => ({ ...counts, [item.status]: (counts[item.status] || 0) + 1 }), {});
-  return success(res, 'OK', { ...data, skills: scores, assessments, interviews, applicationCounts, averageAssessmentScore: data.student.skillScore, generatedAt: new Date() });
+  return success(res, 'OK', { ...data, skills: scores, assessments, interviews, applicationCounts, evidenceAverage: scores.length ? data.student.skillScore : null, generatedAt: new Date() });
 }
 
 async function reports(req, res) {

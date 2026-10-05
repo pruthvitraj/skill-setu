@@ -15,3 +15,9 @@ client/dist
 *.tmp
 .cache
 recruiter-backend-audit.txt
+
+.audit-runtime.json
+
+.audit-resume.pdf
+
+.audit-backups/

@@ -15,6 +15,7 @@ const roadmapSchema = new mongoose.Schema(
     targetRole: { type: String, required: true },
     active: { type: Boolean, default: true, index: true },
     summary: String,
+    source: { type: String, enum: ['template','ai'] },
     gapAnalysis: [String],
     items: [itemSchema],
   },

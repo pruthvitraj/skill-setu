@@ -43,6 +43,9 @@ async function remove(userId, resumeId) {
   const student = await studentService.getByUserId(userId);
   const resume = await Resume.findOne({ _id: resumeId, student: student._id });
   if (!resume) throw new AppError('Resume not found', 404, 'NOT_FOUND');
+  if (await require('../../models/Application').exists({ resume: resume._id })) {
+    throw new AppError('This resume is attached to an application and must be retained. Upload a new version for future applications.', 409, 'RESUME_IN_USE');
+  }
   await deleteFile(resume.fileKey);
   await resume.deleteOne();
   const latestResume = await Resume.findOne({ student: student._id }).sort({ createdAt: -1 });

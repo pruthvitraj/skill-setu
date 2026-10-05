@@ -21,7 +21,7 @@ async function apply(userId, jobId, resumeId, coverNote) {
 
   const job = await Job.findById(jobId);
 
-  if (!job || job.status !== JOB_STATUS.PUBLISHED) {
+  if (!job || job.status !== JOB_STATUS.PUBLISHED || (job.deadline && job.deadline <= new Date())) {
     throw new AppError('Job is not open', 400, 'JOB_CLOSED');
   }
 

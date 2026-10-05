@@ -31,7 +31,7 @@ async function logout(req, res) {
   const sessionId = req.user?.sid;
   const userId = req.user?.sub;
   if (sessionId && userId) {
-    await authService.deleteSession(userId, sessionId);
+    await authService.logout(userId, sessionId);
   }
   res.clearCookie(env.jwtCookieName);
   return success(res, 'Logged out');
@@ -81,7 +81,7 @@ async function getSessions(req, res) {
 async function revokeSession(req, res) {
   const { sessionId } = req.params;
   if (sessionId === req.user.sid) {
-    return success(res, 'Cannot revoke current session', { success: false }, 400);
+    return require('../../utils/response').fail(res, 'Use log out to end the current session', 'CURRENT_SESSION', 400);
   }
   await sessionService.deleteSession(req.user.id, sessionId);
   return success(res, 'Session revoked');

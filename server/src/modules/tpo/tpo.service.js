@@ -18,7 +18,7 @@ const { notify } = require('../notifications/notification.service');
 
 async function getTpo(userId) {
   const tpo = await Tpo.findOne({ user: userId }).populate('university');
-  if (!tpo) throw new AppError('TPO profile not found', 404, 'NOT_FOUND');
+  if (!tpo || !tpo.university) throw new AppError('TPO institution is not linked. Contact your administrator.', 409, 'INSTITUTION_REQUIRED');
   return tpo;
 }
 
@@ -65,15 +65,15 @@ async function students(userId, { q, department, batch, skill, status, interview
   const filter = { university: tpo.university._id };
   if (department) filter.department = department;
   if (batch) filter.batch = batch;
-  if (skill) filter['skills.name'] = { $regex: skill, $options: 'i' };
+  if (skill) filter['skills.name'] = { $regex: require('../../utils/text').escapeRegex(skill), $options: 'i' };
   if (status) filter.placementStatus = status;
   if (q?.trim()) {
     const users = await User.find({ $or: [
-      { firstName: { $regex: q.trim(), $options: 'i' } },
-      { lastName: { $regex: q.trim(), $options: 'i' } },
-      { email: { $regex: q.trim(), $options: 'i' } },
+      { firstName: { $regex: require('../../utils/text').escapeRegex(q.trim()), $options: 'i' } },
+      { lastName: { $regex: require('../../utils/text').escapeRegex(q.trim()), $options: 'i' } },
+      { email: { $regex: require('../../utils/text').escapeRegex(q.trim()), $options: 'i' } },
     ] }).select('_id');
-    filter.$or = [{ enrollmentNo: { $regex: q.trim(), $options: 'i' } }, { user: { $in: users.map((item) => item._id) } }];
+    filter.$or = [{ enrollmentNo: { $regex: require('../../utils/text').escapeRegex(q.trim()), $options: 'i' } }, { user: { $in: users.map((item) => item._id) } }];
   }
   if (interviewStatus) {
     const candidates = await Interview.distinct('candidate', { status: interviewStatus });
@@ -96,7 +96,7 @@ async function studentDetails(userId, studentId) {
     .populate('user', 'firstName lastName email phone')
     .populate('department', 'name');
   if (!student) throw new AppError('Student not found', 404, 'NOT_FOUND');
-  const applications = await Application.find({ student: student._id }).populate('job', 'title');
+  const applications = await Application.find({ student: student._id }).populate({path:'job',select:'title company',populate:{path:'company',select:'name'}});
   return { student, applications };
 }
 
@@ -133,12 +133,22 @@ async function announcements(userId) {
 
 async function createAnnouncement(userId, payload) {
   const tpo = await getTpo(userId);
-  return Announcement.create({ ...payload, university: tpo.university._id, author: userId });
+  const filter = { university: tpo.university._id };
+  if(payload.audience==='department'){if(!payload.department || !await Department.exists({_id:payload.department,university:tpo.university._id}))throw new AppError('Select a department in your institution',422,'INVALID_AUDIENCE');filter.department=payload.department;}
+  if(payload.audience==='batch'){if(!payload.batch)throw new AppError('Select a batch',422,'INVALID_AUDIENCE');filter.batch=payload.batch;}
+  if(payload.audience==='selected'){if(!payload.studentIds?.length || await Student.countDocuments({...filter,_id:{$in:payload.studentIds}})!==new Set(payload.studentIds).size)throw new AppError('Select students in your institution',422,'INVALID_AUDIENCE');filter._id={$in:payload.studentIds};}
+  const students = await Student.find(filter).select('user');
+  const item = await Announcement.create({ ...payload, university: tpo.university._id, author: userId });
+  await Promise.all(students.map(student => notify(student.user, { type: 'announcement', title: item.title, body: item.body, data: { announcementId: item._id } })));
+  return item;
 }
 
 async function companies(userId) {
   const tpo = await getTpo(userId);
-  return Company.find().sort({ name: 1 });
+  const companies=await Company.find().sort({name:1});
+  const counts=await Job.aggregate([{$match:{status:JOB_STATUS.PUBLISHED}},{$group:{_id:'$company',count:{$sum:1}}}]);
+  const byCompany=new Map(counts.map(c=>[String(c._id),c.count]));
+  return companies.map(c=>({...c.toObject(),activeJobs:byCompany.get(String(c._id))||0}));
 }
 
 async function placementDrives(userId) {
@@ -156,8 +166,10 @@ async function requestPlacementDrive(userId, payload) {
     Job.findOne({ _id: payload.job, company: payload.company, status: JOB_STATUS.PUBLISHED }),
   ]);
   if (!company || !job) throw new AppError('Select a valid company and published job', 400, 'INVALID_DRIVE_REQUEST');
-  const recruiter = await Recruiter.findOne({ company: company._id });
+  const recruiter = await Recruiter.findOne({ _id: job.recruiter, company: company._id });
   if (!recruiter) throw new AppError('This company has no recruiter account', 400, 'RECRUITER_NOT_FOUND');
+  if (payload.proposedDate && new Date(payload.proposedDate) <= new Date()) throw new AppError('Choose a future drive date', 422, 'INVALID_DATE');
+  if (await PlacementDrive.exists({ university: tpo.university._id, job: job._id, status: { $in: ['requested', 'approved', 'rescheduled', 'active'] } })) throw new AppError('An active drive already exists for this job', 409, 'DRIVE_EXISTS');
   const drive = await PlacementDrive.create({
     company: company._id,
     recruiter: recruiter._id,
@@ -208,15 +220,15 @@ async function interviews(userId) {
 }
 
 async function placementAnalytics(userId) {
-  const tpo = await getTpo(userId);
-  const university = tpo.university._id;
-  const [summary, applicationsTotal, selected, interviewsTotal] = await Promise.all([
-    dashboard(userId),
-    Application.countDocuments({ student: { $in: await Student.find({ university }).distinct('_id') } }),
-    Application.countDocuments({ student: { $in: await Student.find({ university }).distinct('_id') }, status: { $in: ['selected', 'hired'] } }),
-    Interview.countDocuments({ candidate: { $in: await Student.find({ university }).distinct('_id') } }),
-  ]);
-  return { ...summary, applications: applicationsTotal, selected, interviews: interviewsTotal, applicationStatus: { applications: applicationsTotal, selected } };
+ const tpo = await getTpo(userId);
+ const students = await Student.find({ university: tpo.university._id }).populate('department','name');
+ const ids = students.map(s => s._id);
+ const [summary, applications, drives] = await Promise.all([dashboard(userId), Application.find({student:{$in:ids}}), placementDrives(userId)]);
+ const statusBreakdown = applications.reduce((m,a) => ({...m,[a.status]:(m[a.status]||0)+1}),{});
+ const departments = new Map();
+ for(const s of students){const name=s.department?.name||'Unassigned';const d=departments.get(name)||{department:name,total:0,placed:0};d.total++;if(s.placementStatus==='placed')d.placed++;departments.set(name,d);}
+ const monthlyTrend=Array.from({length:6},(_,i)=>{const date=new Date();date.setDate(1);date.setMonth(date.getMonth()-(5-i));const inMonth=applications.filter(a=>new Date(a.createdAt).getFullYear()===date.getFullYear()&&new Date(a.createdAt).getMonth()===date.getMonth());return {month:date.toLocaleString('en',{month:'short'})+' '+date.getFullYear(),applications:inMonth.length,shortlisted:inMonth.filter(a=>a.status==='shortlisted').length,placed:inMonth.filter(a=>a.status==='hired').length};});
+ return {...summary,totalCompanies:summary.companies,totalDrives:drives.length,applications:applications.length,shortlisted:statusBreakdown.shortlisted||0,selected:statusBreakdown.selected||0,statusBreakdown,departmentComparison:[...departments.values()].map(d=>({...d,rate:d.total?Math.round(d.placed/d.total*100):0})),monthlyTrend,drives};
 }
 
 async function skills(userId) {
@@ -229,11 +241,11 @@ async function reports(userId, type) {
   const tpo = await getTpo(userId);
   const studentIds = await Student.find({ university: tpo.university._id }).distinct('_id');
   const result = { type, generatedAt: new Date(), summary: dash };
-  if (type === 'placement') result.students = await Student.find({ university: tpo.university._id }).populate('user', 'firstName lastName');
+  if (type === 'placement') { const students = await Student.find({ university: tpo.university._id }).populate('user', 'firstName lastName').populate('department','name'); result.students = students.map(s => ({ name: [s.user?.firstName,s.user?.lastName].filter(Boolean).join(' '), department:s.department?.name||'Unassigned', batch:s.batch, placementStatus:s.placementStatus, evidenceScore:s.skillScore, skills:s.skills.map(k=>k.name).join(', ') })); }
   else if (type === 'department') result.departments = await Student.aggregate([{ $match: { university: tpo.university._id } }, { $group: { _id: '$department', students: { $sum: 1 }, placed: { $sum: { $cond: [{ $eq: ['$placementStatus', 'placed'] }, 1, 0] } } } }]);
-  else if (type === 'company' || type === 'drive') result.drives = await placementDrives(userId);
-  else if (type === 'internship') result.opportunities = await internships(userId);
-  else if (type === 'interview') result.interviews = await interviews(userId);
+  else if (type === 'company' || type === 'drive') { result.drives = (await placementDrives(userId)).map(d=>({company:d.company?.name||'Unavailable',job:d.job?.title||d.title,status:d.status,proposedDate:d.proposedDate,scheduledDate:d.scheduledDate,eligibility:d.eligibility})); }
+  else if (type === 'internship') result.opportunities = (await internships(userId)).map(j=>({title:j.title,company:j.company?.name,location:j.location,status:j.status,deadline:j.deadline,institutionApplications:j.applicants.length}));
+  else if (type === 'interview') result.interviews = (await interviews(userId)).map(i=>({student:[i.candidate?.user?.firstName,i.candidate?.user?.lastName].filter(Boolean).join(' '),company:i.job?.company?.name,job:i.job?.title,round:i.round,status:i.status,result:i.result,scheduledAt:i.scheduledAt}));
   else throw new AppError('Unsupported report type', 422, 'INVALID_REPORT');
   return result;
 }

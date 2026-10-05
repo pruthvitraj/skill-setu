@@ -80,8 +80,9 @@ function fallbackRoadmap(student, targetRole) {
     .map((p) => `Gap: ${p.title}`);
 
   return {
-    summary: `Personalized step-by-step path toward mastering "${targetRole}" based on your current skills and target requirements.`,
-    gapAnalysis: gapAnalysis.length ? gapAnalysis : [`Gap: Core ${targetRole} concepts`, `Gap: Production project experience`],
+    source: 'template',
+    summary: `Role template for "${targetRole}". Suggested topics use self-reported skill names; they do not establish competency gaps.`,
+    gapAnalysis,
     items: phases.map((p, i) => ({ ...p, phase: i + 1, completed: false })),
   };
 }
@@ -110,6 +111,7 @@ async function generate({ student, targetRole }) {
   if (!ai?.items?.length) return base;
 
   return {
+    source: 'ai',
     summary: ai.summary || base.summary,
     gapAnalysis: (ai.gapAnalysis && ai.gapAnalysis.length > 0) ? ai.gapAnalysis : base.gapAnalysis,
     items: ai.items.map((item, i) => ({

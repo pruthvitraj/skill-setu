@@ -41,7 +41,7 @@ async function dashboard(userId) {
     if (!month) return;
     month.applications += 1;
     if ([APPLICATION_STATUS.SHORTLISTED, APPLICATION_STATUS.ASSESSMENT, APPLICATION_STATUS.INTERVIEW_SCHEDULED, APPLICATION_STATUS.SELECTED, APPLICATION_STATUS.HIRED].includes(application.status)) month.shortlisted += 1;
-    if ([APPLICATION_STATUS.SELECTED, APPLICATION_STATUS.HIRED].includes(application.status)) month.hired += 1;
+    if (application.status === APPLICATION_STATUS.HIRED) month.hired += 1;
   });
   const skillDemand = jobs.flatMap((job) => job.requiredSkills || []).reduce((counts, skill) => {
     counts[skill] = (counts[skill] || 0) + 1;

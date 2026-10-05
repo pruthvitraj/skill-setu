@@ -7,7 +7,7 @@ function extract(text = '') {
     'spark', 'pandas', 'html', 'css', 'git', 'linux', 'typescript', 'express',
   ];
   const lower = text.toLowerCase();
-  const skills = skillHints.filter((s) => lower.includes(s));
+  const skills = skillHints.filter((s) => require('../../utils/text').hasTerm(lower, s));
   return {
     name: lines[0] || '',
     email,
@@ -26,7 +26,7 @@ async function parseBuffer(buffer, mimeType) {
   if (mimeType === 'application/pdf') {
     try {
       const pdfParse = require('pdf-parse');
-      const data = await pdfParse(buffer);
+      const data = await pdfParse(new Uint8Array(buffer));
       text = data.text || '';
     } catch {
       throw new (require('../../utils/AppError').AppError)('Unable to read this PDF. Upload a readable text-based PDF.', 422, 'UNREADABLE_RESUME');

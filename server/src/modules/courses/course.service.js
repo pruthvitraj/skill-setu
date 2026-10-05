@@ -3,7 +3,7 @@ const studentService = require('../student/student.service');
 const { parsePagination, paginated } = require('../../utils/pagination');
 
 async function list({ skill, page, limit }) {
-  const filter = skill ? { skill: new RegExp(skill, 'i') } : {};
+  const filter = skill ? { skill: new RegExp(require('../../utils/text').escapeRegex(skill), 'i') } : {};
   const [items, total] = await Promise.all([
     Course.find(filter).skip((page - 1) * limit).limit(limit),
     Course.countDocuments(filter),

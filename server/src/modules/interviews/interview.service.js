@@ -14,6 +14,9 @@ async function schedule(userId, payload) {
   const candidate = await require('../../models/Student').findById(payload.candidate);
   if (!job || !candidate) throw new AppError('Candidate or job not available', 404, 'NOT_FOUND');
 
+  if (!payload.application) throw new AppError('Select an application before scheduling an interview', 422, 'APPLICATION_REQUIRED');
+  if (!payload.scheduledAt || new Date(payload.scheduledAt) <= new Date()) throw new AppError('Choose a future interview time', 422, 'INVALID_DATE');
+  if (await Interview.exists({ recruiter: recruiter._id, application: payload.application, status: 'scheduled' })) throw new AppError('An interview is already scheduled for this application', 409, 'INTERVIEW_EXISTS');
   let application;
   if (payload.application) {
     application = await Application.findById(payload.application).populate('job');
@@ -29,7 +32,9 @@ async function schedule(userId, payload) {
   }
 
   if (application && ['rejected', 'selected', 'hired'].includes(application.status)) throw new AppError('This application is no longer available for an interview', 409, 'INVALID_TRANSITION');
-  const interview = await Interview.create({ ...payload, recruiter: recruiter._id });
+  let interview;
+  try { interview = await Interview.create({ ...payload, recruiter: recruiter._id }); }
+  catch(err) { if(err.code===11000)throw new AppError('An interview is already scheduled for this application',409,'INTERVIEW_EXISTS');throw err; }
   if (application && application.status !== APPLICATION_STATUS.INTERVIEW_SCHEDULED) {
     const applicationService = require('../applications/application.service');
     await applicationService.updateStatus(
@@ -44,7 +49,7 @@ async function schedule(userId, payload) {
     await notify(student.user, {
       type: 'interview',
       title: 'Interview scheduled',
-      body: `Round: ${payload.round}`,
+      body: `Round: ${interview.round}`,
       data: { interviewId: interview._id },
     });
   }
@@ -68,6 +73,8 @@ async function listForRecruiter(userId) {
 async function update(userId, id, patch) {
   const recruiter = await Recruiter.findOne({ user: userId });
   if (!recruiter) throw new AppError('Recruiter profile not found', 404, 'NOT_FOUND');
+  if(patch.scheduledAt && new Date(patch.scheduledAt)<=new Date())throw new AppError('Choose a future interview time',422,'INVALID_DATE');
+  if(patch.result && patch.result!=='pending' && patch.status && patch.status!=='completed')throw new AppError('An interview result requires completed status',422,'INVALID_TRANSITION');
   const interview = await Interview.findOneAndUpdate({ _id: id, recruiter: recruiter._id }, patch, { new: true, runValidators: true });
   if (!interview) throw new AppError('Interview not found', 404, 'NOT_FOUND');
   if (patch.result && patch.result !== 'pending') {

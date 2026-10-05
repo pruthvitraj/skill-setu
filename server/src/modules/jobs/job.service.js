@@ -11,17 +11,17 @@ async function listPublished({ q, skill, location, page, limit }) {
 
   if (q) {
     filter.$or = [
-      { title: new RegExp(q, 'i') },
-      { description: new RegExp(q, 'i') },
+      { title: new RegExp(require('../../utils/text').escapeRegex(q), 'i') },
+      { description: new RegExp(require('../../utils/text').escapeRegex(q), 'i') },
     ];
   }
 
   if (skill) {
-    filter.requiredSkills = new RegExp(skill, 'i');
+    filter.requiredSkills = new RegExp(require('../../utils/text').escapeRegex(skill), 'i');
   }
 
   if (location) {
-    filter.location = new RegExp(location, 'i');
+    filter.location = new RegExp(require('../../utils/text').escapeRegex(location), 'i');
   }
 
   const [items, total] = await Promise.all([
@@ -111,8 +111,8 @@ async function mine(userId, { page, limit, status, q }) {
 
   if (q) {
     filter.$or = [
-      { title: new RegExp(q, 'i') },
-      { description: new RegExp(q, 'i') },
+      { title: new RegExp(require('../../utils/text').escapeRegex(q), 'i') },
+      { description: new RegExp(require('../../utils/text').escapeRegex(q), 'i') },
     ];
   }
 
@@ -126,7 +126,9 @@ async function mine(userId, { page, limit, status, q }) {
     Job.countDocuments(filter),
   ]);
 
-  return paginated(items, total, page, limit);
+  const counts = await require('../../models/Application').aggregate([{ $match: { job: { $in: items.map(j => j._id) } } }, { $group: { _id: '$job', count: { $sum: 1 } } }]);
+  const byJob = new Map(counts.map(c => [String(c._id), c.count]));
+  return paginated(items.map(j => ({ ...j.toObject(), applications: byJob.get(String(j._id)) || 0 })), total, page, limit);
 }
 
 async function remove(userId, jobId) {

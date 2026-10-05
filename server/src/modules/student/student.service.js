@@ -9,6 +9,13 @@ const { AppError } = require('../../utils/AppError');
 const { JOB_STATUS } = require('../../utils/constants');
 
 async function getByUserId(userId) {
+  // Older partial registrations can have a user without a role profile.
+  // Repair only the authenticated student; never infer institutional membership.
+  if (!await Student.exists({ user: userId })) {
+    const user = await require('../../models/User').findOne({ _id: userId, role: 'student', isActive: true });
+    if (!user) throw new AppError('Student profile not found', 404, 'NOT_FOUND');
+    await Student.updateOne({ user: userId }, { $setOnInsert: { user: userId } }, { upsert: true, setDefaultsOnInsert: true });
+  }
   const student = await Student.findOne({ user: userId })
     .populate('university', 'name')
     .populate('department', 'name')
@@ -75,12 +82,12 @@ async function dashboard(userId) {
   const student = await getByUserId(userId);
   const [applications, interviews, jobs, courses, notifications, roadmap] = await Promise.all([
     Application.find({ student: student._id }).populate('resume', 'fileName ats createdAt').populate('job', 'title location').limit(8).sort({ createdAt: -1 }),
-    Interview.find({ candidate: student._id, scheduledAt: { $gte: new Date() } })
+    Interview.find({ candidate: student._id, status: 'scheduled', scheduledAt: { $gte: new Date() } })
       .populate('job', 'title')
       .sort({ scheduledAt: 1 })
       .limit(5),
     Job.find({ status: JOB_STATUS.PUBLISHED }).populate('company', 'name').limit(5).sort({ createdAt: -1 }),
-    Course.find(student.targetRole ? { skill: new RegExp(student.targetRole.split(' ')[0], 'i') } : {}).limit(5),
+    Course.find(student.targetRole ? { skill: new RegExp(require('../../utils/text').escapeRegex(student.targetRole.split(' ')[0]), 'i') } : {}).limit(5),
     Notification.find({ user: userId }).sort({ createdAt: -1 }).limit(6),
     Roadmap.findOne({ student: student._id, active: true }),
   ]);

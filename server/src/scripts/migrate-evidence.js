@@ -8,8 +8,7 @@ const Attempt = require('../models/AssessmentAttempt');
 const Evidence = require('../models/SkillEvidence');
 const Submission = require('../models/ChallengeSubmission');
 const { refreshScores } = require('../modules/evidence/evidence.service');
-async function run() {
-  await connectDb();
+async function migrateEvidence() {
   await Promise.all([Attempt.init(), Evidence.init(), Submission.init()]);
   await Attempt.updateMany({ mode: { $exists: false } }, { $set: { mode: 'legacy', status: 'submitted' } });
   await SkillScore.collection.updateMany({ evidenceMigration: { $ne: 1 } }, [{ $set: { legacyOverall: '$overall', overall: 0, evidenceMigration: 1 } }]);
@@ -17,4 +16,5 @@ async function run() {
   for await (const student of Student.find().select('_id').cursor()) await refreshScores(student._id);
   console.log('Evidence migration complete. Legacy scores retained separately; current scores rebuilt from evidence.');
 }
-run().catch(e => { console.error(e.message); process.exitCode = 1; }).finally(() => mongoose.disconnect());
+if (require.main === module) connectDb().then(migrateEvidence).catch(e => { console.error(e.message); process.exitCode = 1; }).finally(() => mongoose.disconnect());
+module.exports = { migrateEvidence };

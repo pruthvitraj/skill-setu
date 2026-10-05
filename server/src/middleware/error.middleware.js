@@ -10,7 +10,7 @@ function errorMiddleware(err, req, res, next) {
 
   res.status(status).json({
     success: false,
-    message: err.code === 11000 ? 'This record already exists' : status === 500 ? 'Something went wrong' : err.message,
+    message: err.code === 11000 ? 'This record already exists' : status >= 500 && !(err instanceof AppError) ? 'Something went wrong' : err.message,
     errorCode,
   });
 }

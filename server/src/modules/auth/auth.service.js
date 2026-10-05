@@ -114,6 +114,7 @@ async function login({ email, password, userAgent, ip }) {
 }
 
 async function forgotPassword(email) {
+  if (!env.smtp.host) throw new AppError('Password recovery is unavailable until email delivery is configured. Contact your administrator.', 503, 'EMAIL_UNAVAILABLE');
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) return;
   const reset = tokenHash();

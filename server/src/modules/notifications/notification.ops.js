@@ -7,7 +7,9 @@ async function list(userId, unreadOnly) {
 }
 
 async function markRead(userId, id) {
-  return Notification.findOneAndUpdate({ _id: id, user: userId }, { read: true }, { new: true });
+  const item = await Notification.findOneAndUpdate({ _id: id, user: userId }, { read: true }, { new: true });
+  if (!item) throw new (require('../../utils/AppError').AppError)('Notification not found', 404, 'NOT_FOUND');
+  return item;
 }
 
 async function markAll(userId) {
