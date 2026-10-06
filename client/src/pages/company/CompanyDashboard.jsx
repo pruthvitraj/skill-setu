@@ -167,14 +167,15 @@ function HiringFunnel({ funnel = [], applications = 0 }) {
         {stages.map((stage) => {
           const value = Number(stage.value) || 0;
           const percentage = Math.round((value / max) * 100);
+          const label = stage.name || stage.label || stage.stage || stage.status || 'Stage';
 
           return (
             <div
-              key={stage.name}
+              key={label}
               className="grid grid-cols-[90px_1fr_45px] items-center gap-3"
             >
               <span className="text-xs font-semibold text-slate-500">
-                {stage.name}
+                {label}
               </span>
 
               <div className="h-2 overflow-hidden rounded-full bg-slate-100">
@@ -261,7 +262,7 @@ export default function CompanyDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-4 p-6">
         <div>
           <div className="h-8 w-64 animate-pulse rounded bg-slate-200" />
           <div className="mt-3 h-4 w-96 animate-pulse rounded bg-slate-100" />
@@ -281,7 +282,7 @@ export default function CompanyDashboard() {
 
   if (error) {
     return (
-      <div className="space-y-5 p-6">
+      <div className="space-y-4 p-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-950">
             Company Dashboard
@@ -340,7 +341,7 @@ export default function CompanyDashboard() {
     : [];
 
   return (
-    <div className="space-y-6 p-6 pb-10">
+    <div className="space-y-4 p-6 pb-10">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -359,14 +360,22 @@ export default function CompanyDashboard() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={loadDashboard}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
-        >
-          <RefreshCw size={16} />
-          Refresh
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/company/applications"
+            className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            Review applications
+          </Link>
+          <button
+            type="button"
+            onClick={loadDashboard}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -401,7 +410,7 @@ export default function CompanyDashboard() {
       </div>
 
       {/* Funnel + Activity */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <HiringFunnel
           funnel={funnel}
           applications={applications}
@@ -463,7 +472,7 @@ export default function CompanyDashboard() {
       </div>
 
       {/* Jobs + quick actions */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
         <Card>
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
             <div>

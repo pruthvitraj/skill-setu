@@ -45,78 +45,86 @@ import CompanyDrives from '../pages/company/CompanyDrives';
 import NetworkPage from '../pages/common/NetworkPage';
 import MessagesPage from '../pages/common/MessagesPage';
 
+function SkillSetuLogo({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+  );
+}
+
 function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 bg-grid-pattern relative">
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-10">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-          <div className="flex items-center gap-8">
-            <Link className="flex items-center gap-2 text-xl font-bold text-[#0f2447]" to="/">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-[#0f2447] text-white">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    <div style={{ minHeight: '100vh', background: 'var(--ui-bg)', fontFamily: 'var(--ui-font)', color: 'var(--ui-ink)' }} className="bg-grid-pattern">
+      <header style={{ borderBottom: '1px solid var(--ui-border)', background: '#fff', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', height: 64, alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+            <Link style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 800, color: 'var(--ui-ink)', textDecoration: 'none', letterSpacing: '-0.01em' }} to="/">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 8, background: 'var(--ui-nav)', color: 'white' }}>
+                <SkillSetuLogo size={18} />
               </div>
               SkillSetu
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-semibold text-slate-900 border-b-2 border-amber-400 py-5" to="/">Home</Link>
-              <Link className="text-sm font-medium text-slate-600 hover:text-slate-900" to="/#how-it-works">How SkillSetu works</Link>
-              <Link className="text-sm font-medium text-slate-600 hover:text-slate-900" to="/#about">About</Link>
+            <nav style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hidden md:flex">
+              <Link style={{ fontSize: 13, fontWeight: 600, color: 'var(--ui-ink)', textDecoration: 'none', borderBottom: '2px solid var(--ui-accent)', paddingBottom: 20 }} to="/">Home</Link>
+              <Link style={{ fontSize: 13, fontWeight: 500, color: 'var(--ui-muted)', textDecoration: 'none' }} to="/#how-it-works">How it works</Link>
+              <Link style={{ fontSize: 13, fontWeight: 500, color: 'var(--ui-muted)', textDecoration: 'none' }} to="/#about">About</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-3">
-            <Link className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" to="/login">Log in</Link>
-            <Link className="rounded-md bg-[#1e40af] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800" to="/register">Register</Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link className="btn btn-ghost btn-sm" to="/login">Log in</Link>
+            <Link className="btn btn-primary btn-sm" to="/register">Register</Link>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="mx-auto max-w-[1200px] px-6 pt-24 pb-20">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center">
+        <section style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px 80px' }}>
+          <div style={{ display: 'grid', gap: 48, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center' }}>
             {/* Left Hero Content */}
-            <div className="max-w-xl">
-              <h1 className="text-5xl font-extrabold leading-[1.1] text-[#0f2447] md:text-6xl tracking-tight" style={{fontFamily: "'Source Serif 4', Georgia, serif"}}>
+            <div style={{ maxWidth: 560 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ui-soft)', color: 'var(--ui-primary)', borderRadius: 99, padding: '4px 12px', fontSize: 12, fontWeight: 700, marginBottom: 20, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="5"/></svg>
+                Skill-based career platform
+              </div>
+              <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 800, lineHeight: 1.1, color: 'var(--ui-ink)', margin: '0 0 20px', letterSpacing: '-0.02em' }}>
                 Bridge the gap between your skills and your career.
               </h1>
-              <p className="mt-6 text-lg text-slate-600">
+              <p style={{ fontSize: 17, color: 'var(--ui-muted)', lineHeight: 1.65, margin: 0 }}>
                 SkillSetu compares what you can do today with what your target role needs, then builds the path across.
               </p>
-              
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link className="rounded-lg bg-[#22488f] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3872]" to="/register">
+
+              <div style={{ marginTop: 32, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                <Link className="btn btn-primary btn-lg" to="/register">
                   Get started
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
-                <Link className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-[#22488f] transition hover:bg-slate-50" to="/student/dashboard">
+                <Link className="btn btn-ghost btn-lg" to="/student/dashboard">
                   Explore platform
                 </Link>
               </div>
 
-              <div className="mt-12 flex gap-10 border-t border-slate-200 pt-8">
-                <div>
-                  <p className="text-2xl font-bold text-[#0f2447]">120</p>
-                  <p className="text-sm text-slate-500">demo students</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#0f2447]">16</p>
-                  <p className="text-sm text-slate-500">demo candidates</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#0f2447]">8</p>
-                  <p className="text-sm text-slate-500">demo roles</p>
-                </div>
+              <div style={{ marginTop: 40, display: 'flex', gap: 32, borderTop: '1px solid var(--ui-border)', paddingTop: 28 }}>
+                {[['120', 'demo students'], ['16', 'demo candidates'], ['8', 'demo roles']].map(([n, l]) => (
+                  <div key={l}>
+                    <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--ui-ink)', margin: 0, letterSpacing: '-0.01em' }}>{n}</p>
+                    <p style={{ fontSize: 13, color: 'var(--ui-muted)', margin: '2px 0 0' }}>{l}</p>
+                  </div>
+                ))}
               </div>
-              <p className="mt-4 text-xs text-slate-500">Figures describe the mock data in this prototype, not real platform usage.</p>
+              <p style={{ marginTop: 12, fontSize: 12, color: 'var(--ui-muted)' }}>Figures describe the mock data in this prototype, not real platform usage.</p>
             </div>
 
-            {/* Right Mock Card */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl relative z-10">
-              <h3 className="text-base font-bold text-[#0f2447] font-serif">Illustration: skill gaps for a sample student</h3>
-              
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-md bg-[#22488f] px-3 py-1.5 text-sm text-white">Data Engineer example</span>
+            {/* Right – Skill gap preview card */}
+            <div className="card" style={{ borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.1)', padding: 28 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ui-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Skill gap preview</p>
+                <span className="badge badge-primary">Data Engineer</span>
               </div>
+              <p style={{ fontSize: 13, color: 'var(--ui-muted)', margin: '0 0 20px' }}>Sample student · not real data</p>
 
-              <div className="mt-6 space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {[
                   { name: 'SQL', have: 4, need: 5 },
                   { name: 'Python', have: 2, need: 4 },
@@ -124,68 +132,73 @@ function HomePage() {
                   { name: 'PostgreSQL', have: 3, need: 4 },
                   { name: 'AWS', have: 2, need: 4 },
                 ].map(skill => (
-                  <div key={skill.name} className="flex items-center text-sm font-medium">
-                    <span className="w-24 text-slate-700">{skill.name}</span>
-                    <div className="flex-1 flex gap-1 h-3 items-center">
+                  <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13, fontWeight: 500 }}>
+                    <span style={{ width: 80, color: 'var(--ui-ink)', flexShrink: 0 }}>{skill.name}</span>
+                    <div style={{ flex: 1, display: 'flex', gap: 3, height: 10, alignItems: 'center' }}>
                       {[1,2,3,4,5].map(i => {
-                        if (i <= skill.have) return <div key={i} className="h-full flex-1 bg-[#22488f]"></div>;
-                        if (i <= skill.need) return <div key={i} className="h-full flex-1 bg-amber-100" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #e2ac3f 2px, #e2ac3f 4px)' }}></div>;
-                        return <div key={i} className="h-full flex-1 bg-slate-100"></div>;
+                        if (i <= skill.have) return <div key={i} style={{ flex: 1, height: '100%', background: 'var(--ui-primary)', borderRadius: 2 }} />;
+                        if (i <= skill.need) return <div key={i} style={{ flex: 1, height: '100%', background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 2 }} />;
+                        return <div key={i} style={{ flex: 1, height: '100%', background: 'var(--ui-border)', borderRadius: 2 }} />;
                       })}
                     </div>
-                    <span className="w-10 text-right text-slate-500 text-xs ml-3">{skill.have} / {skill.need}</span>
+                    <span style={{ width: 36, textAlign: 'right', color: 'var(--ui-muted)', fontSize: 12 }}>{skill.have}/{skill.need}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-slate-600 border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-1.5"><div className="h-2 w-3 bg-[#22488f]"></div> Your level</div>
-                <div className="flex items-center gap-1.5"><div className="h-2 w-3 bg-amber-100" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #e2ac3f 2px, #e2ac3f 4px)' }}></div> Gap to close</div>
-                <div className="flex items-center gap-1.5"><div className="h-3 w-0.5 bg-slate-900"></div> Required level</div>
-                <div className="flex items-center gap-1.5"><div className="h-2 w-3 bg-[#17806d]"></div> Requirement met</div>
+              <div style={{ marginTop: 20, display: 'flex', flexWrap: 'wrap', gap: 12, borderTop: '1px solid var(--ui-border)', paddingTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--ui-muted)' }}>
+                  <div style={{ width: 12, height: 8, background: 'var(--ui-primary)', borderRadius: 2 }} /> Your level
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--ui-muted)' }}>
+                  <div style={{ width: 12, height: 8, background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 2 }} /> Gap to close
+                </div>
               </div>
-              <p className="mt-4 text-sm text-slate-600">
-                <strong>54% career match</strong> for Data Engineer. Sample data, not a real student.
+              <p style={{ marginTop: 12, fontSize: 13, color: 'var(--ui-muted)' }}>
+                <strong style={{ color: 'var(--ui-ink)' }}>54% career match</strong> — sample data only.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="bg-white py-24 relative z-10 border-t border-slate-200">
-          <div className="mx-auto max-w-[1000px] px-6">
-            <h2 className="text-center text-3xl font-bold text-[#0f2447] mb-12 font-serif">
-              Everything between where you are and where you want to be
-            </h2>
+        <section style={{ background: '#fff', borderTop: '1px solid var(--ui-border)', padding: '80px 24px' }}>
+          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ui-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Platform capabilities</p>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: 'var(--ui-ink)', margin: 0, letterSpacing: '-0.01em' }}>
+                Everything between where you are and where you want to be
+              </h2>
+            </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
               {[
-                { title: 'Skill radar', desc: 'See your current skills against a target role on one chart.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg> },
-                { title: 'Skill gap', desc: 'Know exactly which skills to close first, with clear priorities.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> },
-                { title: 'Learning roadmap', desc: 'A week-by-week path of courses, assessments and projects.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
-                { title: 'Study planner', desc: 'Set your weekly hours and see when you could be role-ready.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> },
-                { title: 'Evaluated evidence', desc: 'Turn self-declared skills into proof through quizzes and projects.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> },
-                { title: 'Skill-based matching', desc: 'Recruiters and placement cells see the same match score you do.', icon: <svg className="w-5 h-5 text-[#22488f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> }
+                { title: 'Skill radar', desc: 'See your current skills against a target role on one chart.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg> },
+                { title: 'Skill gap analysis', desc: 'Know exactly which skills to close first, with clear priorities.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> },
+                { title: 'Learning roadmap', desc: 'A week-by-week path of courses, assessments and projects.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
+                { title: 'Study planner', desc: 'Set your weekly hours and see when you could be role-ready.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> },
+                { title: 'Evaluated evidence', desc: 'Turn self-declared skills into proof through quizzes and projects.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> },
+                { title: 'Skill-based matching', desc: 'Recruiters and placement cells see the same match score you do.', icon: <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> },
               ].map((feature, i) => (
-                <div key={i} className="card hover:border-slate-300 transition-colors">
-                  <div className="h-10 w-10 bg-blue-50 text-[#22488f] rounded-lg flex items-center justify-center mb-4">
+                <div key={i} className="card card-hoverable" style={{ transition: 'box-shadow 0.2s, border-color 0.2s', cursor: 'default' }}>
+                  <div style={{ width: 40, height: 40, background: 'var(--ui-soft)', color: 'var(--ui-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                     {feature.icon}
                   </div>
-                  <h4 className="font-bold text-[#0f2447] text-lg font-sans">{feature.title}</h4>
-                  <p className="mt-2 text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
+                  <h4 style={{ fontWeight: 700, color: 'var(--ui-ink)', fontSize: 15, margin: '0 0 8px' }}>{feature.title}</h4>
+                  <p style={{ fontSize: 13, color: 'var(--ui-muted)', lineHeight: 1.6, margin: 0 }}>{feature.desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-32 max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-[#0f2447] mb-8 font-serif">Frequently asked questions</h2>
-              <div className="space-y-4">
+            <div style={{ marginTop: 80, maxWidth: 680, margin: '80px auto 0' }}>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ui-ink)', marginBottom: 24 }}>Frequently asked questions</h2>
+              <div>
                 {['Is the data in this prototype real?', 'How is the match percentage calculated?', 'How is skill evidence recorded?', 'Who can use SkillSetu?'].map((q, i) => (
-                  <details key={i} className="group border-b border-slate-200 pb-4">
-                    <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-[#0f2447] text-sm">
+                  <details key={i} style={{ borderBottom: '1px solid var(--ui-border)', padding: '16px 0' }}>
+                    <summary style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', listStyle: 'none', fontWeight: 700, fontSize: 14, color: 'var(--ui-ink)' }}>
                       {q}
-                      <span className="text-xl text-[#22488f] transition group-open:rotate-45">+</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                     </summary>
-                    <div className="mt-4 text-sm text-slate-600">This is a demo answer for the prototype.</div>
+                    <p style={{ marginTop: 12, fontSize: 14, color: 'var(--ui-muted)', lineHeight: 1.65 }}>This is a demo answer for the prototype.</p>
                   </details>
                 ))}
               </div>

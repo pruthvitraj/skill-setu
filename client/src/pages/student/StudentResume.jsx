@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { FileText, Inbox, Paperclip } from 'lucide-react';
 import { resumeApi } from '../../services/resumeApi';
 import { useFetch } from '../../hooks/useFetch';
 
@@ -64,9 +65,9 @@ function BulletList({ items, color }) {
 
 function ScoredByBadge({ scoredBy }) {
   const map = {
-    gemini: { label: '✨ Scored by Gemini AI',   bg: '#f0fdf4', color: '#15803d', border: '#86efac' },
-    openai: { label: '🤖 Scored by OpenAI',      bg: '#eff6ff', color: '#1d4ed8', border: '#93c5fd' },
-    rules:  { label: '📐 Rule-based Score',       bg: '#fefce8', color: '#92400e', border: '#fde68a' },
+    gemini: { label: 'Scored by Gemini AI',   bg: '#f0fdf4', color: '#15803d', border: '#86efac' },
+    openai: { label: 'Scored by OpenAI',      bg: '#eff6ff', color: '#1d4ed8', border: '#93c5fd' },
+    rules:  { label: 'Rule-based score',       bg: '#fefce8', color: '#92400e', border: '#fde68a' },
   };
   const s = map[scoredBy] || map.rules;
   return (
@@ -130,12 +131,10 @@ export default function StudentResume() {
 
   return (
     <div style={{ maxWidth: 1100, padding: '28px 24px 48px' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f2447', fontFamily: 'Georgia,serif', margin: '0 0 4px' }}>
-        📄 Resume &amp; ATS Score
-      </h1>
-      <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 24px' }}>
-        Upload a readable PDF for keyword and structure guidance. The result identifies its evaluator and limitations; it is not an employer ATS decision.
-      </p>
+      <header className="student-resume-header">
+        <div><p className="student-eyebrow">Student workspace · Opportunities</p><h1><FileText size={24} aria-hidden="true" /> Resume &amp; ATS guidance</h1></div>
+        <p>Upload a readable PDF for keyword and structure guidance. Results identify their evaluator and limitations; they are not employer ATS decisions.</p>
+      </header>
 
       {(msg || err) && (
         <div style={{ padding: '10px 16px', borderRadius: 10, marginBottom: 20, background: err ? '#fef2f2' : '#f0fdf4', color: err ? '#b91c1c' : '#15803d', border: `1px solid ${err ? '#fca5a5' : '#86efac'}`, fontSize: 13, fontWeight: 600 }}>
@@ -150,7 +149,7 @@ export default function StudentResume() {
         onMouseEnter={e => e.currentTarget.style.borderColor = '#3b82f6'}
         onMouseLeave={e => e.currentTarget.style.borderColor = '#bfdbfe'}
       >
-        <p style={{ fontSize: 36, margin: '0 0 8px' }}>📎</p>
+        <Paperclip size={34} aria-hidden="true" style={{ margin: '0 auto 8px', color: '#17665B' }} />
         <p style={{ fontSize: 15, fontWeight: 700, color: '#1d4ed8', margin: '0 0 4px' }}>
           {busy ? 'Analyzing resume…' : 'Click to upload your Resume'}
         </p>
@@ -160,7 +159,7 @@ export default function StudentResume() {
 
       {resumes.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 48, color: '#94a3b8', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 16 }}>
-          <p style={{ fontSize: 32, margin: '0 0 8px' }}>📭</p>
+          <Inbox size={32} aria-hidden="true" style={{ margin: '0 auto 8px', color: '#59635E' }} />
           <p style={{ fontWeight: 600, fontSize: 15 }}>No resumes uploaded yet.</p>
         </div>
       ) : (

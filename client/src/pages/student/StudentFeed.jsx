@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Send, Heart, HeartOff, User, Clock, Tag, Trash2, AlertCircle } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
 import { postApi } from '../../services/postApi';
 import { formatDate } from '../../utils/formatDate';
 
@@ -90,10 +91,12 @@ export default function StudentFeed() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="ui-page space-y-6">
+      <PageHeader title="Student community" description="Share progress, ask questions, and learn with the SkillSetu community." />
       {/* Create Post Form */}
       <div className="card p-4">
         <form onSubmit={handleCreatePost} className="space-y-3">
+          <label className="label" htmlFor="student-post-body">Share an update</label>
           <div className="flex gap-3">
             <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600 flex-shrink-0">
               <User size={20} />
@@ -101,7 +104,8 @@ export default function StudentFeed() {
             <div className="flex-1 space-y-2">
               <textarea
                 className="input resize-none min-h-[80px] max-h-[200px]"
-                placeholder="What's on your mind?"
+                id="student-post-body"
+                placeholder="Share a learning win, question, or placement update"
                 value={newPost.body}
                 onChange={(e) => setNewPost({ ...newPost, body: e.target.value })}
                 rows={3}
@@ -109,7 +113,8 @@ export default function StudentFeed() {
               <input
                 className="input"
                 type="text"
-                placeholder="Tags (comma separated)"
+                aria-label="Post tags"
+                placeholder="Tags, separated by commas"
                 value={newPost.tags}
                 onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
               />

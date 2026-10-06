@@ -65,7 +65,7 @@ export default function TpoDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="h-8 w-64 animate-pulse rounded bg-slate-200" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map((card) => <div key={card.key} className="card h-36 animate-pulse bg-slate-50" />)}</div>
         <div className="card h-80 animate-pulse bg-slate-50" />
@@ -74,7 +74,7 @@ export default function TpoDashboard() {
   }
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-4">
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#17806d]">TPO Workspace</p>
@@ -86,11 +86,25 @@ export default function TpoDashboard() {
 
       {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
+      <section className="card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-[#0f2447]">Today&apos;s coordination</h2>
+            <p className="mt-1 text-sm text-slate-500">Choose the placement task that needs attention first.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/tpo/placement-drives" className="btn btn-primary btn-sm">Review drives <ArrowRight size={15} /></Link>
+            <Link to="/tpo/students" className="btn btn-ghost btn-sm">Review students</Link>
+            <Link to="/tpo/announcements" className="btn btn-ghost btn-sm">Publish announcement</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => <StatCard key={card.key} card={card} value={dashboard?.[card.key]} />)}
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+      <section className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
         <div className="card min-h-[360px]">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -116,7 +130,7 @@ export default function TpoDashboard() {
           </div>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           <div className="card">
             <div className="flex items-start gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-amber-50 text-amber-700"><BriefcaseBusiness size={21} /></div>
@@ -128,14 +142,6 @@ export default function TpoDashboard() {
             </div>
           </div>
 
-          <div className="card">
-            <h2 className="text-lg font-bold text-[#0f2447]">Quick actions</h2>
-            <div className="mt-4 space-y-2">
-              <Link to="/tpo/students" className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"><span>Review students</span><ArrowRight size={16} /></Link>
-              <Link to="/tpo/companies" className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"><span>View companies</span><ArrowRight size={16} /></Link>
-              <Link to="/tpo/announcements" className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"><span>Publish announcement</span><ArrowRight size={16} /></Link>
-            </div>
-          </div>
         </div>
       </section>
     </div>
