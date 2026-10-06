@@ -1,5 +1,5 @@
 {
-  "database": "skillsetu_audit_1791228188742",
+  "database": "skillsetu_audit_1791231388332",
   "checks": [
     "migration twice preserves legacy values and never creates evidence",
     "orphan student receives stable card profile without invented institution",
@@ -20,7 +20,7 @@
     "roadmap provenance, completion and expired sessions",
     "logout invalidates database session"
   ],
-  "createdAt": "2026-10-05T19:23:18.950Z",
-  "studentId": "6ac3f91ebfae2ee21d931430",
-  "browserAssessmentId": "6ac3f91ebfae2ee21d931440"
+  "createdAt": "2026-10-05T20:16:33.844Z",
+  "studentId": "6ac4059d722e3b50a7d2c83e",
+  "browserAssessmentId": "6ac4059d722e3b50a7d2c84e"
 }
