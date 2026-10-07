@@ -3,7 +3,7 @@ const item = (path, label, aliases = []) => ({ path, label, aliases });
 export const workspaceNavigation = {
   student: [
     ['Overview', [item('/student/dashboard', 'Dashboard')]],
-    ['Learn', [item('/student/roadmap', 'Learning roadmap'), item('/student/courses', 'Courses'), item('/student/assessments', 'Practice & assessments'), item('/student/challenges', 'Company challenges')]],
+    ['Learn', [item('/student/roadmap', 'Learning roadmap'), item('/student/courses', 'Resources'), item('/student/assessments', 'Practice & assessments'), item('/student/challenges', 'Company challenges')]],
     ['Skills & evidence', [item('/student/skills', 'Profile skills'), item('/student/skill-tracker', 'Skill tracker'), item('/student/profile', 'Profile & Digital Card')]],
     ['Opportunities', [item('/student/marketplace', 'Jobs'), item('/student/applications', 'Applications'), item('/student/interviews', 'Interviews'), item('/student/resume', 'Resume / ATS guidance')]],
     ['Community', [item('/student/feed', 'Feed'), item('/student/network', 'Network'), item('/student/messages', 'Messages')]],

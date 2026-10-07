@@ -13,11 +13,9 @@ async function list({ skill, page, limit }) {
 
 async function recommended(userId) {
   const student = await studentService.getByUserId(userId);
-  const names = (student.skills || []).map((s) => s.name);
-  const missingHint = student.targetRole || names[0] || 'SQL';
-  return Course.find({
-    $or: [{ skill: new RegExp(missingHint.split(' ')[0], 'i') }, { skill: { $nin: names } }],
-  }).limit(12);
+  return Course.find(require('../../utils/learningRole')
+    .courseFilterForRole(student.targetRole))
+    .sort({ title: 1, _id: 1 }).limit(12);
 }
 
 module.exports = { list, recommended, parsePagination };

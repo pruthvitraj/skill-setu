@@ -1,3 +1,5 @@
+import AuthRoleSelect from '../components/common/AuthRoleSelect';
+import '../styles/auth-login.css';
 import WorkspaceShell from '../layouts/WorkspaceShell';
 import CompanyInterviews from '../pages/company/CompanyInterviews';
 import NotificationsPage from '../pages/common/NotificationsPage';
@@ -243,74 +245,29 @@ function LoginPage() {
   }
 
   const roles = [
-    { value: 'student', label: 'Student', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>, desc: 'Access courses, assessments, and job applications' },
-    { value: 'tpo', label: 'TPO (Training & Placement Officer)', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>, desc: 'Manage placements, drives, and student reports' },
-    { value: 'recruiter', label: 'Company', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>, desc: 'Post jobs, review applications, and hire talent' },
+    { value: 'student', label: 'Student' },
+    { value: 'tpo', label: 'TPO (Training & Placement Officer)' },
+    { value: 'recruiter', label: 'Company' },
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-12">
-      <div className="mx-auto max-w-md">
-        <Link className="text-2xl font-bold text-slate-950" to="/">SkillSetu</Link>
-        <div className="card mt-8">
-          <h1 className="text-2xl font-bold text-slate-950">Sign in to SkillSetu</h1>
-          <p className="mt-2 text-sm text-slate-500">Select your role and enter credentials to continue.</p>
-          
-          <div className="mt-6">
-            <label className="label block mb-3">Select your role</label>
-            <div className="grid gap-3" role="radiogroup" aria-label="Select role">
-              {roles.map((role) => (
-                <button
-                  key={role.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={form.role === role.value}
-                  onClick={() => setForm({ ...form, role: role.value })}
-                  className={`relative p-4 rounded-lg border-2 transition-all text-left ${
-                    form.role === role.value
-                      ? 'border-[#22488f] bg-[#eef2ff]'
-                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                      form.role === role.value ? 'bg-[#22488f] text-white' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {role.icon}
-                    </div>
-                    <div className="flex-1">
-                      <p className={`font-semibold ${form.role === role.value ? 'text-[#1d4ed8]' : 'text-slate-900'}`}>
-                        {role.label}
-                      </p>
-                      <p className="mt-1 text-sm text-slate-500">{role.desc}</p>
-                    </div>
-                    {form.role === role.value && (
-                      <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#22488f] flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <form className="mt-6 space-y-4" onSubmit={submit}>
-            <label className="block">
-              <span className="label">Email</span>
-              <input className="input" type="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
-            </label>
-            <label className="block">
-              <span className="label">Password</span>
-              <input className="input" type="password" required value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} />
-            </label>
-            {error && <p className="text-sm font-medium text-red-600">{error}</p>}
-            <button className="btn-primary w-full" type="submit" disabled={busy}>
-              {busy ? 'Signing in...' : 'Sign in'}
-            </button>
+    <main className="sm-learning skillsetu-auth">
+      <div className="auth-layout">
+        <aside className="auth-brand-panel" aria-label="About SkillSetu">
+          <Link className="auth-brand" to="/">SkillSetu</Link>
+          <div className="auth-brand-copy"><p className="auth-overline">Learn. Apply. Coordinate.</p><h2>Your next step, in one workspace.</h2><p>Learning resources and applications for students. Placement coordination for TPO teams. Hiring workflows for companies.</p></div>
+          <p className="auth-brand-note">Choose your workspace to continue.</p>
+        </aside>
+        <div className="auth-panel">
+          <header><h1>Sign in to SkillSetu</h1><p className="auth-muted">Select your role and enter your credentials.</p></header>
+          <form className="auth-form" onSubmit={submit} aria-busy={busy}>
+            <AuthRoleSelect options={roles} value={form.role} onChange={role => setForm({ ...form, role })} />
+            <label><span className="label">Email</span><input className="input" type="email" autoComplete="username" required value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} /></label>
+            <label><span className="label">Password</span><input className="input" type="password" autoComplete="current-password" required value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} /></label>
+            {error && <p className="auth-error" role="alert">{error}</p>}
+            <button className="btn-primary" type="submit" disabled={busy}>{busy ? 'Signing in...' : 'Sign in'}</button>
           </form>
-          <Link className="mt-4 block text-sm text-blue-700 underline" to="/forgot-password">Forgot password?</Link>
-          <p className="mt-5 text-center text-sm text-slate-500">New to SkillSetu? <Link className="font-semibold text-indigo-700" to="/register">Create an account</Link></p>
+          <div className="auth-links"><Link to="/forgot-password">Forgot password?</Link><p>New to SkillSetu? <Link to="/register">Create an account</Link></p></div>
         </div>
       </div>
     </main>

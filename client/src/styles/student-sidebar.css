@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+/* Navigation only: page tokens/content and other roles retain their current styling. */
+.workspace-shell[data-role='student'] :is(.workspace-sidebar, .workspace-mobile-bar) {
+  --student-nav-bg: #050505;
+  --student-nav-hover: #141414;
+  --student-nav-text: #F8FAFC;
+  --student-nav-muted: #A1A1AA;
+  --student-nav-border: rgba(255,255,255,.10);
+  --student-nav-active: #00FF66;
+  background: var(--student-nav-bg);
+  color: var(--student-nav-text);
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+}
+.workspace-shell[data-role='student'] .workspace-sidebar { border-right: 1px solid var(--student-nav-border); scrollbar-color: var(--student-nav-muted) var(--student-nav-bg); scrollbar-width: thin; }
+.workspace-shell[data-role='student'] .workspace-mobile-bar { border-bottom: 1px solid var(--student-nav-border); }
+.workspace-shell[data-role='student'] :is(.workspace-sidebar, .workspace-mobile-bar) .workspace-brand { color: var(--student-nav-text); }
+.workspace-shell[data-role='student'] :is(.workspace-sidebar, .workspace-mobile-bar) .workspace-brand span { color: var(--student-nav-muted); }
+.workspace-shell[data-role='student'] .workspace-nav-group h2 {
+  color: var(--student-nav-muted);
+  font-family: inherit;
+  font-weight: 500;
+}
+.workspace-shell[data-role='student'] .workspace-nav-group a {
+  position: relative;
+  color: var(--student-nav-text);
+  border-radius: 3px;
+  transition: background-color 180ms, color 180ms;
+}
+.workspace-shell[data-role='student'] .workspace-nav-group a:hover { background: var(--student-nav-hover); }
+.workspace-shell[data-role='student'] .workspace-nav-group a[aria-current='page'] {
+  color: var(--student-nav-active);
+  background: rgba(0,255,102,.08);
+}
+.workspace-shell[data-role='student'] .workspace-nav-group a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--student-nav-active);
+}
+.workspace-shell[data-role='student'] .workspace-nav-group a svg { color: currentColor; }
+.workspace-shell[data-role='student'] .workspace-account { border-color: var(--student-nav-border); }
+.workspace-shell[data-role='student'] .workspace-account p { color: var(--student-nav-muted); }
+.workspace-shell[data-role='student'] :is(.workspace-account button, .workspace-menu-button, .workspace-menu-close) {
+  color: var(--student-nav-text);
+  border-radius: 3px;
+  transition: background-color 180ms, color 180ms;
+}
+.workspace-shell[data-role='student'] :is(.workspace-menu-button, .workspace-menu-close) { border-color: var(--student-nav-border); }
+.workspace-shell[data-role='student'] :is(.workspace-account button, .workspace-menu-button, .workspace-menu-close):hover {
+  background: var(--student-nav-hover);
+  color: var(--student-nav-active);
+}
+.workspace-shell[data-role='student'] :is(.workspace-sidebar, .workspace-mobile-bar) :focus-visible {
+  outline: 2px solid var(--student-nav-active);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-shell[data-role='student'] :is(.workspace-nav-group a, .workspace-account button, .workspace-menu-button, .workspace-menu-close) { transition: none; }
+}

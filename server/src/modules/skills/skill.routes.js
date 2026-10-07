@@ -9,6 +9,7 @@ const validation = require('./skill.validation');
 
 const router = express.Router();
 router.use(authMiddleware);
+router.use('/practice-assignments', require('./practice.routes'));
 router.get('/', asyncHandler(controller.catalog));
 router.get('/assessments', asyncHandler(controller.list));
 router.get('/assessments/:id', requireRoles(ROLES.STUDENT), asyncHandler(controller.getOne));

@@ -87,7 +87,7 @@ async function dashboard(userId) {
       .sort({ scheduledAt: 1 })
       .limit(5),
     Job.find({ status: JOB_STATUS.PUBLISHED }).populate('company', 'name').limit(5).sort({ createdAt: -1 }),
-    Course.find(student.targetRole ? { skill: new RegExp(require('../../utils/text').escapeRegex(student.targetRole.split(' ')[0]), 'i') } : {}).limit(5),
+    Course.find(require('../../utils/learningRole').courseFilterForRole(student.targetRole)).sort({ title: 1, _id: 1 }).limit(5),
     Notification.find({ user: userId }).sort({ createdAt: -1 }).limit(6),
     Roadmap.findOne({ student: student._id, active: true }),
   ]);

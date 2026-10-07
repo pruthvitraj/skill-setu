@@ -1,0 +1,52 @@
+@import './shellmentor.css';
+
+/* Login opt-in only. Reuse the learning system's existing colors and font tokens. */
+.skillsetu-auth.sm-learning {
+  margin: 0; min-height: 100vh; min-height: 100dvh; padding: 32px;
+  display: grid; place-items: center; background: var(--sm-bg);
+}
+.skillsetu-auth .auth-layout { width: 100%; max-width: 1000px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,460px); gap: 64px; align-items: center; }
+.skillsetu-auth .auth-brand-panel { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 32px 0; }
+.skillsetu-auth .auth-brand { font: 800 26px/1.2 var(--sm-display); color: var(--sm-text); letter-spacing: -.03em; width: fit-content; }
+.skillsetu-auth .auth-brand-copy { max-width: 370px; }
+.skillsetu-auth .auth-brand-copy h2 { font-size: clamp(26px,3vw,34px); line-height: 1.2; margin: 16px 0; }
+.skillsetu-auth .auth-brand-copy > p:last-child, .skillsetu-auth .auth-brand-note { color: var(--sm-muted); line-height: 1.7; font-size: 14px; }
+.skillsetu-auth .auth-overline { color: var(--sm-green); font: 500 11px/1.7 var(--sm-mono); text-transform: uppercase; letter-spacing: .16em; }
+.skillsetu-auth .auth-panel { min-width: 0; padding: 32px; background: var(--sm-surface); border: 1px solid var(--sm-border); border-radius: var(--sm-radius); }
+.skillsetu-auth .auth-panel h1 { font: 800 26px/1.25 var(--sm-display); letter-spacing: -.025em; color: var(--sm-text); }
+.skillsetu-auth .auth-muted { font-size: 14px; color: var(--sm-muted); margin-top: 8px; }
+.skillsetu-auth :is(.auth-label,.label) { font: 500 12px/1.6 var(--sm-mono); color: var(--sm-text); }
+.skillsetu-auth .auth-form { display: grid; gap: 16px; margin-top: 24px; }
+.skillsetu-auth .input { background: var(--sm-bg); border-color: var(--sm-border); color: var(--sm-text); font-family: var(--sm-body); }
+.skillsetu-auth .input:focus { border-color: var(--sm-green); }
+.skillsetu-auth .input:-webkit-autofill { -webkit-text-fill-color: var(--sm-text); box-shadow: 0 0 0 1000px var(--sm-bg) inset; caret-color: var(--sm-text); }
+.skillsetu-auth .btn-primary { width: 100%; min-height: 44px; background: var(--sm-green); color: #000; border-color: var(--sm-green); box-shadow: none; }
+.skillsetu-auth .btn-primary:hover:not(:disabled) { background: #00DB58; transform: none; }
+.skillsetu-auth .auth-error { color: #FF8585; font-size: 14px; }
+.skillsetu-auth .auth-links { margin-top: 20px; display: grid; gap: 12px; font-size: 13px; color: var(--sm-muted); }
+.skillsetu-auth .auth-links a { color: var(--sm-text); text-decoration: underline; text-underline-offset: 4px; }
+.skillsetu-auth .auth-links a:hover { color: var(--sm-green); }
+.skillsetu-auth :is(a,button,input,select):focus-visible { outline: 2px solid var(--sm-green); outline-offset: 3px; }
+@media(max-width: 800px) {
+  .skillsetu-auth.sm-learning { padding: 24px 20px; }
+  .skillsetu-auth .auth-layout { max-width: 460px; grid-template-columns: minmax(0,1fr); gap: 24px; }
+  .skillsetu-auth .auth-brand-panel { padding: 0; }
+  .skillsetu-auth .auth-brand-copy, .skillsetu-auth .auth-brand-note { display: none; }
+  .skillsetu-auth .auth-panel { padding: 24px; }
+}
+@media(max-width: 380px) { .skillsetu-auth .auth-panel { padding: 20px; } }
+@media(prefers-reduced-motion: reduce) { .skillsetu-auth :is(button,input,select,a) { transition: none; } }
+
+.skillsetu-auth .auth-role-dropdown { position: relative; min-width: 0; }
+.skillsetu-auth .auth-role-trigger { display: flex; align-items: center; gap: 10px; text-align: left; background: #0C0C0C; border: 1px solid rgba(255,255,255,.10); border-radius: 3px; color: #F8FAFC; cursor: pointer; }
+.skillsetu-auth .auth-role-trigger > span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.skillsetu-auth .auth-role-trigger > svg { flex-shrink: 0; color: var(--sm-muted); }
+.skillsetu-auth .auth-role-trigger[aria-expanded='true'] { border-color: var(--sm-green); }
+.skillsetu-auth .auth-role-trigger[aria-expanded='true'] .auth-role-chevron { transform: rotate(180deg); }
+.skillsetu-auth .auth-role-menu { position: absolute; top: calc(100% + 4px); inset-inline: 0; z-index: 30; margin: 0; list-style: none; padding: 4px; background: #0C0C0C; border: 1px solid rgba(255,255,255,.10); border-radius: 3px; color: #F8FAFC; }
+.skillsetu-auth .auth-role-option { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 12px; cursor: pointer; border-radius: 3px; font: 14px/1.5 var(--sm-body); }
+.skillsetu-auth .auth-role-option > span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.skillsetu-auth .auth-role-option > svg { flex-shrink: 0; color: var(--sm-muted); }
+.skillsetu-auth .auth-role-option:hover, .skillsetu-auth .auth-role-option[data-active='true'] { background: rgba(0,255,102,.08); color: var(--sm-green); }
+.skillsetu-auth .auth-role-option[data-active='true'] { outline: 1px solid rgba(0,255,102,.35); outline-offset: -1px; }
+.skillsetu-auth .auth-role-option[aria-selected='true'] > svg, .skillsetu-auth .auth-role-option .auth-role-selected { color: var(--sm-green); }

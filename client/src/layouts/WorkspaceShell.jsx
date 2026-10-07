@@ -12,6 +12,7 @@ import {
   // Company icons
   PenSquare, UsersRound,
 } from 'lucide-react';
+import '../styles/student-sidebar.css';
 import { useAuth } from '../context/AuthContext';
 import { workspaceNavigation, isWorkspaceItemActive } from './workspaceNavigation';
 
